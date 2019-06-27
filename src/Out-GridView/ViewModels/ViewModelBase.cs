@@ -13,10 +13,7 @@ namespace OutGridView.ViewModels
         public ViewModelBase()
         {
             Activator = new ViewModelActivator();
-            this.WhenActivated((CompositeDisposable disposables) =>
-                    {
-                        System.Console.WriteLine("View Model Base Actiavted");
-                    });
+            this.WhenActivated((CompositeDisposable disposables) => { });
         }
     }
 }

@@ -1,0 +1,37 @@
+<UserControl xmlns="https://github.com/avaloniaui" 
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450" x:Class="OutGridView.Views.FilterQueryBuilderView">
+  <StackPanel Background="#AA000000">
+    <StackPanel Orientation="Horizontal">
+      <ItemsControl Items="{Binding FiltersByPropertyInfoView}">
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <StackPanel Orientation="Horizontal" Background="#10BFE2" />
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+          <DataTemplate>
+            <StackPanel>
+              <TextBlock Text="{Binding Key.Name}"/>
+              <ItemsControl Items="{Binding Items}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate>
+                    <StackPanel Orientation="Horizontal" Background="#DE7B25">
+                      <ComboBox Items="{Binding Operators}" SelectedItem="{Binding Operator}"/>
+                      <TextBox Text="{Binding Value}"/>
+                      <Button Command="{Binding $parent[UserControl].DataContext.RemoveFilterCommand}" CommandParameter="{Binding .}">Remove</Button>
+                    </StackPanel>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+              <Button Command="{Binding $parent[UserControl].DataContext.AddFilterCommand}" CommandParameter="{Binding Key}"> Add Filter </Button>
+            </StackPanel>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+      <ComboBox Items="{Binding VisiblePropertyOptions}" Name="AddFilterComboxBox" SelectedItem="{Binding SelectedAddColumn}" />
+      <Button Command="{Binding ClearFiltersCommand}" Content="Clear Filters"/>
+    </StackPanel>
+  </StackPanel>
+</UserControl>

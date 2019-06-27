@@ -1,6 +1,6 @@
 namespace OutGridView.Models
 {
-    public enum CriteriaFilterType
+    public enum FilterOperator
     {
         Contains,
         Equals

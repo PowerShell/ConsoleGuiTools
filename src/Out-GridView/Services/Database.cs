@@ -9,7 +9,7 @@ namespace OutGridView.Services
     {
         private IEnumerable<PSObject> GetItems()
         {
-            var items = new[] {
+            var items = new List<DummyObject> {
                 new DummyObject { V1 = "Walk the cat" },
                 new DummyObject { V1 = "Buy some milk" },
                 new DummyObject { V1 = "Learn Avalonia", V2 = "Part2" },
@@ -17,12 +17,16 @@ namespace OutGridView.Services
                 new DummyObject { V1 = "Test Avalonia", V2 = "Part2" }
             };
 
-            return items.Select(PSObject.AsPSObject);
+            var psItems = items.Select(PSObject.AsPSObject);
+
+            return psItems;
         }
 
         public DataSource GetDataSource()
         {
-            return new DataSource(GetItems());
+            var items = GetItems();
+
+            return new DataSource(items);
         }
     };
 }

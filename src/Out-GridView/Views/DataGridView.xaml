@@ -1,0 +1,10 @@
+<UserControl xmlns="https://github.com/avaloniaui" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450" x:Class="OutGridView.Views.DataGridView">
+    <StackPanel>
+        <DataGrid Name="DataGridTable" Items="{Binding ViewObjects}" CanUserReorderColumns="True" CanUserSortColumns="True" SelectionMode="1" />
+        <Button Command="{Binding OpenColumn}" Content="Column / Debug buutton"/>
+    </StackPanel>
+</UserControl> 
+ 

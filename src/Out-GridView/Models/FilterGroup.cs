@@ -1,0 +1,22 @@
+using System;
+using System.Collections.Generic;
+using System.Reactive;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using System.Reflection;
+using DynamicData.Binding;
+using ReactiveUI;
+
+namespace OutGridView.Models
+{
+    public class FilterGroup : ReactiveObject
+    {
+        public FilterGroup(PropertyInfo key, IEnumerable<Filter> items)
+        {
+            this.Key = key;
+            this.Items = items;
+        }
+        public IEnumerable<Filter> Items { get; }
+        public PropertyInfo Key { get; }
+    }
+}

@@ -5,28 +5,31 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using OutGridView.Models;
-using OutGridView.Services.CriteriaFilters;
-
-
+using OutGridView.Services.FilterOperators;
+using System.Collections.ObjectModel;
+using DynamicData;
 
 namespace OutGridView.Services
 {
     static class FilterBuilder
     {
-        public static Func<PSObject, bool> BuildFilter(string searchText, IEnumerable<PropertyInfo> properties, IEnumerable<CriteriaFilter> criteriaFilters)
+        public static Func<PSObject, bool> BuildFilter(string searchText, IEnumerable<PropertyInfo> properties, IObservableList<FilterGroup> filters)
         {
-            var criteriaFilter = BuildCriteriaFilter(criteriaFilters);
+            var filterQuery = BuildFilterQuery(filters);
             var quickSearchFilter = BuildQuickSearchFilter(searchText, properties);
-            return PSObject => criteriaFilter(PSObject) && quickSearchFilter(PSObject);
+            return PSObject => filterQuery(PSObject) && quickSearchFilter(PSObject);
         }
-        public static Func<PSObject, bool> BuildCriteriaFilter(IEnumerable<CriteriaFilter> criteriaFilters)
+        public static Func<PSObject, bool> BuildFilterQuery(IObservableList<FilterGroup> filterGroups)
         {
 
-            return PSObject => criteriaFilters.All(f =>
+            return PSObject => filterGroups.Items.All(filterGroup =>
             {
-                var rule = CriteriaFilterLookup.CreateCriteriaFilterRule(f);
-                var value = f.Property.GetValue(PSObject.BaseObject, null);
-                return value != null && rule.Execute(value.ToString());
+                return filterGroup.Items.Any(f =>
+                {
+                    var rule = FilterOperatorLookup.CreateFilterOperatorRule(f);
+                    var value = f.Property.GetValue(PSObject.BaseObject, null);
+                    return rule.Execute(value == null ? String.Empty : value.ToString());
+                });
             });
         }
 
@@ -61,13 +64,13 @@ namespace OutGridView.Services
             {
                 string token;
 
-                if (m.Groups.ElementAt(1).Value != String.Empty)
+                if (m.Groups[1].Value != String.Empty)
                 {
-                    token = m.Groups.ElementAt(1).Value;
+                    token = m.Groups[1].Value;
                 }
-                else if (m.Groups.ElementAt(2).Value != String.Empty)
+                else if (m.Groups[2].Value != String.Empty)
                 {
-                    token = m.Groups.ElementAt(2).Value;
+                    token = m.Groups[2].Value;
                 }
                 else
                 {
