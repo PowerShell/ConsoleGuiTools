@@ -17,8 +17,6 @@ namespace OutGridView
             var name = data.GetType().FullName.Replace("ViewModel", "View");
             var type = Type.GetType(name);
 
-            System.Console.WriteLine(name);
-
             if (type != null)
             {
                 return (Control)Activator.CreateInstance(type);

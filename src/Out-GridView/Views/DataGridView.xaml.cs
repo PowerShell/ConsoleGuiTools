@@ -5,7 +5,6 @@ using OutGridView.ViewModels;
 using System.Reactive.Disposables;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using System.Collections;
 using System.Management.Automation;
 using System.Linq;
 using DynamicData;
@@ -30,11 +29,14 @@ namespace OutGridView.Views
                     DataGridTable.WhenAnyValue(x => x.SelectedItems, x => x.Cast<PSObject>().ToList())
                        .ToPropertyEx(ViewModel, x => x.SelectedObjects);
 
-                    ViewModel.ActiveColumns.Connect()
+                    ViewModel.Columns.Connect()
+                        .AutoRefresh()
+                        .Filter(x => x.IsVisible)
                         .Transform(x => new DataGridTextColumn()
                         {
-                            Binding = new Binding("BaseObject." + x),
-                            Header = x,
+                            Binding = new Binding("BaseObject." + x.Property.Name),
+                            SortMemberPath = "BaseObject." + x.Property.Name,
+                            Header = x.Property.Name,
                             CanUserReorder = true,
                             CanUserSort = true,
                         })
@@ -45,7 +47,9 @@ namespace OutGridView.Views
                             DataGridTable.Columns.AddRange(columns);
                         });
 
+
                 });
+
             AvaloniaXamlLoader.Load(this);
         }
     }

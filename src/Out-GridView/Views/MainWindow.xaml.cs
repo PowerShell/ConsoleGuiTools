@@ -17,11 +17,8 @@ namespace OutGridView.Views
 
         private void InitializeComponent()
         {
-            System.Console.WriteLine("Main window rendered");
-
             this.WhenActivated((CompositeDisposable disposables) =>
                 {
-                    System.Console.WriteLine("Main window activated");
                 });
             AvaloniaXamlLoader.Load(this);
         }

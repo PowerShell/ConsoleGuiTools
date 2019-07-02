@@ -42,9 +42,7 @@ namespace OutGridView.ViewModels
                     .Filter(filterPredicate)
                     .AsObservableList();
 
-                var stringProperties = properties.Items.Select(x => x.Name);
-
-                DataGridView = new DataGridViewModel(filteredObjects, stringProperties);
+                DataGridView = new DataGridViewModel(filteredObjects, properties.Items);
 
             });
         }

@@ -15,7 +15,10 @@ using Avalonia;
 using OutGridView.Views;
 using DynamicData.ReactiveUI;
 using System.Reactive.Linq;
-
+using System.Reflection;
+using System.Linq;
+using System.Reactive;
+using System.Threading.Tasks;
 
 namespace OutGridView.ViewModels
 {
@@ -23,25 +26,31 @@ namespace OutGridView.ViewModels
     {
         private ReadOnlyObservableCollection<PSObject> _viewObjects;
         public ReadOnlyObservableCollection<PSObject> ViewObjects => _viewObjects;
-        public SourceList<string> ActiveColumns { get; } = new SourceList<string>();
+        public SourceList<Column> Columns { get; } = new SourceList<Column>();
+        private ReadOnlyObservableCollection<Column> _columnSelect;
+        public ReadOnlyObservableCollection<Column> ColumnSelect => _columnSelect;
         public IList<PSObject> SelectedObjects { [ObservableAsProperty]get; }
 
-        public DataGridViewModel(IObservableList<PSObject> objects, IEnumerable<string> properties)
+        public DataGridViewModel(IObservableList<PSObject> objects, IEnumerable<PropertyInfo> properties)
         {
-            ActiveColumns.AddRange(properties);
+            Columns.AddRange(properties.Select(x => new Column(x)));
 
             this.WhenActivated((CompositeDisposable disposables) =>
             {
+                Columns.Connect()
+                    .AutoRefresh()
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Bind(out _columnSelect)
+                    .Subscribe();
+
+
+
                 objects.Connect()
                     .Bind(out _viewObjects)
-                    .Subscribe();
+                    .Subscribe(Console.Write);
             });
         }
 
-        public void OpenColumn()
-        {
-            var dialog = new ColumnSelectDialog(ActiveColumns);
-            dialog.ShowDialog(Application.Current.MainWindow);
-        }
+
     }
 }

@@ -3,8 +3,21 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450" x:Class="OutGridView.Views.DataGridView">
     <StackPanel>
+        <Expander Grid.Column="0" Grid.Row="0" Header="Columns">
+            <ItemsControl Items="{Binding ColumnSelect}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <CheckBox Margin="4" IsChecked="{Binding IsVisible}" Content="{Binding PropertyName}"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Expander>
         <DataGrid Name="DataGridTable" Items="{Binding ViewObjects}" CanUserReorderColumns="True" CanUserSortColumns="True" SelectionMode="1" />
-        <Button Command="{Binding OpenColumn}" Content="Column / Debug buutton"/>
     </StackPanel>
 </UserControl> 
  

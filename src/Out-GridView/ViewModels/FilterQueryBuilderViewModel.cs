@@ -11,6 +11,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Collections.ObjectModel;
 using ReactiveUI.Fody.Helpers;
+using DynamicData.Binding;
 
 namespace OutGridView.ViewModels
 {
@@ -27,6 +28,8 @@ namespace OutGridView.ViewModels
         public ReactiveCommand<PropertyInfo, Unit> AddFilterCommand { get; }
         public ReactiveCommand<Filter, Unit> RemoveFilterCommand { get; }
         public ReactiveCommand<Unit, Unit> ClearFiltersCommand { get; }
+        public int ColumnCount { [ObservableAsProperty] get; }
+        public Boolean IsColumnSelectVisible { [ObservableAsProperty] get; }
 
         public FilterQueryBuilderViewModel(IObservableList<PropertyInfo> propertyOptions)
         {
@@ -41,8 +44,7 @@ namespace OutGridView.ViewModels
             {
                 var filterGroups = Filters.Connect()
                     .GroupWithImmutableState(x => x.Property)
-                    .Transform(grouping => new FilterGroup(grouping.Key, grouping.Items))
-                    .ObserveOn(RxApp.MainThreadScheduler);
+                    .Transform(grouping => new FilterGroup(grouping.Key, grouping.Items));
 
                 FiltersByPropertyInfo = Filters.Connect()
                     .AutoRefresh()
@@ -52,14 +54,20 @@ namespace OutGridView.ViewModels
                     .AsObservableList();
 
                 filterGroups
+                    .ObserveOn(RxApp.MainThreadScheduler)
                     .Bind(out _filtersByPropertyInfoView)
                     .Subscribe();
 
-                var activeProperties = filterGroups
-                    .Transform(x => x.Key);
+                var activeProperties = Filters.Connect()
+                    .Transform(x => x.Property)
+                    .DistinctValues(x => x)
+                    .ObserveOn(RxApp.MainThreadScheduler);
+
 
                 PropertyOptions.Connect()
+                    .ObserveOn(RxApp.MainThreadScheduler)
                     .Except(activeProperties)
+                    .Sort(SortExpressionComparer<PropertyInfo>.Ascending(x => x.Name))
                     .Bind(out _visiblePropertyOptions)
                     .Subscribe();
             });

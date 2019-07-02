@@ -23,6 +23,7 @@ namespace OutGridView.Views
                 this.BindCommand(ViewModel, x => x.ClearFiltersCommand, x => x.ClearFiltersButton);
 
                 this.BindCommand(ViewModel, x => x.AddFilterCommand, x => x.AddFilterComboBox, x => x.SelectedAddColumn, nameof(AddFilterComboBox.SelectionChanged));
+
             });
 
             AvaloniaXamlLoader.Load(this);
