@@ -1,8 +1,9 @@
 namespace OutGridView.Services.FilterOperators
 {
-    public interface IFilterOperatorLookup
+    public interface IFilterOperator
     {
-        string Value { get; set; }
+        bool HasValue { get; }
+        object Value { get; set; }
         bool Execute(string input);
     }
 }

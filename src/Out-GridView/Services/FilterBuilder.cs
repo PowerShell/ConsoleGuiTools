@@ -13,43 +13,47 @@ namespace OutGridView.Services
 {
     static class FilterBuilder
     {
-        public static Func<PSObject, bool> BuildFilter(string searchText, IEnumerable<PropertyInfo> properties, IObservableList<FilterGroup> filters)
+        public static Func<DataTableRow, bool> BuildFilter(string searchText, IObservableList<FilterGroup> filters)
         {
             var filterQuery = BuildFilterQuery(filters);
-            var quickSearchFilter = BuildQuickSearchFilter(searchText, properties);
-            return PSObject => filterQuery(PSObject) && quickSearchFilter(PSObject);
+            var quickSearchFilter = BuildQuickSearchFilter(searchText);
+            return dataList => filterQuery(dataList) && quickSearchFilter(dataList);
         }
-        public static Func<PSObject, bool> BuildFilterQuery(IObservableList<FilterGroup> filterGroups)
+        public static Func<DataTableRow, bool> BuildFilterQuery(IObservableList<FilterGroup> filterGroups)
         {
 
-            return PSObject => filterGroups.Items.All(filterGroup =>
+            return dataList => filterGroups.Items.All(filterGroup =>
             {
                 return filterGroup.Items.Any(f =>
                 {
-                    var rule = FilterOperatorLookup.CreateFilterOperatorRule(f);
-                    var value = f.Property.GetValue(PSObject.BaseObject, null);
+                    //Empty filter is always valid (if it requires a value)
+                    if (f.SelectedFilterOperator.HasValue && String.IsNullOrEmpty(f.Value))
+                    {
+                        return true;
+                    }
+                    var rule = f.SelectedFilterOperator;
+                    var value = dataList.Data[f.DataColumn.Index];
                     return rule.Execute(value == null ? String.Empty : value.ToString());
                 });
             });
         }
 
-        public static Func<PSObject, bool> BuildQuickSearchFilter(string searchText, IEnumerable<PropertyInfo> properties)
+        public static Func<DataTableRow, bool> BuildQuickSearchFilter(string searchText)
         {
             List<string> tokens = ParseSearchText(searchText.ToLowerInvariant());
 
             if (string.IsNullOrEmpty(searchText))
             {
-                return PSObject => true;
+                return dataList => true;
             }
 
             //For all terms at least-one property matches
-            return PSObject => tokens.All(t =>
+            return dataList => tokens.All(t =>
             {
-                return properties.Any(p =>
-                          {
-                              var value = p.GetValue(PSObject.BaseObject, null);
-                              return value != null && value.ToString().ToLowerInvariant().Contains(t);
-                          });
+                return dataList.Data.Any(data =>
+                    {
+                        return data != null && data.ToString().ToLowerInvariant().Contains(t);
+                    });
             });
         }
 

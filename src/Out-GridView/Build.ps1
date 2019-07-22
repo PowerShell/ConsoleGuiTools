@@ -1,4 +1,4 @@
 
 dotnet publish
-Import-Module 
-Out-GridViewNew 
+Import-Module .\bin\Debug\netcoreapp2.1\publish\OutGridView.dll
+Get-Process | Test-GridViewCross 

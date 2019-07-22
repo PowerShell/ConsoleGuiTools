@@ -5,14 +5,26 @@ namespace OutGridView.Services.FilterOperators
 {
     public static class FilterOperatorLookup
     {
-        public static IFilterOperatorLookup CreateFilterOperatorRule(Filter filter)
+        public static IFilterOperator CreateFilterOperatorRule(StringFilterOperator filterOp, string value)
         {
-            switch (filter.Operator)
+            switch (filterOp)
             {
-                case FilterOperator.Contains:
-                    return new ContainsOperator { Value = filter.Value };
-                case FilterOperator.Equals:
-                    return new EqualsOperator { Value = filter.Value };
+                case StringFilterOperator.Contains:
+                    return new ContainsOperator { Value = value };
+                case StringFilterOperator.Equals:
+                    return new EqualsOperator { Value = value };
+                case StringFilterOperator.NotContains:
+                    return new NotContainsOperator { Value = value };
+                case StringFilterOperator.StartsWith:
+                    return new StartsWithOperator { Value = value };
+                case StringFilterOperator.EndwsWith:
+                    return new EndsWithOperator { Value = value };
+                case StringFilterOperator.NotEquals:
+                    return new NotEqualsOperator { Value = value };
+                case StringFilterOperator.NotIsEmpty:
+                    return new NotIsEmptyOperator { Value = value };
+                case StringFilterOperator.IsEmpty:
+                    return new IsEmptyOperator();
                 default:
                     throw new Exception("Invalid Rule");
             }

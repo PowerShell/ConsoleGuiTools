@@ -1,7 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <AssemblyName>OutGridView</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="Models\" />
@@ -12,7 +13,6 @@
       <SubType>Designer</SubType>
     </AvaloniaResource>
     <AvaloniaResource Include="Assets\*" />
-
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="0.8.0" />
@@ -21,7 +21,10 @@
     <PackageReference Include="Avalonia.ReactiveUI" Version="0.8.0" />
     <PackageReference Include="DynamicData.ReactiveUI" Version="6.10.0.2604" />
     <PackageReference Include="ReactiveUI.Fody" Version="9.16.6" />
-    <PackageReference Include="System.Management.Automation" Version="6.2.1" />
+    <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" Version="2.1.0" />
+    <PackageReference Include="Microsoft.PowerShell.SDK" Version="6.2.1">
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <Watch Include="**\*.xaml" />

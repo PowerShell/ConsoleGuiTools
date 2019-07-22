@@ -9,12 +9,11 @@ namespace OutGridView.Models
 {
     public class Column : ReactiveObject
     {
-        public PropertyInfo Property { get; set; }
-        public string PropertyName => Property.Name;
+        public DataTableColumn DataColumn { get; set; }
         [Reactive] public Boolean IsVisible { get; set; }
-        public Column(PropertyInfo _propertyInfo)
+        public Column(DataTableColumn dataColumn)
         {
-            Property = _propertyInfo;
+            DataColumn = dataColumn;
             IsVisible = true;
         }
     }

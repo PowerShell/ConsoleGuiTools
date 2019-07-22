@@ -2,31 +2,39 @@ using System.Collections.Generic;
 using System.Management.Automation;
 using OutGridView.Models;
 using System.Linq;
+using Microsoft.PowerShell.Commands.Internal.Format;
 
 namespace OutGridView.Services
 {
     public class Database
     {
-        private IEnumerable<PSObject> GetItems()
+
+        private List<PSObject> _objects { get; set; } = new List<PSObject>();
+
+        public Database() { }
+        public Database(List<PSObject> objects)
         {
-            var items = new List<DummyObject> {
-                new DummyObject { V1 = "Walk the cat", V2="232", V3="df3" },
-                new DummyObject { V1 = "Buy some milk", V2="232", V3="df3" },
-                new DummyObject { V1 = "Learn Avalonia", V2 = "Part2", V3="df3"  },
-                new DummyObject { V1 = "LearnAvalonia", V2 = "Part2", V3="df3"  },
-                new DummyObject { V1 = "Test Avalonia", V2 = "Part2", V3="df3"  }
-            };
-
-            var psItems = items.Select(PSObject.AsPSObject);
-
-            return psItems;
+            _objects = objects;
         }
 
-        public DataSource GetDataSource()
+        private List<PSObject> GetItems()
+        {
+            _objects = PowerShell.Create().AddCommand("Get-Process").Invoke<PSObject>().Take(100).ToList();
+
+            return _objects;
+        }
+
+        public DataTable GetDataTable()
         {
             var items = GetItems();
 
-            return new DataSource(items);
+            var TG = new TypeGetter(PowerShell.Create());
+
+            FormatViewDefinition fvd = TG.GetFormatViewDefinitonForObject(items.First());
+
+            var dataTable = TypeGetter.CastObjectsToTableView(items, fvd);
+
+            return dataTable;
         }
     };
 }

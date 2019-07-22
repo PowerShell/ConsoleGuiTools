@@ -1,39 +1,51 @@
 <UserControl xmlns="https://github.com/avaloniaui" 
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450" x:Class="OutGridView.Views.FilterQueryBuilderView">
-  <DockPanel>
-    <TextBlock DockPanel.Dock="Top" Text="Filters" />
-    <ItemsControl Items="{Binding FiltersByPropertyInfoView}" DockPanel.Dock="Left">
-      <ItemsControl.ItemsPanel>
-        <ItemsPanelTemplate>
-          <StackPanel Orientation="Horizontal" />
-        </ItemsPanelTemplate>
-      </ItemsControl.ItemsPanel>
-      <ItemsControl.ItemTemplate>
-        <DataTemplate>
-          <DockPanel>
-            <TextBlock Text="{Binding Key.Name}" DockPanel.Dock="Top" Height="30" />
-            <Button Command="{Binding $parent[UserControl].DataContext.AddFilterCommand}" CommandParameter="{Binding Key}" DockPanel.Dock="Bottom"> Add Filter </Button>
-            <ItemsControl Items="{Binding Items}">
-              <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                  <StackPanel Orientation="Horizontal" Background="#DE7B25">
-                    <ComboBox Items="{Binding Operators}" SelectedItem="{Binding Operator}" MinWidth="75"/>
-                    <TextBox Text="{Binding Value}" MinWidth="100"/>
-                    <Button Command="{Binding $parent[UserControl].DataContext.RemoveFilterCommand}" CommandParameter="{Binding .}">Remove</Button>
-                  </StackPanel>
-                </DataTemplate>
-              </ItemsControl.ItemTemplate>
-            </ItemsControl>
-          </DockPanel>
-        </DataTemplate>
-      </ItemsControl.ItemTemplate>
-    </ItemsControl>
-    <DockPanel>
-      <Button Command="{Binding ClearFiltersCommand}" Content="Clear Filters" DockPanel.Dock="Right"/>
-      <Button Content="Show Code" DockPanel.Dock="Right"/>
-      <ComboBox Items="{Binding VisiblePropertyOptions}" Name="AddFilterComboxBox" MaxWidth="200" SelectedItem="{Binding SelectedAddColumn}" MemberSelector="Name" Height="30" DockPanel.Dock="Left"/>
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d" x:Class="OutGridView.Views.FilterQueryBuilderView">
+  <Grid RowDefinitions="auto,auto" ColumnDefinitions="auto,*">
+    <TextBlock Classes="h1" Grid.Row="0" Grid.Column="0" Text="Filters"/>
+    <StackPanel Orientation="Horizontal" Grid.Row="1">
+      <ItemsControl Items="{Binding FiltersByDataColumnView}" DockPanel.Dock="Left" Grid.Column="0">
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <StackPanel Orientation="Horizontal" />
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+          <DataTemplate>
+            <DockPanel>
+              <Border DockPanel.Dock="Top" Background="{DynamicResource ThemeControlMidBrush}" Height="25">
+                <TextBlock Text="{Binding Key.Label}" />
+              </Border>
+              <Button Command="{Binding $parent[UserControl].DataContext.AddFilterCommand}" CommandParameter="{Binding Key}" DockPanel.Dock="Bottom"> Add Filter </Button>
+              <ItemsControl Items="{Binding Items}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate>
+                    <StackPanel Orientation="Horizontal" Background="#DE7B25">
+                      <ComboBox Items="{Binding Operators}" SelectedItem="{Binding SelectedOperator}" MinWidth="75">
+                        <ComboBox.ItemTemplate>
+                          <DataTemplate>
+                            <TextBlock Text="{Binding ., Converter={StaticResource EnumDescriptionConverter}}" />
+                          </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                      </ComboBox>
+                      <TextBox Text="{Binding Value}" IsEnabled="{Binding SelectedFilterOperator.HasValue}" MinWidth="100"/>
+                      <Button Command="{Binding $parent[UserControl].DataContext.RemoveFilterCommand}" CommandParameter="{Binding .}">Remove</Button>
+                    </StackPanel>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </DockPanel>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+      <ComboBox Items="{Binding VisibleDataColumnOptions}" Name="AddFilterComboxBox" MaxWidth="200" SelectedItem="{Binding SelectedAddColumn}" MemberSelector="Label" Height="30" IsVisible="{Binding IsColumnSelectVisible}" />
+    </StackPanel>
+    <DockPanel Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Top">
+      <StackPanel Orientation="Horizontal">
+        <Button Classes="secondary" Command="{Binding ClearFiltersCommand}" Content="Clear Filters" />
+        <Button Classes="primary" Content="Show Code"/>
+      </StackPanel>
     </DockPanel>
-  </DockPanel>
+  </Grid>
 </UserControl>

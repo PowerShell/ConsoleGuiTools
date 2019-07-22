@@ -1,8 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
-using OutGridView.Services;
-using OutGridView.ViewModels;
 using OutGridView.Models;
 using ReactiveUI;
 using System.Collections.ObjectModel;
@@ -24,33 +21,32 @@ namespace OutGridView.ViewModels
 {
     public class DataGridViewModel : ViewModelBase
     {
-        private ReadOnlyObservableCollection<PSObject> _viewObjects;
-        public ReadOnlyObservableCollection<PSObject> ViewObjects => _viewObjects;
+        private ReadOnlyObservableCollection<DataTableRow> _viewObjects;
+        public ReadOnlyObservableCollection<DataTableRow> ViewObjects => _viewObjects;
+
         public SourceList<Column> Columns { get; } = new SourceList<Column>();
         private ReadOnlyObservableCollection<Column> _columnSelect;
         public ReadOnlyObservableCollection<Column> ColumnSelect => _columnSelect;
-        public IList<PSObject> SelectedObjects { [ObservableAsProperty]get; }
-
-        public DataGridViewModel(IObservableList<PSObject> objects, IEnumerable<PropertyInfo> properties)
+        public List<DataTableRow> SelectedObjects { get; set; }
+        public DataGridViewModel(List<DataTableColumn> dataColumns, IObservableList<DataTableRow> data)
         {
-            Columns.AddRange(properties.Select(x => new Column(x)));
+            var columns = dataColumns.Select(x => new Column(x));
+
+            Columns.AddRange(columns);
 
             this.WhenActivated((CompositeDisposable disposables) =>
             {
                 Columns.Connect()
-                    .AutoRefresh()
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Bind(out _columnSelect)
-                    .Subscribe();
+                        .AutoRefresh()
+                        .ObserveOn(RxApp.MainThreadScheduler)
+                        .Bind(out _columnSelect)
+                        .Subscribe();
 
-
-
-                objects.Connect()
+                data.Connect()
                     .Bind(out _viewObjects)
                     .Subscribe(Console.Write);
             });
         }
-
-
     }
+
 }

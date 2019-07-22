@@ -2,8 +2,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450" x:Class="OutGridView.Views.DataGridView">
-    <StackPanel>
-        <Expander Grid.Column="0" Grid.Row="0" Header="Columns">
+    <DockPanel>
+        <Expander Header="Columns" DockPanel.Dock="Top">
             <ItemsControl Items="{Binding ColumnSelect}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -12,12 +12,12 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <CheckBox Margin="4" IsChecked="{Binding IsVisible}" Content="{Binding PropertyName}"/>
+                        <CheckBox Margin="4" IsChecked="{Binding IsVisible}" Content="{Binding DataColumn.Label}"/>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </Expander>
-        <DataGrid Name="DataGridTable" Items="{Binding ViewObjects}" CanUserReorderColumns="True" CanUserSortColumns="True" SelectionMode="1" />
-    </StackPanel>
+        <DataGrid Name="DataGridTable" DockPanel.Dock="Top" Items="{Binding ViewObjects, Mode=OneWay}" CanUserReorderColumns="True" CanUserSortColumns="True" IsReadOnly="True" SelectionMode="0" />
+    </DockPanel>
 </UserControl> 
  
