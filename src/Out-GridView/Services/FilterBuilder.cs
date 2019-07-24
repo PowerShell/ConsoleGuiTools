@@ -33,7 +33,7 @@ namespace OutGridView.Services
                     }
                     var rule = f.SelectedFilterOperator;
                     var value = dataList.Data[f.DataColumn.Index];
-                    return rule.Execute(value == null ? String.Empty : value.ToString());
+                    return rule.Execute(value == null ? String.Empty : value.Value);
                 });
             });
         }
@@ -52,11 +52,10 @@ namespace OutGridView.Services
             {
                 return dataList.Data.Any(data =>
                     {
-                        return data != null && data.ToString().ToLowerInvariant().Contains(t);
+                        return data != null && data.Value.ToLowerInvariant().Contains(t);
                     });
             });
         }
-
         public static string TokenPattern = @"[^\s""']+|""([^""]*)""|'([^']*)'";
         public static List<string> ParseSearchText(string searchText)
         {

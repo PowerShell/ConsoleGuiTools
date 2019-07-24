@@ -5,7 +5,7 @@ namespace OutGridView.Services.FilterOperators
 {
     public static class FilterOperatorLookup
     {
-        public static IFilterOperator CreateFilterOperatorRule(StringFilterOperator filterOp, string value)
+        public static IStringFilterOperator CreateFilterOperatorRule(StringFilterOperator filterOp, string value)
         {
             switch (filterOp)
             {

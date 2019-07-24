@@ -3,6 +3,7 @@ using Avalonia;
 using Avalonia.Logging.Serilog;
 using OutGridView.ViewModels;
 using OutGridView.Views;
+using OutGridView.Models;
 using OutGridView.Services;
 using System.Management.Automation.Runspaces;
 using System.Management.Automation;
@@ -20,29 +21,15 @@ namespace OutGridView
         [STAThread]
         public static void Main(string[] args)
         {
-            BuildAvaloniaApp().Start(AppMain, args);
-        }
-
-        // Avalonia configuration, don't remove; also used by visual designer.
-        public static AppBuilder BuildAvaloniaApp()
-            => AppBuilder.Configure<App>()
-                .UsePlatformDetect()
-                .UseDataGrid()
-                .LogToDebug()
-                .UseReactiveUI();
-
-        // Your application's entry point. Here you can initialize your MVVM framework, DI
-        // container, etc.
-        private static void AppMain(Application app, string[] args)
-        {
-
-            var db = new Database();
-            var window = new MainWindow
+            var applicationData = new ApplicationData
             {
-                DataContext = new MainWindowViewModel(db),
+                Title = "TestTitle",
+                OutputMode = OutputModeOption.Single,
+                PassThru = true,
             };
+            AvaloniaAppRunner.RunApp(applicationData);
 
-            app.Run(window);
+            var passThruObjects = AvaloniaAppRunner.GetPassThruObjects();
         }
     }
 }

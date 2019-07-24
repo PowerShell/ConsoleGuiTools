@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using OutGridView.Models;
 using ReactiveUI;
 using DynamicData;
@@ -11,13 +10,12 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Collections.ObjectModel;
 using ReactiveUI.Fody.Helpers;
-using DynamicData.ReactiveUI;
-
+using DynamicData.Aggregation;
 namespace OutGridView.ViewModels
 {
     public class FilterQueryBuilderViewModel : ViewModelBase
     {
-        private SourceList<DataTableColumn> DataColumnOptions { get; } = new SourceList<DataTableColumn>();
+        private SourceList<DataTableColumn> DataColumnOptions = new SourceList<DataTableColumn>();
 
         private ReadOnlyObservableCollection<DataTableColumn> _visibleDataColumnOptions;
         public ReadOnlyObservableCollection<DataTableColumn> VisibleDataColumnOptions => _visibleDataColumnOptions;
@@ -29,18 +27,18 @@ namespace OutGridView.ViewModels
         public ReactiveCommand<DataTableColumn, Unit> AddFilterCommand { get; }
         public ReactiveCommand<Filter, Unit> RemoveFilterCommand { get; }
         public ReactiveCommand<Unit, Unit> ClearFiltersCommand { get; }
-        public Boolean IsColumnSelectVisible { [ObservableAsProperty] get; } = true;
+        public Boolean IsColumnSelectVisible { [ObservableAsProperty] get; }
 
         //Placeholder hack for combo box
-        private DataTableColumn placeholderColumn = new DataTableColumn("Add Filter", -1);
+        private DataTableColumn placeholderColumn = new DataTableColumn("Add Column Filter", -1, 1.GetType());
 
-        public FilterQueryBuilderViewModel(IObservableList<DataTableColumn> dataColumnOptions)
+        public FilterQueryBuilderViewModel(IObservableList<DataTableColumn> dataColumns)
         {
 
-            SelectedAddColumn = placeholderColumn;
-
             DataColumnOptions.Add(placeholderColumn);
-            DataColumnOptions.AddRange(dataColumnOptions.Items);
+            DataColumnOptions.AddRange(dataColumns.Items);
+
+            SelectedAddColumn = placeholderColumn;
 
             AddFilterCommand = ReactiveCommand.Create<DataTableColumn>(AddFilter);
             RemoveFilterCommand = ReactiveCommand.Create<Filter>(RemoveFilter);
@@ -73,18 +71,20 @@ namespace OutGridView.ViewModels
                     .DisposeMany()
                     .ObserveOn(RxApp.MainThreadScheduler);
 
-                DataColumnOptions.Connect()
-                    .ObserveOn(RxApp.MainThreadScheduler)
+                var dataColumnOptions = DataColumnOptions.Connect()
                     .Except(activeDataColumns)
+                    .Publish();
+
+                dataColumnOptions
                     .Bind(out _visibleDataColumnOptions)
                     .Subscribe();
 
-                DataColumnOptions.Connect()
+                dataColumnOptions
                     .Count()
                     .Select(x => x > 1)
                     .ToPropertyEx(this, x => x.IsColumnSelectVisible);
 
-
+                dataColumnOptions.Connect();
 
 
 

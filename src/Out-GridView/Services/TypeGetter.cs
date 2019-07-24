@@ -59,7 +59,23 @@ namespace OutGridView.Services
                 }
             }
 
-            var data = expressions.Select(x => x.GetValues(ps).FirstOrDefault().Result.ToString()).ToList();
+            var data = expressions.Select(x => x.GetValues(ps).FirstOrDefault().Result.ToString())
+                .Select<string, IValue>(x =>
+                {
+                    var isDecimal = decimal.TryParse(x, NumberStyles.Any, CultureInfo.InvariantCulture.NumberFormat, out var decimalValue);
+                    if (isDecimal)
+                    {
+                        return new DecimalValue
+                        {
+                            Value = x,
+                            SortValue = decimalValue
+                        };
+                    }
+                    return new StringValue
+                    {
+                        Value = x
+                    };
+                }).ToList();
 
             return new DataTableRow(data, ps);
         }
@@ -67,22 +83,15 @@ namespace OutGridView.Services
         public static List<Type> GetTypesForColumns(List<DataTableRow> dataTableRows)
         {
             var dataRows = dataTableRows.Select(x => x.Data);
-            var types = dataRows.Select(x => typeof(Type)).ToList();
+            var types = dataRows.FirstOrDefault().Select(x => typeof(decimal)).ToList();
+
             foreach (var dataRow in dataRows)
             {
-                dataRow.Select<string, object>((x, i) =>
+                for (var i = 0; i < dataRow.Count; i++)
                 {
-                    try
-                    {
-                        float.Parse(x, CultureInfo.InvariantCulture.NumberFormat);
-                    }
-                    catch (Exception)
-                    {
-                        //If any object in a column can't be cast assume the whole column is strings
-                        types[i] = typeof(string);
-                    }
-                    return null;
-                });
+                    var isNumber = dataRow.ElementAt(i) is DecimalValue;
+                    if (!isNumber) types[i] = typeof(string);
+                }
             }
             return types;
         }
@@ -102,16 +111,18 @@ namespace OutGridView.Services
                     return propertyLabel;
                 }
                 return definedColumnLabel;
-            }).ToList();
-
-
+            }).Zip(types, (definedColumnLabel, type) => (definedColumnLabel, type))
+            .Select((labelTypePair, i) => new DataTableColumn(labelTypePair.definedColumnLabel, i, labelTypePair.type))
+            .ToList();
         }
 
         public static DataTable CastObjectsToTableView(List<PSObject> psObjects, FormatViewDefinition fvd)
         {
             var formattedObjects = psObjects.Select(ps => CastObjectToDataTableRow(ps, fvd)).ToList();
 
-            var columnHeaders = GetColumnHeadersForObject(fvd, formattedObjects);
+            var columnTypes = GetTypesForColumns(formattedObjects);
+
+            var columnHeaders = GetColumnHeadersForObject(fvd, columnTypes);
 
             return new DataTable(columnHeaders, formattedObjects);
         }

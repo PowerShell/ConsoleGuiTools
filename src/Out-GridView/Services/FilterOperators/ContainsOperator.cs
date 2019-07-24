@@ -4,7 +4,7 @@ using System.Management.Automation;
 
 namespace OutGridView.Services.FilterOperators
 {
-    public class ContainsOperator : IFilterOperator
+    public class ContainsOperator : IStringFilterOperator
     {
         public bool HasValue { get; } = true;
         public string Value { get; set; }

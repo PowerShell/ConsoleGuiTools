@@ -15,7 +15,7 @@ namespace OutGridView.Models
         public DataTableColumn DataColumn { get; set; }
         [Reactive] public StringFilterOperator SelectedOperator { get; set; }
 
-        public IFilterOperator SelectedFilterOperator { [ObservableAsProperty] get; }
+        public IStringFilterOperator SelectedFilterOperator { [ObservableAsProperty] get; }
         [Reactive] public string Value { get; set; }
         public Filter(DataTableColumn dataColumn)
         {

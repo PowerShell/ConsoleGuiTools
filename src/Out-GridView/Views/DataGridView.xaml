@@ -3,7 +3,10 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450" x:Class="OutGridView.Views.DataGridView">
     <DockPanel>
-        <Expander Header="Columns" DockPanel.Dock="Top">
+        <Expander DockPanel.Dock="Top">
+            <Expander.Header>
+                <TextBlock Classes="h1">Columns</TextBlock>
+            </Expander.Header>
             <ItemsControl Items="{Binding ColumnSelect}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -17,7 +20,7 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </Expander>
-        <DataGrid Name="DataGridTable" DockPanel.Dock="Top" Items="{Binding ViewObjects, Mode=OneWay}" CanUserReorderColumns="True" CanUserSortColumns="True" IsReadOnly="True" SelectionMode="0" />
+        <DataGrid Name="DataGridTable" DockPanel.Dock="Top" Items="{Binding ViewObjects, Mode=OneWay}" CanUserReorderColumns="True" CanUserSortColumns="True" IsReadOnly="True" SelectionMode="{Binding SelectionMode}" />
     </DockPanel>
 </UserControl> 
  

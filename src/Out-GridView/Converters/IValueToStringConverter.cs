@@ -1,16 +1,16 @@
 using System;
 using Avalonia.Data.Converters;
+using OutGridView.Models;
 using System.Globalization;
 
 namespace OutGridView.Converters
 {
-    public class EnumToDescriptionConverter : IValueConverter
+    public class IValueToStringConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo cultureInfo)
         {
-            var enumValue = value as Enum;
-
-            return enumValue == null ? Avalonia.AvaloniaProperty.UnsetValue : enumValue.GetDescriptionFromEnumValue();
+            IValue stringValue = value as IValue;
+            return stringValue.Value;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo cultureInfo)

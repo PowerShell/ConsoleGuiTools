@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using ReactiveUI.Fody.Helpers;
 using System.Management.Automation;
 using System.Linq;
+using OutGridView.Converters;
 using DynamicData;
 using Avalonia.Data;
 using System;
@@ -30,19 +31,13 @@ namespace OutGridView.Views
             this.WhenActivated((CompositeDisposable disposables) =>
                 {
                     DataGridTable.WhenAnyValue(x => x.SelectedItem, x => x.SelectedItems, (x, y) => y.OfType<DataTableRow>().ToList())
-                        .BindTo(this, x => x.ViewModel.SelectedObjects)
+                        .BindTo(this, x => x.ViewModel.SelectedRows)
                         .DisposeWith(disposables);
 
                     ViewModel.Columns.Connect()
                         .AutoRefresh()
                         .Filter(x => x.IsVisible)
-                        .Transform(x => new DataGridTextColumn()
-                        {
-                            Binding = new Binding("Data[" + x.DataColumn.Index + "]", BindingMode.OneTime),
-                            Header = x.DataColumn.Label,
-                            CanUserReorder = true,
-                            CanUserSort = true,
-                        })
+                        .Transform(ColumnToDataGridTextColumn)
                         .Bind(out var columns)
                         .DisposeMany()
                         .Subscribe(x =>
@@ -50,12 +45,28 @@ namespace OutGridView.Views
                             DataGridTable.Columns.Clear(); //TODO incremental?
                             DataGridTable.Columns.AddRange(columns);
                         });
-
-
-
                 });
 
             AvaloniaXamlLoader.Load(this);
         }
+        private DataGridTextColumn ColumnToDataGridTextColumn(Column column)
+        {
+            var binding = new Binding
+            {
+                Path = "Data[" + column.DataColumn.Index + "]",
+                Mode = BindingMode.OneTime
+            };
+
+            binding.Converter = new IValueToStringConverter();
+
+            return new DataGridTextColumn()
+            {
+                Binding = binding,
+                Header = column.DataColumn.Label,
+                CanUserReorder = true,
+                CanUserSort = true,
+            };
+        }
     }
+
 }

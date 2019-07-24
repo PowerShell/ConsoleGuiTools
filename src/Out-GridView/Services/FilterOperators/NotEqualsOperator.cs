@@ -1,6 +1,6 @@
 namespace OutGridView.Services.FilterOperators
 {
-    public class NotEqualsOperator : IFilterOperator
+    public class NotEqualsOperator : IStringFilterOperator
     {
         public bool HasValue { get; } = true;
         public string Value { get; set; }

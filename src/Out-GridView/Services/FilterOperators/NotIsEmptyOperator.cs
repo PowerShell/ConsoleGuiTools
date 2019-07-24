@@ -1,7 +1,7 @@
 using System;
 namespace OutGridView.Services.FilterOperators
 {
-    public class NotIsEmptyOperator : IFilterOperator
+    public class NotIsEmptyOperator : IStringFilterOperator
     {
         public bool HasValue { get; } = true;
         public string Value { get; set; }

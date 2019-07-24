@@ -27,12 +27,15 @@ namespace OutGridView.ViewModels
         public SourceList<Column> Columns { get; } = new SourceList<Column>();
         private ReadOnlyObservableCollection<Column> _columnSelect;
         public ReadOnlyObservableCollection<Column> ColumnSelect => _columnSelect;
-        public List<DataTableRow> SelectedObjects { get; set; }
-        public DataGridViewModel(List<DataTableColumn> dataColumns, IObservableList<DataTableRow> data)
+        public DataGridSelectionMode SelectionMode { get; set; }
+        public List<DataTableRow> SelectedRows { get; set; }
+        public DataGridViewModel(List<DataTableColumn> dataColumns, IObservableList<DataTableRow> data, OutputModeOption outputMode)
         {
             var columns = dataColumns.Select(x => new Column(x));
 
             Columns.AddRange(columns);
+
+            SelectionMode = OutputModeToSelectionMode(outputMode);
 
             this.WhenActivated((CompositeDisposable disposables) =>
             {
@@ -44,9 +47,23 @@ namespace OutGridView.ViewModels
 
                 data.Connect()
                     .Bind(out _viewObjects)
-                    .Subscribe(Console.Write);
+                    .Subscribe();
             });
         }
-    }
 
+        public DataGridSelectionMode OutputModeToSelectionMode(OutputModeOption outputModeOption)
+        {
+            switch (outputModeOption)
+            {
+                case OutputModeOption.None:
+                    return DataGridSelectionMode.Extended;
+                case OutputModeOption.Single:
+                    return DataGridSelectionMode.Single;
+                case OutputModeOption.Multiple:
+                    return DataGridSelectionMode.Extended;
+                default:
+                    return DataGridSelectionMode.Extended;
+            }
+        }
+    }
 }

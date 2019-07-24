@@ -9,17 +9,22 @@ namespace OutGridView.Services
     public class Database
     {
 
-        private List<PSObject> _objects { get; set; } = new List<PSObject>();
-
+        private List<PSObject> _objects;
+        public string Title { get; set; }
+        public bool PassThru { get; set; }
+        public OutputModeOption OutputMode { get; set; }
         public Database() { }
-        public Database(List<PSObject> objects)
+        public Database(ApplicationData applicationData)
         {
-            _objects = objects;
+            _objects = applicationData.Objects;
+            Title = applicationData.Title;
+            PassThru = applicationData.PassThru;
+            OutputMode = applicationData.OutputMode;
         }
 
         private List<PSObject> GetItems()
         {
-            _objects = PowerShell.Create().AddCommand("Get-Process").Invoke<PSObject>().Take(100).ToList();
+            // _objects = PowerShell.Create().AddScript("Get-Process").Invoke<PSObject>().Take(100).ToList();
 
             return _objects;
         }
