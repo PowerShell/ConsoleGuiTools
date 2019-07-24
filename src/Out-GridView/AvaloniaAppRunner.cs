@@ -8,6 +8,7 @@ using OutGridView.Views;
 using OutGridView.Services;
 using System.Threading;
 using OutGridView.Models;
+using System.Linq;
 
 namespace OutGridView
 {
@@ -16,6 +17,7 @@ namespace OutGridView
         public static App App;
         public static AppBuilder Builder;
         private static ApplicationData _applicationData;
+        private static CancellationTokenSource _source;
         static AvaloniaAppRunner()
         {
             new CustomAssemblyLoadContext().LoadNativeLibraries();
@@ -29,17 +31,18 @@ namespace OutGridView
                .UsePlatformDetect()
                .UseDataGrid()
                .LogToDebug()
-               .UseReactiveUI();
+               .UseReactiveUI()
+               .SetupWithoutStarting();
         public static void RunApp(ApplicationData applicationData)
         {
             _applicationData = applicationData;
 
             var thread = Thread.CurrentThread.GetApartmentState();
 
-            Builder.Start(AppMain, new string[] { });
+            AppMain(App);
 
         }
-        private static void AppMain(Application app, string[] args)
+        private static void AppMain(Application app)
         {
             var db = new Database(_applicationData);
             var window = new MainWindow
@@ -47,7 +50,20 @@ namespace OutGridView
                 DataContext = new MainWindowViewModel(db),
             };
 
-            app.Run(window);
+            _source = new CancellationTokenSource();
+
+            window.Show();
+            window.Closing += Window_Closing;
+
+            App.MainWindow = window;
+
+            App.Run(_source.Token);
+        }
+
+
+        private static void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            _source.Cancel();
         }
         public static void CloseWindow()
         {

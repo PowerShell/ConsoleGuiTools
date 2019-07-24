@@ -23,8 +23,8 @@ namespace OutGridView.ViewModels
         [Reactive] public FilterQueryBuilderViewModel FilterQueryBuilder { get; set; }
         [Reactive] public DataGridViewModel DataGridView { get; set; }
         [Reactive] public string SearchText { get; set; } = String.Empty;
-        public readonly bool IsPassThruEnabled;
-        public readonly string Title;
+        public bool IsPassThruEnabled { get; }
+        public string Title { get; }
         public ReactiveCommand<Unit, Unit> PassThruOkCommand { get; }
         public ReactiveCommand<Unit, Unit> PassThruCancelCommand { get; }
         private readonly OutputModeOption outputMode;
@@ -82,6 +82,7 @@ namespace OutGridView.ViewModels
 
         public void CloseWindow()
         {
+            //There is no main window, due to the 
             App.Current.MainWindow.Close();
         }
     }
