@@ -9,6 +9,8 @@ using OutGridView.Services;
 using System.Threading;
 using OutGridView.Models;
 using System.Linq;
+using ReactiveUI;
+using Avalonia.Threading;
 
 namespace OutGridView
 {
@@ -23,15 +25,15 @@ namespace OutGridView
             new CustomAssemblyLoadContext().LoadNativeLibraries();
             new CustomAssemblyLoadContext().LoadLibs();
             App = new App();
-            Thread.CurrentThread.TrySetApartmentState(ApartmentState.STA);
+            RxApp.MainThreadScheduler = AvaloniaScheduler.Instance;
             Builder = BuildAvaloniaApp();
         }
 
         public static AppBuilder BuildAvaloniaApp() => AppBuilder.Configure(App)
+               .UseReactiveUI()
                .UsePlatformDetect()
                .UseDataGrid()
                .LogToDebug()
-               .UseReactiveUI()
                .SetupWithoutStarting();
         public static void RunApp(ApplicationData applicationData)
         {
