@@ -24,7 +24,7 @@ namespace OutGridView.Services
 
         private List<PSObject> GetItems()
         {
-            _objects = PowerShell.Create().AddScript("Get-Process |  Select-Object -Property ProcessName, CPU").Invoke<PSObject>().Take(100).ToList();
+            // _objects = PowerShell.Create().AddScript("Get-Process |  Select-Object -Property ProcessName, CPU").Invoke<PSObject>().Take(100).ToList();
 
             return _objects;
         }
