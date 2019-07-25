@@ -88,7 +88,7 @@ namespace OutGridView
         {
             var libFolder = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "win" : "unix";
             var assemblyBasePath = Path.GetDirectoryName(this.GetType().GetTypeInfo().Assembly.Location);
-            var nativePath = Path.Combine(assemblyBasePath, "runtimes", libFolder, "lib", "netcoreapp2.0");
+            var nativePath = Path.Combine(assemblyBasePath, "runtimes", libFolder, "lib", "netcoreapp2.1");
 
             if (!Directory.Exists(nativePath))
             {
