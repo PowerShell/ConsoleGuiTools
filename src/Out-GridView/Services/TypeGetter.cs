@@ -31,6 +31,9 @@ namespace OutGridView.Services
             var types = _powerShell.AddScript("Get-FormatData " + typeName)
                 .Invoke<PSObject>();
 
+            //No custom type definitions found
+            if (types == null || types.Count == 0) return null;
+
             var extendedTypeDefiniton = types[0].BaseObject as ExtendedTypeDefinition;
 
             return extendedTypeDefiniton.FormatViewDefinition[0];
@@ -38,28 +41,47 @@ namespace OutGridView.Services
 
         public static DataTableRow CastObjectToDataTableRow(PSObject ps, FormatViewDefinition fvd)
         {
-            var tableControl = fvd.Control as TableControl;
-
-            var columns = tableControl.Rows[0].Columns;
-
-            var PSObject = new PSObject(ps.BaseObject);
-
             var expressions = new List<PSPropertyExpression>();
 
-            foreach (var column in columns)
+            if (fvd == null)
             {
-                var displayEntry = column.DisplayEntry;
-                if (displayEntry.ValueType == DisplayEntryValueType.Property)
+                foreach (var property in ps.Properties)
                 {
-                    expressions.Add(new PSPropertyExpression(displayEntry.Value));
-                }
-                if (displayEntry.ValueType == DisplayEntryValueType.ScriptBlock)
-                {
-                    expressions.Add(new PSPropertyExpression(ScriptBlock.Create(displayEntry.Value)));
+                    expressions.Add(new PSPropertyExpression(property.Name));
                 }
             }
+            else
+            {
+                var tableControl = fvd.Control as TableControl;
 
-            var data = expressions.Select(x => x.GetValues(ps).FirstOrDefault().Result.ToString())
+                var columns = tableControl.Rows[0].Columns;
+
+                foreach (var column in columns)
+                {
+                    var displayEntry = column.DisplayEntry;
+                    if (displayEntry.ValueType == DisplayEntryValueType.Property)
+                    {
+                        expressions.Add(new PSPropertyExpression(displayEntry.Value));
+                    }
+                    if (displayEntry.ValueType == DisplayEntryValueType.ScriptBlock)
+                    {
+                        expressions.Add(new PSPropertyExpression(ScriptBlock.Create(displayEntry.Value)));
+                    }
+                }
+
+            }
+
+            var stringData = expressions.Select(x =>
+            {
+                var result = x.GetValues(ps).FirstOrDefault().Result;
+                if (result == null)
+                {
+                    return string.Empty;
+                }
+                return result.ToString();
+            });
+
+            var data = stringData
                 .Select<string, IValue>(x =>
                 {
                     var isDecimal = decimal.TryParse(x, NumberStyles.Any, CultureInfo.InvariantCulture.NumberFormat, out var decimalValue);
@@ -95,25 +117,35 @@ namespace OutGridView.Services
             }
             return types;
         }
-        public static List<DataTableColumn> GetColumnHeadersForObject(FormatViewDefinition fvd, List<Type> types)
+        public static List<DataTableColumn> GetColumnHeadersForObject(PSObject ps, FormatViewDefinition fvd, List<Type> types)
         {
+            var labels = new List<string>();
 
-            var tableControl = fvd.Control as TableControl;
-
-            var definedColumnLabels = tableControl.Headers.Select(x => x.Label);
-
-            var propertyLabels = tableControl.Rows[0].Columns.Select(x => x.DisplayEntry.Value);
-
-            return definedColumnLabels.Zip(propertyLabels, (definedColumnLabel, propertyLabel) =>
+            if (fvd == null)
             {
-                if (String.IsNullOrEmpty(definedColumnLabel))
+                labels = ps.Properties.Select(x => x.Name).ToList();
+            }
+            else
+            {
+                var tableControl = fvd.Control as TableControl;
+
+                var definedColumnLabels = tableControl.Headers.Select(x => x.Label);
+
+                var propertyLabels = tableControl.Rows[0].Columns.Select(x => x.DisplayEntry.Value);
+
+                labels = definedColumnLabels.Zip(propertyLabels, (definedColumnLabel, propertyLabel) =>
                 {
-                    return propertyLabel;
-                }
-                return definedColumnLabel;
-            }).Zip(types, (definedColumnLabel, type) => (definedColumnLabel, type))
-            .Select((labelTypePair, i) => new DataTableColumn(labelTypePair.definedColumnLabel, i, labelTypePair.type))
-            .ToList();
+                    if (String.IsNullOrEmpty(definedColumnLabel))
+                    {
+                        return propertyLabel;
+                    }
+                    return definedColumnLabel;
+                }).ToList();
+            }
+
+            return labels.Zip(types, (definedColumnLabel, type) => (definedColumnLabel, type))
+               .Select((labelTypePair, i) => new DataTableColumn(labelTypePair.definedColumnLabel, i, labelTypePair.type))
+               .ToList();
         }
 
         public static DataTable CastObjectsToTableView(List<PSObject> psObjects, FormatViewDefinition fvd)
@@ -122,7 +154,7 @@ namespace OutGridView.Services
 
             var columnTypes = GetTypesForColumns(formattedObjects);
 
-            var columnHeaders = GetColumnHeadersForObject(fvd, columnTypes);
+            var columnHeaders = GetColumnHeadersForObject(psObjects.First(), fvd, columnTypes);
 
             return new DataTable(columnHeaders, formattedObjects);
         }
