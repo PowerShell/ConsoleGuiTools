@@ -43,6 +43,7 @@ namespace OutGridView.Services
         {
             var expressions = new List<PSPropertyExpression>();
 
+            //Just iterate properties if no type def is found
             if (fvd == null)
             {
                 foreach (var property in ps.Properties)
@@ -71,6 +72,7 @@ namespace OutGridView.Services
 
             }
 
+            // Stringify expression's results because we don't get the types from ExpressionResult
             var stringData = expressions.Select(x =>
             {
                 var result = x.GetValues(ps).FirstOrDefault().Result;
@@ -107,6 +109,7 @@ namespace OutGridView.Services
             var dataRows = dataTableRows.Select(x => x.Data);
             var types = dataRows.FirstOrDefault().Select(x => typeof(decimal)).ToList();
 
+            //If every value in a column could be a decimal, assume that it is supposed to be a decimal
             foreach (var dataRow in dataRows)
             {
                 for (var i = 0; i < dataRow.Count; i++)
@@ -133,6 +136,7 @@ namespace OutGridView.Services
 
                 var propertyLabels = tableControl.Rows[0].Columns.Select(x => x.DisplayEntry.Value);
 
+                //Use the TypeDefinition Label if availble otherwise just use the property name as a label
                 labels = definedColumnLabels.Zip(propertyLabels, (definedColumnLabel, propertyLabel) =>
                 {
                     if (String.IsNullOrEmpty(definedColumnLabel))
@@ -143,8 +147,8 @@ namespace OutGridView.Services
                 }).ToList();
             }
 
-            return labels.Zip(types, (definedColumnLabel, type) => (definedColumnLabel, type))
-               .Select((labelTypePair, i) => new DataTableColumn(labelTypePair.definedColumnLabel, i, labelTypePair.type))
+            return labels.Zip(types, (label, type) => (label, type))
+               .Select((labelTypePair, i) => new DataTableColumn(labelTypePair.label, i, labelTypePair.type))
                .ToList();
         }
 

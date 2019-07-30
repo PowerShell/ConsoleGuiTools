@@ -40,7 +40,7 @@ namespace OutGridView.Services
 
         public static Func<DataTableRow, bool> BuildQuickSearchFilter(string searchText)
         {
-            List<string> tokens = ParseSearchText(searchText.ToLowerInvariant());
+            List<string> tokens = ParseSearchText(searchText);
 
             if (string.IsNullOrEmpty(searchText))
             {
@@ -52,11 +52,13 @@ namespace OutGridView.Services
             {
                 return dataList.Data.Any(data =>
                     {
-                        return data != null && data.Value.ToLowerInvariant().Contains(t);
+                        //Quick Search is NOT case-sensitive
+                        return data != null && data.Value.ToLowerInvariant().Contains(t.ToLowerInvariant());
                     });
             });
         }
         public static string TokenPattern = @"[^\s""']+|""([^""]*)""|'([^']*)'";
+        //Seperates words by spaces unless they are quoted
         public static List<string> ParseSearchText(string searchText)
         {
             RegexOptions options = RegexOptions.Multiline;

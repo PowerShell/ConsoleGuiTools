@@ -29,7 +29,6 @@ namespace OutGridView.ViewModels
         public ReactiveCommand<Unit, Unit> PassThruCancelCommand { get; }
         private readonly OutputModeOption outputMode;
         public List<PSObject> OutputObjects { get; set; }
-
         public MainWindowViewModel(Database db)
         {
 
@@ -82,7 +81,6 @@ namespace OutGridView.ViewModels
 
         public void CloseWindow()
         {
-            //There is no main window, due to the 
             App.Current.MainWindow.Close();
         }
     }

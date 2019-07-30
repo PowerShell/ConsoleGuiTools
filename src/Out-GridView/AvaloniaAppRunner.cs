@@ -25,7 +25,6 @@ namespace OutGridView
             new CustomAssemblyLoadContext().LoadNativeLibraries();
             new CustomAssemblyLoadContext().LoadLibs();
             App = new App();
-            RxApp.MainThreadScheduler = AvaloniaScheduler.Instance;
             Builder = BuildAvaloniaApp();
         }
 
@@ -39,7 +38,6 @@ namespace OutGridView
         {
             _applicationData = applicationData;
             AppMain(App);
-
         }
         private static void AppMain(Application app)
         {

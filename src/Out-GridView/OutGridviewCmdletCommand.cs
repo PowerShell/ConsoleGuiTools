@@ -7,7 +7,6 @@ using System.Management.Automation.Internal;
 using OutGridView.Models;
 using System.Management.Automation.Runspaces;
 
-using Microsoft.PowerShell.Commands.Internal.Format;
 namespace OutGridView
 {
     /// Enum for SelectionMode parameter.
@@ -68,7 +67,6 @@ namespace OutGridView
         // This method gets called once for each cmdlet in the pipeline when the pipeline starts executing
         protected override void BeginProcessing()
         {
-            WriteVerbose("Begin!");
         }
 
         // This method will be called for each input received from the pipeline to this cmdlet; if no input is received, this method is not called
@@ -148,7 +146,6 @@ namespace OutGridView
                 }
                 this.WriteObject(selectedObject, false);
             }
-            WriteVerbose("End!");
         }
     }
 }

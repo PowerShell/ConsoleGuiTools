@@ -3,7 +3,7 @@ namespace OutGridView.Services.FilterOperators
 {
     public class NotIsEmptyOperator : IStringFilterOperator
     {
-        public bool HasValue { get; } = true;
+        public bool HasValue { get; } = false;
         public string Value { get; set; }
         public bool Execute(string input)
         {

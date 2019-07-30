@@ -24,6 +24,7 @@ namespace OutGridView.Services
 
         private List<PSObject> GetItems()
         {
+            // Used in debugging dotnet core
             // _objects = PowerShell.Create().AddScript("Get-Process |  Select-Object -Property ProcessName, CPU").Invoke<PSObject>().Take(100).ToList();
 
             return _objects;

@@ -11,6 +11,7 @@ namespace OutGridView.Models
 {
     public class Filter : ReactiveObject
     {
+        //List of Operators used in View
         public static IEnumerable<StringFilterOperator> Operators { get; } = Enum.GetValues(typeof(StringFilterOperator)).Cast<StringFilterOperator>();
         public DataTableColumn DataColumn { get; set; }
         [Reactive] public StringFilterOperator SelectedOperator { get; set; }

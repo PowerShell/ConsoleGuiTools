@@ -11,6 +11,7 @@ using Microsoft.PowerShell.Commands;
 
 using System.Threading;
 
+//Used to run the module directly from Dotnet
 namespace OutGridView
 {
     public class Program

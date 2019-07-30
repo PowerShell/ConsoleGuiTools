@@ -34,6 +34,7 @@ namespace OutGridView.Views
                         .BindTo(this, x => x.ViewModel.SelectedRows)
                         .DisposeWith(disposables);
 
+                    //Bind the data columns directly on the DataGrid
                     ViewModel.Columns.Connect()
                         .AutoRefresh()
                         .Filter(x => x.IsVisible)
