@@ -38,9 +38,6 @@ namespace OutGridView
         public static void RunApp(ApplicationData applicationData)
         {
             _applicationData = applicationData;
-
-            var thread = Thread.CurrentThread.GetApartmentState();
-
             AppMain(App);
 
         }
