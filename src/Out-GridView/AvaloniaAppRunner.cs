@@ -55,6 +55,8 @@ namespace OutGridView
             App.MainWindow = window;
 
             App.Run(_source.Token);
+
+            _source.Dispose();
         }
 
 
