@@ -28,7 +28,7 @@ namespace OutGridView.ViewModels
         public ReactiveCommand<Unit, Unit> PassThruOkCommand { get; }
         public ReactiveCommand<Unit, Unit> PassThruCancelCommand { get; }
         private readonly OutputModeOption outputMode;
-        public List<PSObject> OutputObjects { get; set; }
+        public List<PSObject> OutputObjects { get; set; } = new List<PSObject>();
         public MainWindowViewModel(Database db)
         {
 
