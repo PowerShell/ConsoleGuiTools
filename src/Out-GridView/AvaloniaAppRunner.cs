@@ -51,6 +51,7 @@ namespace OutGridView
 
             window.Show();
             window.Closing += Window_Closing;
+            App.OnExit += App_Closing;
 
             App.MainWindow = window;
 
@@ -58,15 +59,18 @@ namespace OutGridView
 
             _source.Dispose();
         }
-
-
         private static void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            CloseProgram();
+        }
+
+        private static void App_Closing(object sender, EventArgs e)
         {
             _source.Cancel();
         }
-        public static void CloseWindow()
+        public static void CloseProgram()
         {
-            App.Current.MainWindow.Close();
+            App.Current.Exit();
         }
 
         public static List<PSObject> GetPassThruObjects()

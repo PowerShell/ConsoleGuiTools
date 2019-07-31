@@ -96,7 +96,7 @@ namespace OutGridView
         {
             if (this.Wait || this.OutputMode != OutputModeOption.None)
             {
-                AvaloniaAppRunner.CloseWindow();
+                AvaloniaAppRunner.CloseProgram();
             }
         }
 

@@ -71,17 +71,17 @@ namespace OutGridView.ViewModels
         {
             OutputObjects = DataGridView.SelectedRows.Select(x => x.OriginalObject).ToList();
 
-            CloseWindow();
+            CloseProgam();
         }
 
         public void OnPassThruCancel()
         {
-            CloseWindow();
+            CloseProgam();
         }
 
-        public void CloseWindow()
+        public void CloseProgam()
         {
-            App.Current.MainWindow.Close();
+            App.Current.Exit();
         }
     }
 }
