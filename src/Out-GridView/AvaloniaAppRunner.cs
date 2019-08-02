@@ -11,6 +11,7 @@ using OutGridView.Models;
 using System.Linq;
 using ReactiveUI;
 using Avalonia.Threading;
+using Avalonia.Controls;
 
 namespace OutGridView
 {
@@ -19,6 +20,7 @@ namespace OutGridView
         public static App App;
         public static AppBuilder Builder;
         private static ApplicationData _applicationData;
+        private static Window _mainWindow;
         private static CancellationTokenSource _source;
         static AvaloniaAppRunner()
         {
@@ -42,15 +44,15 @@ namespace OutGridView
         private static void AppMain(Application app)
         {
             var db = new Database(_applicationData);
-            var window = new MainWindow
+            _mainWindow = new MainWindow
             {
                 DataContext = new MainWindowViewModel(db),
             };
 
             _source = new CancellationTokenSource();
 
-            window.Show();
-            window.Closing += Window_Closing;
+            _mainWindow.Show();
+            _mainWindow.Closing += Window_Closing;
 
             App.Run(_source.Token);
 
@@ -62,11 +64,15 @@ namespace OutGridView
             _source.Cancel();
         }
 
+        public static void CloseProgram()
+        {
+            _mainWindow.Close();
+        }
+
         public static List<PSObject> GetPassThruObjects()
         {
-            var mainWindowContext = App.MainWindow.DataContext as MainWindowViewModel;
-
-            return mainWindowContext.OutputObjects;
+            var mainWindowDataContext = _mainWindow.DataContext as MainWindowViewModel;
+            return mainWindowDataContext.OutputObjects;
         }
     }
 }
