@@ -14,6 +14,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using DynamicData.Binding;
 using System.Reactive;
+using Avalonia.Controls;
 
 namespace OutGridView.ViewModels
 {
@@ -25,8 +26,8 @@ namespace OutGridView.ViewModels
         [Reactive] public string SearchText { get; set; } = String.Empty;
         public bool IsPassThruEnabled { get; }
         public string Title { get; }
-        public ReactiveCommand<Unit, Unit> PassThruOkCommand { get; }
-        public ReactiveCommand<Unit, Unit> PassThruCancelCommand { get; }
+        public ReactiveCommand<Window, Unit> PassThruOkCommand { get; }
+        public ReactiveCommand<Window, Unit> PassThruCancelCommand { get; }
         private readonly OutputModeOption outputMode;
         public List<PSObject> OutputObjects { get; set; } = new List<PSObject>();
         public MainWindowViewModel(Database db)
@@ -38,8 +39,8 @@ namespace OutGridView.ViewModels
             Title = db.Title;
             outputMode = db.OutputMode;
 
-            PassThruOkCommand = ReactiveCommand.Create(OnPassThruOk);
-            PassThruCancelCommand = ReactiveCommand.Create(OnPassThruCancel);
+            PassThruOkCommand = ReactiveCommand.Create<Window>(OnPassThruOk);
+            PassThruCancelCommand = ReactiveCommand.Create<Window>(OnPassThruCancel);
 
             this.WhenActivated((CompositeDisposable disposables) =>
             {
@@ -67,21 +68,21 @@ namespace OutGridView.ViewModels
             });
         }
 
-        public void OnPassThruOk()
+        public void OnPassThruOk(Window window)
         {
             OutputObjects = DataGridView.SelectedRows.Select(x => x.OriginalObject).ToList();
 
-            CloseProgam();
+            CloseProgam(window);
         }
 
-        public void OnPassThruCancel()
+        public void OnPassThruCancel(Window window)
         {
-            CloseProgam();
+            CloseProgam(window);
         }
 
-        public void CloseProgam()
+        public void CloseProgam(Window window)
         {
-            App.Current.Exit();
+            window.Close();
         }
     }
 }

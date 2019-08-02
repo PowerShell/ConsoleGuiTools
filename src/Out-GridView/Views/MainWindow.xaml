@@ -3,7 +3,7 @@
     xmlns:vm="clr-namespace:OutGridView.ViewModels;assembly=OutGridView" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
     xmlns:views="clr-namespace:OutGridView.ViewModels" 
-    xmlns:converters="clr-namespace:OutGridView.Converters" 
+    xmlns:converters="clr-namespace:OutGridView.Converters" Name="MainWindow" 
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450" x:Class="OutGridView.Views.MainWindow" Icon="/Assets/avalonia-logo.ico" Title="{Binding Title}">
     <Window.Resources>
         <converters:EnumToDescriptionConverter x:Key="EnumDescriptionConverter"/>
@@ -70,8 +70,8 @@
         <Border BorderThickness="0,1,0,0" BorderBrush="#000000" Grid.Row="3" IsVisible="{Binding IsPassThruEnabled}">
             <DockPanel Margin="5">
                 <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                    <Button Classes="primary" Command="{Binding PassThruOkCommand}">Export</Button>
-                    <Button Classes="secondary" Command="{Binding PassThruCancelCommand}">Cancel</Button>
+                    <Button Classes="primary" Command="{Binding PassThruOkCommand}" CommandParameter="{Binding ElementName=MainWindow}">Export</Button>
+                    <Button Classes="secondary" Command="{Binding PassThruCancelCommand}" CommandParameter="{Binding ElementName=MainWindow}">Cancel</Button>
                 </StackPanel>
             </DockPanel>
         </Border>
