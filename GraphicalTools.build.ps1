@@ -161,7 +161,7 @@ task PackageModule {
 }
 
 task UploadArtifacts -If ($null -ne $env:TF_BUILD) {
-    Copy-Item -Path ".\GraphicalTools.zip" -Destination $env:BUILD_ARTIFACTSTAGINGDIRECTORY
+    Copy-Item -Path ".\GraphicalTools.zip" -Destination "$env:BUILD_ARTIFACTSTAGINGDIRECTORY/GraphicalTools-$($env:Agent_OS).zip"
 }
 
 task . Clean,Build,PackageModule,UploadArtifacts
