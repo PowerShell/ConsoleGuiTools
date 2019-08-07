@@ -1,0 +1,97 @@
+name: PR-$(System.PullRequest.PullRequestNumber)-$(Date:yyyyMMdd)$(Rev:.rr)
+
+variables:
+  # Don't download unneeded packages
+  - name: DOTNET_SKIP_FIRST_TIME_EXPERIENCE
+    value: 'true'
+  # Improve performance by not sending telemetry
+  - name: DOTNET_CLI_TELEMETRY_OPTOUT
+    value: 'true'
+
+trigger:
+  batch: true
+  branches:
+    include:
+      - master
+  paths:
+    exclude:
+      - /.dependabot/*
+      - /.poshchan/*
+      - /.github/**/*
+      - /.vscode/**/*
+      - /.vsts-ci/misc-analysis.yml
+      - /tools/**/*
+      - .editorconfig
+      - .gitattributes
+      - .gitignore
+      - /docs/**/*
+      - /CHANGELOG.md
+      - /CONTRIBUTING.md
+      - /README.md
+      - /LICENSE.txt
+      - /CODE_OF_CONDUCT.md
+
+jobs:
+- job: 'ReleaseBuild'
+  displayName: PowerShell 6 | Windows 10
+  pool:
+    vmImage: 'vs2017-win2016'
+  steps:
+  - template: templates/ci-general.yml
+
+- job: 'SignBuild'
+  displayName: PowerShell 6 | macOS
+  dependsOn: 'ReleaseBuild'
+  pool:
+    name: 'Package ES CodeHub Lab E'
+    demands: DotNetFramework
+  steps:
+  - task: PkgESSetupBuild@10
+    displayName: 'Package ES - Setup Build'
+    inputs:
+      productName: GraphicalTools
+
+  - task: ms.vss-governance-buildtask.governance-build-task-component-detection.ComponentGovernanceComponentDetection@0
+    displayName: 'Component Detection'
+
+  - task: DownloadBuildArtifacts@0
+    displayName: 'Download Build Artifacts'
+    inputs:
+      downloadType: specific
+
+  - task: PkgESCodeSign@10
+    displayName: 'CodeSign tools/releaseBuild/signing.xml'
+    inputs:
+      signConfigXml: tools/releaseBuild/signing.xml
+      inPathRoot: '$(System.ArtifactsDirectory)'
+      outPathRoot: '$(System.ArtifactsDirectory)\Signed'
+
+  - task: PowerShell@1
+    displayName: 'Copy unsigned files to signed folder'
+    inputs:
+      scriptType: inlineScript
+      inlineScript: |
+        $signed="$(System.ArtifactsDirectory)\Signed\GraphicalTools-Windows_NT\*"
+        $notSigned="$(System.ArtifactsDirectory)\GraphicalTools-Windows_NT"
+        Copy-Item $signed $notSigned -Recurse -Force
+
+  - task: PowerShell@1
+    displayName: 'Create catalog file'
+    inputs:
+      scriptType: inlineScript
+      inlineScript: |
+        $signedDir = "$(System.ArtifactsDirectory)\GraphicalTools-Windows_NT"
+        New-FileCatalog -CatalogFilePath "$(System.ArtifactsDirectory)\GraphicalTools.cat" -Path "$signedDir"
+
+  - task: PkgESCodeSign@10
+    displayName: 'CodeSign tools/releaseBuild/FileCatalogSigning.xml'
+    inputs:
+      signConfigXml: tools/releaseBuild/FileCatalogSigning.xml
+      inPathRoot: '$(System.ArtifactsDirectory)'
+      outPathRoot: '$(System.ArtifactsDirectory)'
+
+  - task: PowerShell@1
+    displayName: 'Upload Artifacts'
+    inputs:
+      scriptType: inlineScript
+      inlineScript: 'Write-Host "##vso[artifact.upload containerfolder=GraphicalTools;artifactname=GraphicalTools]$(System.ArtifactsDirectory)\GraphicalTools-Windows_NT"'
