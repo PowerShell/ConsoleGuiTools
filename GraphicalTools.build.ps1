@@ -5,10 +5,7 @@ $script:ModuleBinPath = "$PSScriptRoot/module/GraphicalTools/"
 $script:TargetFramework = "netcoreapp3.0"
 $script:RequiredSdkVersion = "3.0.100-preview5-011568"
 $script:Configuration = "Debug"
-
-#TODO add other platforms
-# $script:TargetPlatforms = @("win10-x64", "osx-x64", "linux-x64")
-$script:TargetPlatforms = @("osx-x64")
+$script:TargetPlatforms = @("win10-x64", "osx-x64", "linux-x64")
 
 $script:RequiredBuildAssets = @{
     $script:ModuleBinPath = @{
@@ -159,15 +156,12 @@ task LayoutModule -After Build {
 }
 
 task PackageModule {
-    [System.IO.Compression.ZipFile]::CreateFromDirectory(
-        "$PSScriptRoot/module/",
-        "$PSScriptRoot/GraphicalTools.zip",
-        [System.IO.Compression.CompressionLevel]::Optimal,
-        $false)
+    Remove-Item "$PSScriptRoot/GraphicalTools.zip" -Force -ErrorAction Ignore
+    Compress-Archive -Path "$PSScriptRoot/module/" -DestinationPath GraphicalTools.zip -CompressionLevel Optimal -Force
 }
 
 task UploadArtifacts -If ($null -ne $env:TF_BUILD) {
-    Copy-Item -Path .\GraphicalTools.zip -Destination $env:BUILD_ARTIFACTSTAGINGDIRECTORY
+    Copy-Item -Path ".\GraphicalTools.zip" -Destination $env:BUILD_ARTIFACTSTAGINGDIRECTORY
 }
 
 task . Clean,Build,PackageModule,UploadArtifacts
