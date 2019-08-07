@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Management.Automation;
+using System.Text.Json;
 
 namespace OutGridView.Models
 {
@@ -9,6 +9,6 @@ namespace OutGridView.Models
         public string Title { get; set; }
         public OutputModeOption OutputMode { get; set; }
         public bool PassThru { get; set; }
-        public List<PSObject> Objects { get; set; }
+        public DataTable DataTable { get; set; }
     }
 }

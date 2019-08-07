@@ -1,5 +1,4 @@
 using System;
-using System.Management.Automation;
 using System.Collections.Generic;
 
 namespace OutGridView.Models
@@ -32,12 +31,12 @@ namespace OutGridView.Models
     }
     public class DataTableRow
     {
-        public List<IValue> Data { get; }
-        public PSObject OriginalObject { get; }
-        public DataTableRow(List<IValue> data, PSObject originalObject)
+        public List<IValue> Values { get; set; }
+        public int OriginalObjectIndex { get; set; }
+        public DataTableRow(List<IValue> data, int originalObjectIndex)
         {
-            Data = data;
-            OriginalObject = originalObject;
+            Values = data;
+            OriginalObjectIndex = originalObjectIndex;
         }
     }
 }

@@ -1,0 +1,26 @@
+<UserControl xmlns="https://github.com/avaloniaui" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450" x:Class="OutGridView.Application.Views.DataGridView">
+    <DockPanel>
+        <Expander DockPanel.Dock="Top">
+            <Expander.Header>
+                <TextBlock Classes="h1">Columns</TextBlock>
+            </Expander.Header>
+            <ItemsControl Items="{Binding ColumnSelect}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <CheckBox Margin="4" IsChecked="{Binding IsVisible}" Content="{Binding DataColumn.Label}"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Expander>
+        <DataGrid Name="DataGridTable" DockPanel.Dock="Top" Items="{Binding ViewObjects, Mode=OneWay}" CanUserReorderColumns="True" CanUserSortColumns="True" IsReadOnly="True" SelectionMode="{Binding SelectionMode}" />
+    </DockPanel>
+</UserControl> 
+ 

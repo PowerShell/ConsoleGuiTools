@@ -7,9 +7,11 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/OutGridView.csproj"
+                "${workspaceFolder}/Cmdlet/OutGridViewCmdlet.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
             ],
-            "problemMatcher": "$tsc"
+            "problemMatcher": "$msCompile"
         },
         {
             "label": "publish",
@@ -17,9 +19,11 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/OutGridView.csproj"
+                "${workspaceFolder}/Cmdlet/OutGridViewCmdlet.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
             ],
-            "problemMatcher": "$tsc"
+            "problemMatcher": "$msCompile"
         },
         {
             "label": "watch",
@@ -28,9 +32,36 @@
             "args": [
                 "watch",
                 "run",
-                "${workspaceFolder}/OutGridView.csproj"
+                "${workspaceFolder}/Cmdlet/OutGridViewCmdlet.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
             ],
-            "problemMatcher": "$tsc"
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "buildApp",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/Application/OutGridViewApplication.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "publishSolution",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "publish",
+                "${workspaceFolder}\\Out-GridView.sln",
+                "/property:GenerateFullPaths=true",
+                "-r",
+                "win10-x64"
+            ],
+            "problemMatcher": "$msCompile"
         }
     ]
 }
