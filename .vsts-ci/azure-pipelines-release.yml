@@ -68,6 +68,8 @@ jobs:
 
   - task: PkgESCodeSign@10
     displayName: 'CodeSign tools/releaseBuild/signing.xml'
+    env:
+      SYSTEM_ACCESSTOKEN: $(System.AccessToken)
     inputs:
       signConfigXml: tools/releaseBuild/signing.xml
       inPathRoot: '$(System.ArtifactsDirectory)'
