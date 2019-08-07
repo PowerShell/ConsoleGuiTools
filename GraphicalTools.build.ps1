@@ -157,7 +157,7 @@ task LayoutModule -After Build {
 
 task PackageModule {
     Remove-Item "$PSScriptRoot/GraphicalTools.zip" -Force -ErrorAction Ignore
-    Compress-Archive -Path "$PSScriptRoot/module/" -DestinationPath GraphicalTools.zip -CompressionLevel Optimal -Force
+    Compress-Archive -Path "$PSScriptRoot/module/GraphicalTools" -DestinationPath GraphicalTools.zip -CompressionLevel Optimal -Force
 }
 
 task UploadArtifacts -If ($null -ne $env:TF_BUILD) {
