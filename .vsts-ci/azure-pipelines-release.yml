@@ -64,7 +64,7 @@ jobs:
     inputs:
       scriptType: inlineScript
       inlineScript: |
-        Expand-Archive -Path "$(System.ArtifactsDirectory)\GraphicalTools\GraphicalTools-Windows_NT.zip" -DestinationPath "$(System.ArtifactsDirectory)\GraphicalTools"
+        Expand-Archive -Path "$(System.ArtifactsDirectory)\GraphicalTools\GraphicalTools-Windows_NT.zip" -DestinationPath "$(System.ArtifactsDirectory)\GraphicalTools\GraphicalTools"
 
   - task: PkgESCodeSign@10
     displayName: 'CodeSign tools/releaseBuild/signing.xml'
@@ -76,7 +76,7 @@ jobs:
       outPathRoot: '$(System.ArtifactsDirectory)\Signed'
 
   - task: PowerShell@1
-    displayName: 'Copy unsigned files to signed folder'
+    displayName: 'Copy signed files to unsigned folder'
     inputs:
       scriptType: inlineScript
       inlineScript: |
