@@ -2,23 +2,23 @@
 <SignConfigXML>
   <job platform="" configuration="" dest="__OUTPATHROOT__\signed" jobname="GraphicalTools" approvers="vigarg;gstolt">
     <!-- GraphicalTools Script -->
-    <file src="__INPATHROOT__\release\out\GraphicalTools\GraphicalTools.psd1" signType="AuthenticodeFormer"
+    <file src="__INPATHROOT__\GraphicalTools\GraphicalTools.psd1" signType="AuthenticodeFormer"
       dest="__OUTPATHROOT__\GraphicalTools\GraphicalTools.psd1" />
 
     <!-- GraphicalTools Binary -->
-    <file src="__INPATHROOT__\release\out\GraphicalTools\GraphicalToolsModule.dll" signType="AuthenticodeFormer"
+    <file src="__INPATHROOT__\GraphicalTools\GraphicalToolsModule.dll" signType="AuthenticodeFormer"
       dest="__OUTPATHROOT__\GraphicalTools\GraphicalToolsModule.dll" />
-    <file src="__INPATHROOT__\release\out\GraphicalTools\OutGridView.Models.dll" signType="AuthenticodeFormer"
+    <file src="__INPATHROOT__\GraphicalTools\OutGridView.Models.dll" signType="AuthenticodeFormer"
       dest="__OUTPATHROOT__\GraphicalTools\OutGridView.Models.dll" />
-    <file src="__INPATHROOT__\release\out\GraphicalTools\OutGridView.Gui\linux-x64\OutGridView.Gui.dll" signType="AuthenticodeFormer"
+    <file src="__INPATHROOT__\GraphicalTools\OutGridView.Gui\linux-x64\OutGridView.Gui.dll" signType="AuthenticodeFormer"
       dest="__OUTPATHROOT__\GraphicalTools\OutGridView.Gui\linux-x64\OutGridView.Gui.dll" />
-    <file src="__INPATHROOT__\release\out\GraphicalTools\OutGridView.Gui\win-x64\OutGridView.Gui.dll" signType="AuthenticodeFormer"
+    <file src="__INPATHROOT__\GraphicalTools\OutGridView.Gui\win-x64\OutGridView.Gui.dll" signType="AuthenticodeFormer"
       dest="__OUTPATHROOT__\GraphicalTools\OutGridView.Gui\win-x64\OutGridView.Gui.dll" />
-    <file src="__INPATHROOT__\release\out\GraphicalTools\OutGridView.Gui\osx-x64\OutGridView.Gui.dll" signType="AuthenticodeFormer"
+    <file src="__INPATHROOT__\GraphicalTools\OutGridView.Gui\osx-x64\OutGridView.Gui.dll" signType="AuthenticodeFormer"
       dest="__OUTPATHROOT__\GraphicalTools\OutGridView.Gui\osx-x64\OutGridView.Gui.dll" />
 
     <!-- GraphicalTools Executables -->
-    <file src="__INPATHROOT__\release\out\GraphicalTools\OutGridView.Gui\win-x64\OutGridView.Gui.exe" signType="AuthenticodeFormer"
+    <file src="__INPATHROOT__\GraphicalTools\OutGridView.Gui\win-x64\OutGridView.Gui.exe" signType="AuthenticodeFormer"
       dest="__OUTPATHROOT__\GraphicalTools\OutGridView.Gui\win-x64\OutGridView.Gui.exe" />
   </job>
 </SignConfigXML>

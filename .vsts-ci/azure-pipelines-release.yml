@@ -33,14 +33,14 @@ trigger:
 
 jobs:
 - job: 'ReleaseBuild'
-  displayName: PowerShell 6 | Windows 10
+  displayName: Release Build
   pool:
     vmImage: 'vs2017-win2016'
   steps:
   - template: templates/ci-general.yml
 
 - job: 'SignBuild'
-  displayName: PowerShell 6 | macOS
+  displayName: Signing Build
   dependsOn: 'ReleaseBuild'
   pool:
     name: 'Package ES CodeHub Lab E'
