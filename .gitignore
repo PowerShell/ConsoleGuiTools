@@ -38,3 +38,6 @@ module/
 
 # ingore downloaded .NET
 .dotnet
+
+# Ignore package
+GraphicalTools.zip
