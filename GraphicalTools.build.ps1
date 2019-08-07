@@ -8,17 +8,17 @@ $script:Configuration = "Debug"
 
 #TODO add other platforms
 # $script:TargetPlatforms = @("win10-x64", "osx-x64", "linux-x64")
-$script:TargetPlatforms = @("osx-x64")
+$script:TargetPlatforms = @("win-x64")
 
 $script:RequiredBuildAssets = @{
     $script:ModuleBinPath = @{
-        'GraphicalToolsModule'      = @(
+        'GraphicalToolsModule' = @(
             'publish/GraphicalToolsModule.dll',
             'publish/GraphicalToolsModule.pdb',
             'publish/GraphicalTools.psd1'
         )
 
-        'OutGridView.Models'      = @(
+        'OutGridView.Models'   = @(
             'publish/OutGridView.Models.dll',
             'publish/OutGridView.Models.pdb'
         )
@@ -29,7 +29,7 @@ $script:NativeBuildAssets = @(
     'OutGridView.Gui' 
 )
 
-task SetupDotNet -Before Clean,Build {
+task SetupDotNet -Before Clean, Build {
 
     $dotnetPath = "$PSScriptRoot/.dotnet"
     $dotnetExePath = if ($script:IsUnix) { "$dotnetPath/dotnet" } else { "$dotnetPath/dotnet.exe" }
@@ -87,8 +87,7 @@ task SetupDotNet -Before Clean,Build {
 
     # This variable is used internally by 'dotnet' to know where it's installed
     $script:dotnetExe = Resolve-Path $script:dotnetExe
-    if (!$env:DOTNET_INSTALL_DIR)
-    {
+    if (!$env:DOTNET_INSTALL_DIR) {
         $dotnetExeDir = [System.IO.Path]::GetDirectoryName($script:dotnetExe)
         $env:PATH = $dotnetExeDir + [System.IO.Path]::PathSeparator + $env:PATH
         $env:DOTNET_INSTALL_DIR = $dotnetExeDir
@@ -104,7 +103,7 @@ task Build {
     exec { & $script:dotnetExe publish -c $script:Configuration "$PSScriptRoot/src/OutGridView.Models/OutGridView.Models.csproj" }
 
 
-    foreach($targetPlatform in $script:TargetPlatforms) {
+    foreach ($targetPlatform in $script:TargetPlatforms) {
         exec { & $script:dotnetExe publish -c $script:Configuration "$PSScriptRoot/src/OutGridView.Gui/OutGridView.Gui.csproj" -r $targetPlatform }
     }
 }
@@ -126,7 +125,7 @@ task LayoutModule -After Build {
         # For each PSES subproject
         foreach ($projectName in $script:RequiredBuildAssets[$destDir].Keys) {
             # Get the project build dir path
-            $basePath = [System.IO.Path]::Combine($PSScriptRoot, 'src', $projectName, 'bin', $Configuration,  $script:TargetFramework)
+            $basePath = [System.IO.Path]::Combine($PSScriptRoot, 'src', $projectName, 'bin', $Configuration, $script:TargetFramework)
 
             # For each asset in the subproject
             foreach ($bin in $script:RequiredBuildAssets[$destDir][$projectName]) {
@@ -140,13 +139,13 @@ task LayoutModule -After Build {
     }
 
     foreach ($projectName in $script:NativeBuildAssets) {
-        foreach($targetPlatform in $script:TargetPlatforms) {
+        foreach ($targetPlatform in $script:TargetPlatforms) {
             $destDir = Join-Path $script:ModuleBinPath $projectName $targetPlatform
 
             $null = New-Item -Force $destDir -Type Directory
 
             # Get the project build dir path
-            $publishPath = [System.IO.Path]::Combine($PSScriptRoot, 'src', $projectName, 'bin', $Configuration,  $script:TargetFramework, $targetPlatform, "publish\*" )
+            $publishPath = [System.IO.Path]::Combine($PSScriptRoot, 'src', $projectName, 'bin', $Configuration, $script:TargetFramework, $targetPlatform, "publish\*" )
 
             Write-Host $publishPath
             # Binplace the asset
@@ -158,4 +157,4 @@ task LayoutModule -After Build {
     Copy-Item -Force "$PSScriptRoot/LICENSE.txt" "$PSScriptRoot/module/GraphicalTools"
 }
 
-task . Clean,Build
+task . Clean, Build
