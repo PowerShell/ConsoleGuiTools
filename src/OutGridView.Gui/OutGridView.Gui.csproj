@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="Models\" />
+    <Compile Update="**\*.xaml.cs">
+      <DependentUpon>%(Filename)</DependentUpon>
+    </Compile>
+    <AvaloniaResource Include="**\*.xaml">
+      <SubType>Designer</SubType>
+    </AvaloniaResource>
+    <AvaloniaResource Include="Assets\*" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="0.8.1" />
+    <PackageReference Include="Avalonia.Desktop" Version="0.8.1" />
+    <PackageReference Include="Avalonia.Controls.DataGrid" Version="0.8.1" />
+    <PackageReference Include="Avalonia.ReactiveUI" Version="0.8.1" />
+    <PackageReference Include="DynamicData.ReactiveUI" Version="6.10.0.2604" />
+    <PackageReference Include="ReactiveUI.Fody" Version="9.16.6" />
+    <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" Version="3.0.0-preview7-27912-14" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include ="../OutGridView.Models/OutGridView.Models.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Watch Include="**\*.xaml" />
+  </ItemGroup>
+</Project>
