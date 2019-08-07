@@ -158,4 +158,16 @@ task LayoutModule -After Build {
     Copy-Item -Force "$PSScriptRoot/LICENSE.txt" "$PSScriptRoot/module/GraphicalTools"
 }
 
-task . Clean,Build
+task PackageModule {
+    [System.IO.Compression.ZipFile]::CreateFromDirectory(
+        "$PSScriptRoot/module/",
+        "$PSScriptRoot/GraphicalTools.zip",
+        [System.IO.Compression.CompressionLevel]::Optimal,
+        $false)
+}
+
+task UploadArtifacts -If ($null -ne $env:TF_BUILD) {
+    Copy-Item -Path .\GraphicalTools.zip -Destination $env:BUILD_ARTIFACTSTAGINGDIRECTORY
+}
+
+task . Clean,Build,PackageModule,UploadArtifacts
