@@ -1,9 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Management.Automation;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using OutGridView.Models;
-using System.Collections.Generic;
 
 namespace OutGridView.Cmdlet
 {
@@ -61,7 +63,25 @@ namespace OutGridView.Cmdlet
 
         public static string GetOutgridViewApplicationLocation()
         {
-            return @"C:\Users\t-jozeid\Documents\Code\GraphicalTools\src\Out-GridView\module\OutGridView\bin\Application\win10-x64\OutGridViewApplication.exe";
+            string osRid;
+            string executableName;
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                osRid = "win-x64";
+                executableName = "OutGridView.Gui.exe";
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                osRid = "osx-x64";
+                executableName = "OutGridView.Gui";
+            }
+            else
+            {
+                osRid = "linux-x64";
+                executableName = "OutGridView.Gui";
+            }
+
+            return Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "OutGridView.Gui", osRid, executableName);
         }
     }
 }

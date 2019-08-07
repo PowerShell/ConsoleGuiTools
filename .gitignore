@@ -5,9 +5,6 @@ project.lock.json
 *.pyc
 nupkg/
 
-# Visual Studio Code
-.vscode
-
 # Rider
 .idea
 
@@ -38,4 +35,6 @@ module/
 
 # Visual Studio 2015
 .vs/
-.vscode/
+
+# ingore downloaded .NET
+.dotnet

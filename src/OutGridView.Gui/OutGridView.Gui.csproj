@@ -23,7 +23,7 @@
     <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" Version="3.0.0-preview7-27912-14" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include ="../Models/OutGridViewModels.csproj" />
+    <ProjectReference Include ="../OutGridView.Models/OutGridView.Models.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Watch Include="**\*.xaml" />

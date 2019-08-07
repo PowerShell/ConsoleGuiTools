@@ -1,0 +1,54 @@
+name: PR-$(System.PullRequest.PullRequestNumber)-$(Date:yyyyMMdd)$(Rev:.rr)
+
+variables:
+  # Don't download unneeded packages
+  - name: DOTNET_SKIP_FIRST_TIME_EXPERIENCE
+    value: 'true'
+  # Improve performance by not sending telemetry
+  - name: DOTNET_CLI_TELEMETRY_OPTOUT
+    value: 'true'
+
+trigger:
+  batch: true
+  branches:
+    include:
+      - master
+  paths:
+    exclude:
+      - /.dependabot/*
+      - /.poshchan/*
+      - /.github/**/*
+      - /.vscode/**/*
+      - /.vsts-ci/misc-analysis.yml
+      - /tools/**/*
+      - .editorconfig
+      - .gitattributes
+      - .gitignore
+      - /docs/**/*
+      - /CHANGELOG.md
+      - /CONTRIBUTING.md
+      - /README.md
+      - /LICENSE.txt
+      - /CODE_OF_CONDUCT.md
+
+jobs:
+- job: 'PS6_Win10'
+  displayName: PowerShell 6 | Windows 10
+  pool:
+    vmImage: 'vs2017-win2016'
+  steps:
+  - template: templates/ci-general.yml
+
+- job: 'PS6_macOS'
+  displayName: PowerShell 6 | macOS
+  pool:
+    vmImage: 'macOS-10.13'
+  steps:
+  - template: templates/ci-general.yml
+
+- job: 'PS6_Ubuntu'
+  displayName: PowerShell 6 | Ubuntu
+  pool:
+    vmImage: 'ubuntu-16.04'
+  steps:
+  - template: templates/ci-general.yml

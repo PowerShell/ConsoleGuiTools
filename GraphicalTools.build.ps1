@@ -1,34 +1,35 @@
 
 $script:IsUnix = $PSVersionTable.PSEdition -and $PSVersionTable.PSEdition -eq "Core" -and !$IsWindows
 
-$script:ModuleBinPath = "$PSScriptRoot/module/OutGridView/bin/"
+$script:ModuleBinPath = "$PSScriptRoot/module/GraphicalTools/"
 $script:TargetFramework = "netcoreapp3.0"
 $script:RequiredSdkVersion = "3.0.100-preview5-011568"
 $script:Configuration = "Debug"
 
 #TODO add other platforms
 # $script:TargetPlatforms = @("win10-x64", "osx-x64", "linux-x64")
-$script:TargetPlatforms = @("win10-x64")
+$script:TargetPlatforms = @("osx-x64")
 
 $script:RequiredBuildAssets = @{
     $script:ModuleBinPath = @{
-        'Cmdlet'      = @(
-            'publish/OutGridViewCmdlet.dll',
-            'publish/OutGridViewCmdlet.pdb'
+        'GraphicalToolsModule'      = @(
+            'publish/GraphicalToolsModule.dll',
+            'publish/GraphicalToolsModule.pdb',
+            'publish/GraphicalTools.psd1'
         )
 
-        'Models'      = @(
-            'publish/OutGridViewModels.dll',
-            'publish/OutGridViewModels.pdb'
+        'OutGridView.Models'      = @(
+            'publish/OutGridView.Models.dll',
+            'publish/OutGridView.Models.pdb'
         )
     }
 }
 
 $script:NativeBuildAssets = @(
-    'Application' 
+    'OutGridView.Gui' 
 )
 
-task SetupDotNet -Before Build {
+task SetupDotNet -Before Clean,Build {
 
     $dotnetPath = "$PSScriptRoot/.dotnet"
     $dotnetExePath = if ($script:IsUnix) { "$dotnetPath/dotnet" } else { "$dotnetPath/dotnet.exe" }
@@ -69,7 +70,7 @@ task SetupDotNet -Before Build {
 
         # Download the official installation script and run it
         $installScriptPath = "$([System.IO.Path]::GetTempPath())dotnet-install.$installScriptExt"
-        Invoke-WebRequest "https://raw.githubusercontent.com/dotnet/cli/v$script:RequiredSdkVersion/scripts/obtain/dotnet-install.$installScriptExt" -OutFile $installScriptPath
+        Invoke-WebRequest "https://dot.net/v1/dotnet-install.$installScriptExt" -OutFile $installScriptPath
         $env:DOTNET_INSTALL_DIR = "$PSScriptRoot/.dotnet"
 
         if (!$script:IsUnix) {
@@ -96,31 +97,25 @@ task SetupDotNet -Before Build {
     Write-Host "`n### Using dotnet v$(& $script:dotnetExe --version) at path $script:dotnetExe`n" -ForegroundColor Green
 }
 
-function BuildForPlatform {
-    param (
-        [string]$TargetPlatform 
-    )
-
-    exec { & $script:dotnetExe publish -c $script:Configuration .\Cmdlet\OutGridViewCmdlet.csproj  }
-    exec { & $script:dotnetExe publish -c $script:Configuration .\Models\OutGridViewModels.csproj }
-
-    exec { & $script:dotnetExe publish -c $script:Configuration .\Application\OutGridViewApplication.csproj -r $TargetPlatform }
-}
-
 task Build {
+    Remove-Item $PSScriptRoot/module -Recurse -Force -ErrorAction Ignore
+
+    exec { & $script:dotnetExe publish -c $script:Configuration "$PSScriptRoot/src/GraphicalToolsModule/GraphicalToolsModule.csproj" }
+    exec { & $script:dotnetExe publish -c $script:Configuration "$PSScriptRoot/src/OutGridView.Models/OutGridView.Models.csproj" }
+
+
     foreach($targetPlatform in $script:TargetPlatforms) {
-        BuildForPlatform -TargetPlatform $targetPlatform
+        exec { & $script:dotnetExe publish -c $script:Configuration "$PSScriptRoot/src/OutGridView.Gui/OutGridView.Gui.csproj" -r $targetPlatform }
     }
 }
 
-task Clean -Before Build {
+task Clean {
     #Remove Module Build
-    Remove-Item $PSScriptRoot\module\OutGridView\bin -Recurse -Force -ErrorAction Ignore
+    Remove-Item $PSScriptRoot/module -Recurse -Force -ErrorAction Ignore
 
-    #Remove Project Build Folders
-    Remove-Item $PSScriptRoot\Application\bin -Recurse -Force -ErrorAction Ignore
-    Remove-Item $PSScriptRoot\Cmdlet\bin -Recurse -Force -ErrorAction Ignore
-    Remove-Item $PSScriptRoot\Models\bin -Recurse -Force -ErrorAction Ignore
+    exec { & $script:dotnetExe clean -c $script:Configuration "$PSScriptRoot/src/GraphicalToolsModule/GraphicalToolsModule.csproj" }
+    exec { & $script:dotnetExe clean -c $script:Configuration "$PSScriptRoot/src/OutGridView.Models/OutGridView.Models.csproj" }
+    exec { & $script:dotnetExe clean -c $script:Configuration "$PSScriptRoot/src/OutGridView.Gui/OutGridView.Gui.csproj" }
 }
 
 task LayoutModule -After Build {
@@ -131,7 +126,7 @@ task LayoutModule -After Build {
         # For each PSES subproject
         foreach ($projectName in $script:RequiredBuildAssets[$destDir].Keys) {
             # Get the project build dir path
-            $basePath = [System.IO.Path]::Combine($PSScriptRoot, $projectName, 'bin', $Configuration,  $script:TargetFramework)
+            $basePath = [System.IO.Path]::Combine($PSScriptRoot, 'src', $projectName, 'bin', $Configuration,  $script:TargetFramework)
 
             # For each asset in the subproject
             foreach ($bin in $script:RequiredBuildAssets[$destDir][$projectName]) {
@@ -151,14 +146,16 @@ task LayoutModule -After Build {
             $null = New-Item -Force $destDir -Type Directory
 
             # Get the project build dir path
-            $publishPath = [System.IO.Path]::Combine($PSScriptRoot, $projectName, 'bin', $Configuration,  $script:TargetFramework, $targetPlatform, "publish\*" )
+            $publishPath = [System.IO.Path]::Combine($PSScriptRoot, 'src', $projectName, 'bin', $Configuration,  $script:TargetFramework, $targetPlatform, "publish\*" )
 
             Write-Host $publishPath
             # Binplace the asset
             Copy-Item -Recurse -Force  $publishPath $destDir
         }
     }
+
+    Copy-Item -Force "$PSScriptRoot/README.md" "$PSScriptRoot/module/GraphicalTools"
+    Copy-Item -Force "$PSScriptRoot/LICENSE.txt" "$PSScriptRoot/module/GraphicalTools"
 }
 
-task . Build
-
+task . Clean,Build
