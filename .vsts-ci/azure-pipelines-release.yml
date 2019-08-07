@@ -59,6 +59,13 @@ jobs:
     inputs:
       downloadType: specific
 
+  - task: PowerShell@1
+    displayName: 'Copy unsigned files to signed folder'
+    inputs:
+      scriptType: inlineScript
+      inlineScript: |
+        Expand-Archive -Path "$(System.ArtifactsDirectory)\GraphicalTools-Windows_NT.zip" -DestinationPath "$(System.ArtifactsDirectory)"
+
   - task: PkgESCodeSign@10
     displayName: 'CodeSign tools/releaseBuild/signing.xml'
     inputs:
@@ -71,8 +78,8 @@ jobs:
     inputs:
       scriptType: inlineScript
       inlineScript: |
-        $signed="$(System.ArtifactsDirectory)\Signed\GraphicalTools-Windows_NT\*"
-        $notSigned="$(System.ArtifactsDirectory)\GraphicalTools-Windows_NT"
+        $signed="$(System.ArtifactsDirectory)\Signed\GraphicalTools\*"
+        $notSigned="$(System.ArtifactsDirectory)\GraphicalTools"
         Copy-Item $signed $notSigned -Recurse -Force
 
   - task: PowerShell@1
@@ -80,7 +87,7 @@ jobs:
     inputs:
       scriptType: inlineScript
       inlineScript: |
-        $signedDir = "$(System.ArtifactsDirectory)\GraphicalTools-Windows_NT"
+        $signedDir = "$(System.ArtifactsDirectory)\GraphicalTools"
         New-FileCatalog -CatalogFilePath "$(System.ArtifactsDirectory)\GraphicalTools.cat" -Path "$signedDir"
 
   - task: PkgESCodeSign@10
@@ -94,4 +101,4 @@ jobs:
     displayName: 'Upload Artifacts'
     inputs:
       scriptType: inlineScript
-      inlineScript: 'Write-Host "##vso[artifact.upload containerfolder=GraphicalTools;artifactname=GraphicalTools]$(System.ArtifactsDirectory)\GraphicalTools-Windows_NT"'
+      inlineScript: 'Write-Host "##vso[artifact.upload containerfolder=GraphicalTools;artifactname=GraphicalTools]$(System.ArtifactsDirectory)\GraphicalTools"'
