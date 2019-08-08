@@ -103,4 +103,4 @@ jobs:
     displayName: 'Upload Artifacts'
     inputs:
       scriptType: inlineScript
-      inlineScript: 'Write-Host "##vso[artifact.upload containerfolder=GraphicalTools-Signed;artifactname=GraphicalTools]$(System.ArtifactsDirectory)\GraphicalTools\GraphicalTools"'
+      inlineScript: 'Write-Host "##vso[artifact.upload containerfolder=GraphicalTools-Signed;artifactname=GraphicalTools-Signed]$(System.ArtifactsDirectory)\GraphicalTools\GraphicalTools"'
