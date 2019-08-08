@@ -64,7 +64,7 @@ jobs:
     inputs:
       scriptType: inlineScript
       inlineScript: |
-        Expand-Archive -Path "$(System.ArtifactsDirectory)\GraphicalTools\GraphicalTools-Windows_NT.zip" -DestinationPath "$(System.ArtifactsDirectory)\GraphicalTools\GraphicalTools"
+        Expand-Archive -Path "$(System.ArtifactsDirectory)\GraphicalTools\GraphicalTools-Windows_NT.zip" -DestinationPath "$(System.ArtifactsDirectory)\GraphicalTools"
 
   - task: PkgESCodeSign@10
     displayName: 'CodeSign tools/releaseBuild/signing.xml'
@@ -81,7 +81,7 @@ jobs:
       scriptType: inlineScript
       inlineScript: |
         $signed="$(System.ArtifactsDirectory)\Signed\GraphicalTools\*"
-        $notSigned="$(System.ArtifactsDirectory)\GraphicalTools\GraphicalTools"
+        $notSigned="$(System.ArtifactsDirectory)\GraphicalTools"
         Copy-Item $signed $notSigned -Recurse -Force
 
   - task: PowerShell@1
@@ -103,4 +103,4 @@ jobs:
     displayName: 'Upload Artifacts'
     inputs:
       scriptType: inlineScript
-      inlineScript: 'Write-Host "##vso[artifact.upload containerfolder=GraphicalTools;artifactname=GraphicalTools]$(System.ArtifactsDirectory)\GraphicalTools\GraphicalTools"'
+      inlineScript: 'Write-Host "##vso[artifact.upload containerfolder=GraphicalTools-Signed;artifactname=GraphicalTools]$(System.ArtifactsDirectory)\GraphicalTools\GraphicalTools"'
