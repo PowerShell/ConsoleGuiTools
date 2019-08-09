@@ -66,7 +66,7 @@ jobs:
     inputs:
       scriptType: inlineScript
       inlineScript: |
-        Expand-Archive -Path "$env:SYSTEM_ARTIFACTSTAGINGDIRECTORY\GraphicalTools\GraphicalTools-Windows_NT.zip" -DestinationPath "$env:SYSTEM_ARTIFACTSTAGINGDIRECTORY\GraphicalTools"
+        Expand-Archive -Path "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\GraphicalTools\GraphicalTools-Windows_NT.zip" -DestinationPath "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\GraphicalTools"
 
   - task: PkgESCodeSign@10
     displayName: 'CodeSign tools/releaseBuild/signing.xml'
@@ -74,16 +74,16 @@ jobs:
       SYSTEM_ACCESSTOKEN: $(System.AccessToken)
     inputs:
       signConfigXml: tools/releaseBuild/signing.xml
-      inPathRoot: '$(System.ArtifactStagingDirectory)'
-      outPathRoot: '$(System.ArtifactStagingDirectory)\Signed'
+      inPathRoot: '$(Build.ArtifactStagingDirectory)'
+      outPathRoot: '$(Build.ArtifactStagingDirectory)\Signed'
 
   - task: PowerShell@1
     displayName: 'Copy signed files to unsigned folder'
     inputs:
       scriptType: inlineScript
       inlineScript: |
-        $signed="$env:SYSTEM_ARTIFACTSTAGINGDIRECTORY\Signed\GraphicalTools\*"
-        $notSigned="$env:SYSTEM_ARTIFACTSTAGINGDIRECTORY\GraphicalTools"
+        $signed="$env:BUILD_ARTIFACTSTAGINGDIRECTORY\Signed\GraphicalTools\*"
+        $notSigned="$env:BUILD_ARTIFACTSTAGINGDIRECTORY\GraphicalTools"
         Copy-Item $signed $notSigned -Recurse -Force
 
   - task: PowerShell@1
@@ -91,8 +91,8 @@ jobs:
     inputs:
       scriptType: inlineScript
       inlineScript: |
-        $signedDir = "$env:SYSTEM_ARTIFACTSTAGINGDIRECTORY\GraphicalTools\GraphicalTools"
-        New-FileCatalog -CatalogFilePath "$env:SYSTEM_ARTIFACTSTAGINGDIRECTORY\GraphicalTools\GraphicalTools.cat" -Path "$signedDir"
+        $signedDir = "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\GraphicalTools\GraphicalTools"
+        New-FileCatalog -CatalogFilePath "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\GraphicalTools\GraphicalTools.cat" -Path "$signedDir"
 
   - task: PkgESCodeSign@10
     displayName: 'CodeSign tools/releaseBuild/FileCatalogSigning.xml'
@@ -100,8 +100,8 @@ jobs:
       SYSTEM_ACCESSTOKEN: $(System.AccessToken)
     inputs:
       signConfigXml: tools/releaseBuild/FileCatalogSigning.xml
-      inPathRoot: '$(System.ArtifactStagingDirectory)'
-      outPathRoot: '$(System.ArtifactStagingDirectory)'
+      inPathRoot: '$(Build.ArtifactStagingDirectory)'
+      outPathRoot: '$(Build.ArtifactStagingDirectory)'
 
   - task: ms.vss-governance-buildtask.governance-build-task-component-detection.ComponentGovernanceComponentDetection@0
     displayName: 'Component Detection'
@@ -110,7 +110,7 @@ jobs:
     inputs:
       InputType: 'Basic'
       ScanType: 'CustomScan'
-      FileDirPath: '$(Build.ArtifactsDirectory)'
+      FileDirPath: '$(Build.ArtifactStagingDirectory)'
       EnableServices: false
       SupportLogOnError: false
       TreatSignatureUpdateFailureAs: 'Warning'
@@ -133,7 +133,7 @@ jobs:
     inputs:
       InputType: 'Basic'
       Function: 'analyze'
-      AnalyzeTarget: '$(Build.ArtifactsDirectory)\GraphicalTools*\*.dll;$(Build.ArtifactsDirectory)\GraphicalTools*\*.exe'
+      AnalyzeTarget: '$(Build.ArtifactStagingDirectory)\GraphicalTools*\*.dll;$(Build.ArtifactStagingDirectory)\GraphicalTools*\*.exe'
 
   # Publish results as artifacts
   - task: PublishSecurityAnalysisLogs@3
@@ -167,4 +167,4 @@ jobs:
     condition: succeededOrFailed()
     inputs:
       scriptType: inlineScript
-      inlineScript: 'Write-Host "##vso[artifact.upload containerfolder=GraphicalTools-Signed;artifactname=GraphicalTools-Signed]$(System.ArtifactStagingDirectory)\GraphicalTools\GraphicalTools"'
+      inlineScript: 'Write-Host "##vso[artifact.upload containerfolder=GraphicalTools-Signed;artifactname=GraphicalTools-Signed]$(Build.ArtifactStagingDirectory)\GraphicalTools\GraphicalTools"'
