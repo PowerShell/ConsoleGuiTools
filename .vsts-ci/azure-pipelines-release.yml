@@ -39,8 +39,6 @@ jobs:
   steps:
   - template: templates/ci-general.yml
 
-- template: templates/credscan.yml
-
 - job: 'SignBuild'
   displayName: Signing Build
   dependsOn:
@@ -50,13 +48,11 @@ jobs:
     name: 'Package ES CodeHub Lab E'
     demands: DotNetFramework
   steps:
+  
   - task: PkgESSetupBuild@10
     displayName: 'Package ES - Setup Build'
     inputs:
       productName: GraphicalTools
-
-  - task: ms.vss-governance-buildtask.governance-build-task-component-detection.ComponentGovernanceComponentDetection@0
-    displayName: 'Component Detection'
 
   - task: DownloadBuildArtifacts@0
     displayName: 'Download Build Artifacts'
@@ -105,8 +101,68 @@ jobs:
       inPathRoot: '$(System.ArtifactsDirectory)'
       outPathRoot: '$(System.ArtifactsDirectory)'
 
+  - task: ms.vss-governance-buildtask.governance-build-task-component-detection.ComponentGovernanceComponentDetection@0
+    displayName: 'Component Detection'
+
+  - task: AntiMalware@3
+    inputs:
+      InputType: 'Basic'
+      ScanType: 'CustomScan'
+      FileDirPath: '$(Build.ArtifactsDirectory)'
+      EnableServices: false
+      SupportLogOnError: false
+      TreatSignatureUpdateFailureAs: 'Warning'
+      SignatureFreshness: 'UpToDate'
+      TreatStaleSignatureAs: 'Error'
+
+  - task: PoliCheck@1
+    condition: succeededOrFailed()
+    inputs:
+      inputType: 'Basic'
+      targetType: 'F'
+      targetArgument: '$(Build.SourcesDirectory)'
+      result: 'PoliCheck.xml'
+
+  - task: CredScan@2
+    condition: succeededOrFailed()
+
+  - task: BinSkim@3
+    condition: succeededOrFailed()
+    inputs:
+      InputType: 'Basic'
+      Function: 'analyze'
+      AnalyzeTarget: '$(Build.ArtifactsDirectory)\*.dll;$(Build.ArtifactsDirectory)\*.exe'
+
+  # Publish results as artifacts
+  - task: PublishSecurityAnalysisLogs@3
+    condition: succeededOrFailed()
+    inputs:
+      ArtifactName: 'CodeAnalysisLogs'
+      ArtifactType: 'Container'
+
+  # Publish to TSA server
+  - task: TSAUpload@1
+    condition: succeededOrFailed()
+    inputs:
+      tsaVersion: 'TsaV2'
+      codebase: 'Existing'
+      tsaEnvironment: 'PROD'
+      codeBaseName: 'PowerShell_GraphicalTools_20190809'
+      uploadAPIScan: false
+      uploadBinSkim: true
+      uploadCredScan: true
+      uploadFortifySCA: false
+      uploadFxCop: false
+      uploadModernCop: false
+      uploadPoliCheck: true
+      uploadPREfast: false
+      uploadRoslyn: false
+      uploadTSLint: false
+      uploadAsync: true
+
   - task: PowerShell@1
     displayName: 'Upload Artifacts'
+    condition: succeededOrFailed()
     inputs:
       scriptType: inlineScript
       inlineScript: 'Write-Host "##vso[artifact.upload containerfolder=GraphicalTools-Signed;artifactname=GraphicalTools-Signed]$(System.ArtifactsDirectory)\GraphicalTools\GraphicalTools"'
