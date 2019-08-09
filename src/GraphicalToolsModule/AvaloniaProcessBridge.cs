@@ -81,7 +81,7 @@ namespace OutGridView.Cmdlet
             string executableName;
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                osRid = "win10-x64";
+                osRid = "win-x64";
                 executableName = "OutGridView.Gui.exe";
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
