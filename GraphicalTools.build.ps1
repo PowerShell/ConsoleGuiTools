@@ -112,6 +112,8 @@ task Clean {
     exec { & $script:dotnetExe clean -c $script:Configuration "$PSScriptRoot/src/GraphicalToolsModule/GraphicalToolsModule.csproj" }
     exec { & $script:dotnetExe clean -c $script:Configuration "$PSScriptRoot/src/OutGridView.Models/OutGridView.Models.csproj" }
     exec { & $script:dotnetExe clean -c $script:Configuration "$PSScriptRoot/src/OutGridView.Gui/OutGridView.Gui.csproj" }
+
+    Get-ChildItem $PSScriptRoot\module\GraphicalTools\Commands\en-US\*-help.xml -ErrorAction Ignore | Remove-Item -Force -ErrorAction Ignore
 }
 
 task LayoutModule -After Build {
@@ -154,6 +156,10 @@ task LayoutModule -After Build {
     Copy-Item -Force "$PSScriptRoot/LICENSE.txt" "$PSScriptRoot/module/GraphicalTools"
 }
 
+task BuildCmdletHelp {
+    New-ExternalHelp -Path $PSScriptRoot\docs -OutputPath $PSScriptRoot\module\GraphicalTools\en-US -Force
+}
+
 task PackageModule {
     Remove-Item "$PSScriptRoot/GraphicalTools.zip" -Force -ErrorAction Ignore
     Compress-Archive -Path "$PSScriptRoot/module/GraphicalTools" -DestinationPath GraphicalTools.zip -CompressionLevel Optimal -Force
@@ -163,4 +169,4 @@ task UploadArtifacts -If ($null -ne $env:TF_BUILD) {
     Copy-Item -Path ".\GraphicalTools.zip" -Destination "$env:BUILD_ARTIFACTSTAGINGDIRECTORY/GraphicalTools-$($env:AGENT_OS).zip"
 }
 
-task . Clean, Build, PackageModule, UploadArtifacts
+task . Clean, Build, BuildCmdletHelp, PackageModule, UploadArtifacts

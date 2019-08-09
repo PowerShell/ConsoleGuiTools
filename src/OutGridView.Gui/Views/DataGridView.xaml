@@ -20,7 +20,7 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </Expander>
-        <DataGrid Name="DataGridTable" DockPanel.Dock="Top" Items="{Binding ViewObjects, Mode=OneWay}" CanUserReorderColumns="True" CanUserSortColumns="True" IsReadOnly="True" SelectionMode="{Binding SelectionMode}" />
+        <DataGrid Name="DataGridTable" DockPanel.Dock="Top" Items="{Binding ViewObjects, Mode=OneWay}" CanUserReorderColumns="True" CanUserSortColumns="True" IsReadOnly="True" SelectionMode="{Binding SelectionMode}" ClipboardCopyMode="None" />
     </DockPanel>
 </UserControl> 
  
