@@ -39,9 +39,13 @@ jobs:
   steps:
   - template: templates/ci-general.yml
 
+- template: templates/credscan.yml
+
 - job: 'SignBuild'
   displayName: Signing Build
-  dependsOn: 'ReleaseBuild'
+  dependsOn:
+    - 'ReleaseBuild'
+    - 'credscan'
   pool:
     name: 'Package ES CodeHub Lab E'
     demands: DotNetFramework
