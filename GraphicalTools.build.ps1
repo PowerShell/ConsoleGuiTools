@@ -5,7 +5,7 @@ $script:ModuleBinPath = "$PSScriptRoot/module/GraphicalTools/"
 $script:TargetFramework = "netcoreapp3.0"
 $script:RequiredSdkVersion = "3.0.100-preview5-011568"
 $script:Configuration = "Debug"
-$script:TargetPlatforms = @("win10-x64", "osx-x64", "linux-x64")
+$script:TargetPlatforms = @("win-x64", "osx-x64", "linux-x64")
 
 $script:RequiredBuildAssets = @{
     $script:ModuleBinPath = @{
