@@ -5,8 +5,6 @@ $script:ModuleBinPath = "$PSScriptRoot/module/GraphicalTools/"
 $script:TargetFramework = "netcoreapp3.0"
 $script:RequiredSdkVersion = "3.0.100-preview5-011568"
 $script:Configuration = "Debug"
-
-#TODO add other platforms
 $script:TargetPlatforms = @("win10-x64", "osx-x64", "linux-x64")
 
 $script:RequiredBuildAssets = @{
@@ -156,4 +154,13 @@ task LayoutModule -After Build {
     Copy-Item -Force "$PSScriptRoot/LICENSE.txt" "$PSScriptRoot/module/GraphicalTools"
 }
 
-task . Clean, Build
+task PackageModule {
+    Remove-Item "$PSScriptRoot/GraphicalTools.zip" -Force -ErrorAction Ignore
+    Compress-Archive -Path "$PSScriptRoot/module/GraphicalTools" -DestinationPath GraphicalTools.zip -CompressionLevel Optimal -Force
+}
+
+task UploadArtifacts -If ($null -ne $env:TF_BUILD) {
+    Copy-Item -Path ".\GraphicalTools.zip" -Destination "$env:BUILD_ARTIFACTSTAGINGDIRECTORY/GraphicalTools-$($env:AGENT_OS).zip"
+}
+
+task . Clean, Build, PackageModule, UploadArtifacts
