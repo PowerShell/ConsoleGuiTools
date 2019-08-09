@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -13,7 +16,7 @@ namespace OutGridView.Cmdlet
     {
         private static Process _process;
 
-        public static List<int> SelectedIndexes { get; }
+        public static List<int> SelectedIndexes { get; set; }
         public static void Start(ApplicationData applicationData)
         {
             _process = new Process();
@@ -33,7 +36,7 @@ namespace OutGridView.Cmdlet
             {
                 if (!string.IsNullOrWhiteSpace(data.Data))
                 {
-                    var selectedIndexes = Serializers.ObjectFromJson<List<int>>(data.Data);
+                    SelectedIndexes = Serializers.ObjectFromJson<List<int>>(data.Data);
                 }
             };
 
@@ -59,6 +62,17 @@ namespace OutGridView.Cmdlet
         public static void CloseProcess()
         {
             _process.Close();
+        }
+        public static bool IsClosed()
+        {
+            if (_process == null || _process.HasExited)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         public static string GetOutgridViewApplicationLocation()

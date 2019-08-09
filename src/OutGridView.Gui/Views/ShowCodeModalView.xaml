@@ -1,0 +1,11 @@
+<Window xmlns="https://github.com/avaloniaui" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+    xmlns:vm="clr-namespace:OutGridView.Application.ViewModels;assembly=OutGridViewApplication" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d" SizeToContent="WidthAndHeight" x:Class="OutGridView.Application.Views.ShowCodeModal" Icon="/Assets/Powershell_black.ico" Title="Show Code" Padding="10">
+    <StackPanel>
+        <TextBox FontSize="15" Focusable="True" Text="{Binding FilterScript, Mode=OneWay}" IsReadOnly="True" />
+        <Button Classes="primary" Content="Copy To Clipboard" Width="125" Command="{Binding CopyToClipboardCommand}" Margin="0,10,0,0" HorizontalAlignment="Left" />
+    </StackPanel>
+</Window>
+  

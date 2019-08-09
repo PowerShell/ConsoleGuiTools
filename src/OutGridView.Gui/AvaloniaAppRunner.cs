@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 using System;
 using Avalonia;
 using System.Collections.Generic;
@@ -51,6 +54,8 @@ namespace OutGridView.Application
 
             _mainWindow.Show();
             _mainWindow.Closing += Window_Closing;
+
+            App.MainWindow = _mainWindow;
 
             App.Run(_source.Token);
 

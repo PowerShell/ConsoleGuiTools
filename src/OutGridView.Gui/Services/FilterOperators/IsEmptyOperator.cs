@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 using System;
 namespace OutGridView.Application.Services.FilterOperators
 {
@@ -8,6 +11,10 @@ namespace OutGridView.Application.Services.FilterOperators
         public bool Execute(string input)
         {
             return String.IsNullOrWhiteSpace(input);
+        }
+        public string GetPowerShellString()
+        {
+            return $"-EQ \'\'";
         }
     }
 }

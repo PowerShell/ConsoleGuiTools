@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,7 +28,7 @@ namespace OutGridView.Application.Services
 
             return dataList => filterGroups.Items.All(filterGroup =>
             {
-                return filterGroup.Items.Any(f =>
+                return filterGroup.Filters.Any(f =>
                 {
                     //Empty filter is always valid (if it requires a value)
                     if (f.SelectedFilterOperator.HasValue && String.IsNullOrEmpty(f.Value))

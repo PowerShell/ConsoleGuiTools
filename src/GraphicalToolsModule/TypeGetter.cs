@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 using System;
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
@@ -120,13 +123,16 @@ namespace OutGridView.Cmdlet
             }
             return types;
         }
-        public static List<DataTableColumn> GetColumnHeadersForObject(PSObject ps, FormatViewDefinition fvd, List<Type> types)
+        public static List<DataTableColumn> GetDataColumnsForObject(PSObject ps, FormatViewDefinition fvd, List<Type> types)
         {
             var labels = new List<string>();
+
+            var propertyAccesors = new List<string>();
 
             if (fvd == null)
             {
                 labels = ps.Properties.Select(x => x.Name).ToList();
+                propertyAccesors = ps.Properties.Select(x => $"$_.{x.Name}").ToList();
             }
             else
             {
@@ -134,7 +140,9 @@ namespace OutGridView.Cmdlet
 
                 var definedColumnLabels = tableControl.Headers.Select(x => x.Label);
 
-                var propertyLabels = tableControl.Rows[0].Columns.Select(x => x.DisplayEntry.Value);
+                var displayEntries = tableControl.Rows[0].Columns.Select(x => x.DisplayEntry);
+
+                var propertyLabels = displayEntries.Select(x => x.Value);
 
                 //Use the TypeDefinition Label if availble otherwise just use the property name as a label
                 labels = definedColumnLabels.Zip(propertyLabels, (definedColumnLabel, propertyLabel) =>
@@ -145,11 +153,28 @@ namespace OutGridView.Cmdlet
                     }
                     return definedColumnLabel;
                 }).ToList();
+
+
+                propertyAccesors = displayEntries.Select(x =>
+                   {
+                       //If it's a propety access directly
+                       if (x.ValueType == DisplayEntryValueType.Property)
+                       {
+                           return $"$_.{x.Value}";
+                       }
+                       //Otherwise return access script
+                       return x.Value;
+                   }).ToList();
             }
 
-            return labels.Zip(types, (label, type) => (label, type))
-               .Select((labelTypePair, i) => new DataTableColumn(labelTypePair.label, i, labelTypePair.type.FullName))
-               .ToList();
+            var dataColumns = new List<DataTableColumn>();
+
+            for (var i = 0; i < labels.Count; i++)
+            {
+                dataColumns.Add(new DataTableColumn(labels[i], i, types[i].Name, propertyAccesors[i]));
+            }
+
+            return dataColumns;
         }
 
         public static DataTable CastObjectsToTableView(List<PSObject> psObjects, FormatViewDefinition fvd)
@@ -158,7 +183,7 @@ namespace OutGridView.Cmdlet
 
             var columnTypes = GetTypesForColumns(formattedObjects);
 
-            var columnHeaders = GetColumnHeadersForObject(psObjects.First(), fvd, columnTypes);
+            var columnHeaders = GetDataColumnsForObject(psObjects.First(), fvd, columnTypes);
 
             return new DataTable(columnHeaders, formattedObjects);
         }
