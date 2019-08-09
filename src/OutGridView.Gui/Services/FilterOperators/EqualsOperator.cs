@@ -9,7 +9,11 @@ namespace OutGridView.Application.Services.FilterOperators
         public string Value { get; set; }
         public bool Execute(string input)
         {
-            return input.Equals(Value);
+            return input.Equals(Value, StringComparison.CurrentCultureIgnoreCase);
+        }
+        public string GetPowerShellString()
+        {
+            return $"-EQ \'{Value}\'";
         }
     }
 }

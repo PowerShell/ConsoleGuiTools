@@ -4,5 +4,6 @@ namespace OutGridView.Application.Services.FilterOperators
     {
         bool HasValue { get; }
         bool Execute(string input);
+        string GetPowerShellString();
     }
 }

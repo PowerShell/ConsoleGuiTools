@@ -11,12 +11,14 @@ namespace OutGridView.Models
         public string Label { get; set; }
         //Serializable Version of Type
         public string StringType { get; set; }
+        public string PropertyScriptAccessor { get; set; }
         public int Index { get; set; }
-        public DataTableColumn(string label, int index, string stringType)
+        public DataTableColumn(string label, int index, string stringType, string propertyScriptAccessor)
         {
             Label = label;
             Index = index;
             StringType = stringType;
+            PropertyScriptAccessor = propertyScriptAccessor;
         }
     }
 }

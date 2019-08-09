@@ -15,10 +15,10 @@
           <DataTemplate>
             <DockPanel Margin="0,0,5,0">
               <Border DockPanel.Dock="Top" Background="{DynamicResource ThemeControlMidBrush}" Height="25" Margin="0,0,0,1" Padding="5,0,0,0">
-                <TextBlock Text="{Binding Key.Label}" VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding DataColumn.Label}" VerticalAlignment="Center"/>
               </Border>
-              <Button Classes="primary" Margin="0,5,0,0" HorizontalAlignment="Stretch" Command="{Binding $parent[UserControl].DataContext.AddFilterCommand}" CommandParameter="{Binding Key}" DockPanel.Dock="Bottom" Content="{Binding Path=Key.Label, StringFormat='Add {0} Filter'}"/>
-              <ItemsControl Items="{Binding Items}">
+              <Button Classes="primary" Margin="0,5,0,0" HorizontalAlignment="Stretch" Command="{Binding $parent[UserControl].DataContext.AddFilterCommand}" CommandParameter="{Binding DataColumn}" DockPanel.Dock="Bottom" Content="{Binding Path=DataColumn.Label, StringFormat='Add {0} Filter'}"/>
+              <ItemsControl Items="{Binding Filters}">
                 <ItemsControl.ItemTemplate>
                   <DataTemplate>
                     <Grid ColumnDefinitions="auto,*,auto">
@@ -44,7 +44,7 @@
     <DockPanel Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Top">
       <StackPanel Orientation="Horizontal">
         <Button Classes="secondary" Command="{Binding ClearFiltersCommand}" Content="Clear Filters" />
-        <Button Classes="primary" Content="Show Code"/>
+        <Button Classes="primary" Content="Show Code" Command="{Binding ShowCodeCommand}"/>
       </StackPanel>
     </DockPanel>
   </Grid>

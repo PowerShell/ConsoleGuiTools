@@ -9,5 +9,9 @@ namespace OutGridView.Application.Services.FilterOperators
         {
             return String.IsNullOrWhiteSpace(input);
         }
+        public string GetPowerShellString()
+        {
+            return $"-EQ \'\'";
+        }
     }
 }

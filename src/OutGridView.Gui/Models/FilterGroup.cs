@@ -13,12 +13,12 @@ namespace OutGridView.Application.Models
 {
     public class FilterGroup : ReactiveObject
     {
-        public FilterGroup(DataTableColumn key, IEnumerable<Filter> items)
+        public FilterGroup(DataTableColumn dataColumn, IEnumerable<Filter> filters)
         {
-            this.Key = key;
-            this.Items = items;
+            this.DataColumn = dataColumn;
+            this.Filters = filters;
         }
-        public IEnumerable<Filter> Items { get; }
-        public DataTableColumn Key { get; }
+        public IEnumerable<Filter> Filters { get; }
+        public DataTableColumn DataColumn { get; }
     }
 }

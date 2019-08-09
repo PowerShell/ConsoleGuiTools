@@ -52,6 +52,8 @@ namespace OutGridView.Application
             _mainWindow.Show();
             _mainWindow.Closing += Window_Closing;
 
+            App.MainWindow = _mainWindow;
+
             App.Run(_source.Token);
 
             _source.Dispose();

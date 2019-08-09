@@ -12,6 +12,7 @@ using System.Collections.ObjectModel;
 using ReactiveUI.Fody.Helpers;
 using DynamicData.Aggregation;
 using OutGridView.Models;
+using OutGridView.Application.Services;
 
 namespace OutGridView.Application.ViewModels
 {
@@ -29,10 +30,11 @@ namespace OutGridView.Application.ViewModels
         public ReactiveCommand<DataTableColumn, Unit> AddFilterCommand { get; }
         public ReactiveCommand<Filter, Unit> RemoveFilterCommand { get; }
         public ReactiveCommand<Unit, Unit> ClearFiltersCommand { get; }
+        public ReactiveCommand<Unit, Unit> ShowCodeCommand { get; }
         public Boolean IsColumnSelectVisible { [ObservableAsProperty] get; }
 
         //Placeholder hack for combo box
-        private DataTableColumn placeholderColumn = new DataTableColumn("Add Column Filter", -1, 1.GetType().FullName);
+        private DataTableColumn placeholderColumn = new DataTableColumn("Add Column Filter", -1, 1.GetType().FullName, "");
 
         public FilterQueryBuilderViewModel(IObservableList<DataTableColumn> dataColumns)
         {
@@ -45,6 +47,7 @@ namespace OutGridView.Application.ViewModels
             AddFilterCommand = ReactiveCommand.Create<DataTableColumn>(AddFilter);
             RemoveFilterCommand = ReactiveCommand.Create<Filter>(RemoveFilter);
             ClearFiltersCommand = ReactiveCommand.Create(ClearFilters);
+            ShowCodeCommand = ReactiveCommand.Create(ShowCode);
 
 
             this.WhenActivated((CompositeDisposable disposables) =>
@@ -62,6 +65,7 @@ namespace OutGridView.Application.ViewModels
                     .AsObservableList();
 
                 filterGroups
+                    .AutoRefresh()
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Bind(out _filtersByDataColumnView)
                     .DisposeMany()
@@ -87,9 +91,6 @@ namespace OutGridView.Application.ViewModels
                     .ToPropertyEx(this, x => x.IsColumnSelectVisible);
 
                 dataColumnOptions.Connect();
-
-
-
             });
         }
 
@@ -104,6 +105,17 @@ namespace OutGridView.Application.ViewModels
         private void RemoveFilter(Filter filter)
         {
             Filters.Remove(filter);
+        }
+
+        private void ShowCode()
+        {
+            var filterGroupList = _filtersByDataColumnView.ToList();
+            var filterString = PowerShellCodeGenerator.GetPowershellForFilterGroups(filterGroupList);
+
+            //TODO: Inject service
+            var modalService = new ModalService();
+
+            modalService.ShowCodeModal(filterString);
         }
 
         private void ClearFilters()

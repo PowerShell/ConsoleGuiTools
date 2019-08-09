@@ -25,7 +25,7 @@ namespace OutGridView.Application.Services
 
             return dataList => filterGroups.Items.All(filterGroup =>
             {
-                return filterGroup.Items.Any(f =>
+                return filterGroup.Filters.Any(f =>
                 {
                     //Empty filter is always valid (if it requires a value)
                     if (f.SelectedFilterOperator.HasValue && String.IsNullOrEmpty(f.Value))
