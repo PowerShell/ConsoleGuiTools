@@ -129,7 +129,7 @@ jobs:
     inputs:
       InputType: 'Basic'
       Function: 'analyze'
-      AnalyzeTarget: '$(Build.ArtifactsDirectory)\*.dll;$(Build.ArtifactsDirectory)\*.exe'
+      AnalyzeTarget: '$(Build.ArtifactsDirectory)\GraphicalTools*\*.dll;$(Build.ArtifactsDirectory)\GraphicalTools*\*.exe'
 
   # Publish results as artifacts
   - task: PublishSecurityAnalysisLogs@3
