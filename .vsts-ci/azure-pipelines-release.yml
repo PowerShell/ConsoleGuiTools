@@ -66,7 +66,7 @@ jobs:
     inputs:
       scriptType: inlineScript
       inlineScript: |
-        Expand-Archive -Path "$(System.ArtifactStagingDirectory)\GraphicalTools\GraphicalTools-Windows_NT.zip" -DestinationPath "$(System.ArtifactStagingDirectory)\GraphicalTools"
+        Expand-Archive -Path "$env:SYSTEM_ARTIFACTSTAGINGDIRECTORY\GraphicalTools\GraphicalTools-Windows_NT.zip" -DestinationPath "$env:SYSTEM_ARTIFACTSTAGINGDIRECTORY\GraphicalTools"
 
   - task: PkgESCodeSign@10
     displayName: 'CodeSign tools/releaseBuild/signing.xml'
@@ -82,8 +82,8 @@ jobs:
     inputs:
       scriptType: inlineScript
       inlineScript: |
-        $signed="$(System.ArtifactStagingDirectory)\Signed\GraphicalTools\*"
-        $notSigned="$(System.ArtifactStagingDirectory)\GraphicalTools"
+        $signed="$env:SYSTEM_ARTIFACTSTAGINGDIRECTORY\Signed\GraphicalTools\*"
+        $notSigned="$env:SYSTEM_ARTIFACTSTAGINGDIRECTORY\GraphicalTools"
         Copy-Item $signed $notSigned -Recurse -Force
 
   - task: PowerShell@1
@@ -91,8 +91,8 @@ jobs:
     inputs:
       scriptType: inlineScript
       inlineScript: |
-        $signedDir = "$(System.ArtifactStagingDirectory)\GraphicalTools\GraphicalTools"
-        New-FileCatalog -CatalogFilePath "$(System.ArtifactStagingDirectory)\GraphicalTools\GraphicalTools.cat" -Path "$signedDir"
+        $signedDir = "$env:SYSTEM_ARTIFACTSTAGINGDIRECTORY\GraphicalTools\GraphicalTools"
+        New-FileCatalog -CatalogFilePath "$env:SYSTEM_ARTIFACTSTAGINGDIRECTORY\GraphicalTools\GraphicalTools.cat" -Path "$signedDir"
 
   - task: PkgESCodeSign@10
     displayName: 'CodeSign tools/releaseBuild/FileCatalogSigning.xml'
