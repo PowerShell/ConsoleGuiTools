@@ -46,7 +46,7 @@ jobs:
     name: 'Package ES CodeHub Lab E'
     demands: DotNetFramework
   steps:
-  - pwsh: |
+  - powershell: |
       Get-ChildItem -Path env:
     displayName: Capture environment
     condition: succeededOrFailed()
