@@ -11,9 +11,9 @@ using ReactiveUI;
 
 namespace OutGridView.Application.Views
 {
-    public class MainWindow : ReactiveWindow<MainWindowViewModel>
+    public class ShowCodeModal : ReactiveWindow<ShowCodeModalViewModel>
     {
-        public MainWindow()
+        public ShowCodeModal()
         {
             InitializeComponent();
         }

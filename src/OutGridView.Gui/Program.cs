@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+using System;
 using Avalonia;
 using Avalonia.Logging.Serilog;
 using OutGridView.Application.ViewModels;

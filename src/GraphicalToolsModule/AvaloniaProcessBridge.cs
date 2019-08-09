@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -13,7 +16,7 @@ namespace OutGridView.Cmdlet
     {
         private static Process _process;
 
-        public static List<int> SelectedIndexes { get; }
+        public static List<int> SelectedIndexes { get; set; }
         public static void Start(ApplicationData applicationData)
         {
             _process = new Process();
@@ -33,7 +36,7 @@ namespace OutGridView.Cmdlet
             {
                 if (!string.IsNullOrWhiteSpace(data.Data))
                 {
-                    var selectedIndexes = Serializers.ObjectFromJson<List<int>>(data.Data);
+                    SelectedIndexes = Serializers.ObjectFromJson<List<int>>(data.Data);
                 }
             };
 
@@ -60,6 +63,17 @@ namespace OutGridView.Cmdlet
         {
             _process.Close();
         }
+        public static bool IsClosed()
+        {
+            if (_process == null || _process.HasExited)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
 
         public static string GetOutgridViewApplicationLocation()
         {
@@ -67,7 +81,7 @@ namespace OutGridView.Cmdlet
             string executableName;
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                osRid = "win-x64";
+                osRid = "win10-x64";
                 executableName = "OutGridView.Gui.exe";
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))

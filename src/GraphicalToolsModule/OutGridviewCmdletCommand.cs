@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 
 using System;
 using System.Collections;
@@ -11,7 +14,8 @@ namespace OutGridView.Cmdlet
 {
     /// Enum for SelectionMode parameter.
     /// </summary>
-    [Cmdlet(VerbsData.Out, "CrossGridView", DefaultParameterSetName = "PassThru", HelpUri = "https://go.microsoft.com/fwlink/?LinkID=113364")]
+    [Cmdlet(VerbsData.Out, "GridView", DefaultParameterSetName = "PassThru", HelpUri = "https://go.microsoft.com/fwlink/?LinkID=113364")]
+    [Alias("ogv")]
     public class OutGridViewCmdletCommand : PSCmdlet
     {
         #region Properties
@@ -94,6 +98,7 @@ namespace OutGridView.Cmdlet
 
         protected override void StopProcessing()
         {
+            WriteVerbose("Called Stop Processing");
             if (this.Wait || this.OutputMode != OutputModeOption.None)
             {
                 AvaloniaProcessBridge.CloseProcess();
@@ -112,7 +117,7 @@ namespace OutGridView.Cmdlet
                 baseObject is PSObject)
             {
                 ErrorRecord error = new ErrorRecord(
-                    new FormatException(""),
+                    new FormatException("Invalid data type for Out-GridView"),
                     DataNotQualifiedForGridView,
                     ErrorCategory.InvalidType,
                     null);
@@ -127,6 +132,7 @@ namespace OutGridView.Cmdlet
         protected override void EndProcessing()
         {
 
+            //TODO: Inject current powershell runtime
             var TG = new TypeGetter(PowerShell.Create());
 
             FormatViewDefinition fvd = TG.GetFormatViewDefinitonForObject(PSObjects.First());
@@ -142,14 +148,20 @@ namespace OutGridView.Cmdlet
 
             AvaloniaProcessBridge.Start(applicationData);
 
-            AvaloniaProcessBridge.WaitForExit();
+            if (this.Wait || this.OutputMode != OutputModeOption.None)
+            {
+                AvaloniaProcessBridge.WaitForExit();
+            }
 
             var selectedIndexes = AvaloniaProcessBridge.SelectedIndexes;
+
+            if (selectedIndexes == null)
+                return;
 
             foreach (int idx in selectedIndexes)
             {
                 var selectedObject = PSObjects[idx];
-                if (selectedIndexes == null)
+                if (selectedObject == null)
                 {
                     continue;
                 }
