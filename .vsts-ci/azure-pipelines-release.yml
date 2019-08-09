@@ -41,9 +41,7 @@ jobs:
 
 - job: 'SignBuild'
   displayName: Signing Build
-  dependsOn:
-    - 'ReleaseBuild'
-    - 'credscan'
+  dependsOn: 'ReleaseBuild'
   pool:
     name: 'Package ES CodeHub Lab E'
     demands: DotNetFramework
