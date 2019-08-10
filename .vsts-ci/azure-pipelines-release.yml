@@ -149,6 +149,7 @@ jobs:
   # Publish to TSA server
   - task: TSAUpload@1
     condition: succeededOrFailed()
+    continueOnError: true
     inputs:
       tsaVersion: 'TsaV2'
       codebase: 'Existing'
