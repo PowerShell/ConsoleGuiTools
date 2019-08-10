@@ -120,10 +120,13 @@ jobs:
   - task: PoliCheck@1
     condition: succeededOrFailed()
     inputs:
-      inputType: 'Basic'
-      targetType: 'F'
-      targetArgument: '$(Build.SourcesDirectory)'
-      result: 'PoliCheck.xml'
+      targetType: F
+      optionsFC: 0
+      optionsXS: 0
+      optionsPE: '1|2|3|4'
+      optionsHMENABLE: 0
+      optionsFTPATH: '$(Build.SourcesDirectory)\tools\terms\FileTypeSet.xml'
+      # toolVersion: 5.8.2.1
 
   - task: CredScan@2
     condition: succeededOrFailed()
