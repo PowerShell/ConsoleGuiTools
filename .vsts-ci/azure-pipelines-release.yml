@@ -137,7 +137,7 @@ jobs:
       InputType: 'Basic'
       Function: 'analyze'
       AnalyzeRecurse: true
-      AnalyzeTarget: '$(Build.ArtifactStagingDirectory)\GraphicalToolsModule.dll;$(Build.ArtifactStagingDirectory)\OutGridView*.dll;$(Build.ArtifactStagingDirectory)\OutGridView*.exe;$(Build.ArtifactStagingDirectory)\GraphicalTools-Signed\osx-x64\OutGridView.Gui'
+      AnalyzeTarget: '$(Build.ArtifactStagingDirectory)\GraphicalToolsModule.dll;$(Build.ArtifactStagingDirectory)\OutGridView*.dll'
 
   # Publish results as artifacts
   - task: PublishSecurityAnalysisLogs@3
