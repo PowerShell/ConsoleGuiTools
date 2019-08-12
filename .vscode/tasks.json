@@ -15,7 +15,8 @@
             "type": "process",
             "args": [
                 "-c",
-                "Invoke-Build"
+                "Invoke-Build",
+                "Build"
             ],
             "problemMatcher": "$msCompile",
             "group": {

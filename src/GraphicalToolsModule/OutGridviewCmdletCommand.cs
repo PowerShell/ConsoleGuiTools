@@ -14,7 +14,7 @@ namespace OutGridView.Cmdlet
 {
     /// Enum for SelectionMode parameter.
     /// </summary>
-    [Cmdlet(VerbsData.Out, "GridView", DefaultParameterSetName = "PassThru", HelpUri = "https://github.com/PowerShell/GraphicalTools/")]
+    [Cmdlet(VerbsData.Out, "GridView", DefaultParameterSetName = "PassThru")]
     [Alias("ogv")]
     public class OutGridViewCmdletCommand : PSCmdlet
     {
