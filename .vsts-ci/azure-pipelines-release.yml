@@ -46,13 +46,15 @@ jobs:
     name: 'Package ES CodeHub Lab E'
     demands: DotNetFramework
   steps:
+  - powershell: |
+      Get-ChildItem -Path env:
+    displayName: Capture environment
+    condition: succeededOrFailed()
+
   - task: PkgESSetupBuild@10
     displayName: 'Package ES - Setup Build'
     inputs:
       productName: GraphicalTools
-
-  - task: ms.vss-governance-buildtask.governance-build-task-component-detection.ComponentGovernanceComponentDetection@0
-    displayName: 'Component Detection'
 
   - task: DownloadBuildArtifacts@0
     displayName: 'Download Build Artifacts'
@@ -64,7 +66,7 @@ jobs:
     inputs:
       scriptType: inlineScript
       inlineScript: |
-        Expand-Archive -Path "$(System.ArtifactsDirectory)\GraphicalTools\GraphicalTools-Windows_NT.zip" -DestinationPath "$(System.ArtifactsDirectory)\GraphicalTools"
+        Expand-Archive -Path "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\GraphicalTools\GraphicalTools-Windows_NT.zip" -DestinationPath "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\GraphicalTools"
 
   - task: PkgESCodeSign@10
     displayName: 'CodeSign tools/releaseBuild/signing.xml'
@@ -72,16 +74,16 @@ jobs:
       SYSTEM_ACCESSTOKEN: $(System.AccessToken)
     inputs:
       signConfigXml: tools/releaseBuild/signing.xml
-      inPathRoot: '$(System.ArtifactsDirectory)'
-      outPathRoot: '$(System.ArtifactsDirectory)\Signed'
+      inPathRoot: '$(Build.ArtifactStagingDirectory)'
+      outPathRoot: '$(Build.ArtifactStagingDirectory)\Signed'
 
   - task: PowerShell@1
     displayName: 'Copy signed files to unsigned folder'
     inputs:
       scriptType: inlineScript
       inlineScript: |
-        $signed="$(System.ArtifactsDirectory)\Signed\GraphicalTools\*"
-        $notSigned="$(System.ArtifactsDirectory)\GraphicalTools"
+        $signed="$env:BUILD_ARTIFACTSTAGINGDIRECTORY\Signed\GraphicalTools\*"
+        $notSigned="$env:BUILD_ARTIFACTSTAGINGDIRECTORY\GraphicalTools"
         Copy-Item $signed $notSigned -Recurse -Force
 
   - task: PowerShell@1
@@ -89,8 +91,8 @@ jobs:
     inputs:
       scriptType: inlineScript
       inlineScript: |
-        $signedDir = "$(System.ArtifactsDirectory)\GraphicalTools\GraphicalTools"
-        New-FileCatalog -CatalogFilePath "$(System.ArtifactsDirectory)\GraphicalTools\GraphicalTools.cat" -Path "$signedDir"
+        $signedDir = "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\GraphicalTools\GraphicalTools"
+        New-FileCatalog -CatalogFilePath "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\GraphicalTools\GraphicalTools.cat" -Path "$signedDir"
 
   - task: PkgESCodeSign@10
     displayName: 'CodeSign tools/releaseBuild/FileCatalogSigning.xml'
@@ -98,11 +100,76 @@ jobs:
       SYSTEM_ACCESSTOKEN: $(System.AccessToken)
     inputs:
       signConfigXml: tools/releaseBuild/FileCatalogSigning.xml
-      inPathRoot: '$(System.ArtifactsDirectory)'
-      outPathRoot: '$(System.ArtifactsDirectory)'
+      inPathRoot: '$(Build.ArtifactStagingDirectory)'
+      outPathRoot: '$(Build.ArtifactStagingDirectory)'
+
+  - task: ms.vss-governance-buildtask.governance-build-task-component-detection.ComponentGovernanceComponentDetection@0
+    displayName: 'Component Detection'
+
+  - task: AntiMalware@3
+    inputs:
+      InputType: 'Basic'
+      ScanType: 'CustomScan'
+      FileDirPath: '$(Build.ArtifactStagingDirectory)'
+      EnableServices: false
+      SupportLogOnError: false
+      TreatSignatureUpdateFailureAs: 'Warning'
+      SignatureFreshness: 'UpToDate'
+      TreatStaleSignatureAs: 'Error'
+
+  - task: PoliCheck@1
+    condition: succeededOrFailed()
+    inputs:
+      targetType: F
+      optionsFC: 0
+      optionsXS: 0
+      optionsPE: '1|2|3|4'
+      optionsHMENABLE: 0
+      optionsFTPATH: '$(Build.SourcesDirectory)\tools\terms\FileTypeSet.xml'
+      # toolVersion: 5.8.2.1
+
+  - task: CredScan@2
+    condition: succeededOrFailed()
+
+  - task: BinSkim@3
+    condition: succeededOrFailed()
+    inputs:
+      InputType: 'Basic'
+      Function: 'analyze'
+      AnalyzeRecurse: true
+      AnalyzeTarget: '$(Build.ArtifactStagingDirectory)\GraphicalToolsModule.dll;$(Build.ArtifactStagingDirectory)\OutGridView*.dll'
+
+  # Publish results as artifacts
+  - task: PublishSecurityAnalysisLogs@3
+    condition: succeededOrFailed()
+    inputs:
+      ArtifactName: 'CodeAnalysisLogs'
+      ArtifactType: 'Container'
+
+  # Publish to TSA server
+  - task: TSAUpload@1
+    condition: succeededOrFailed()
+    continueOnError: true
+    inputs:
+      tsaVersion: 'TsaV2'
+      codebase: 'Existing'
+      tsaEnvironment: 'PROD'
+      codeBaseName: 'PowerShell_GraphicalTools_20190809'
+      uploadAPIScan: false
+      uploadBinSkim: true
+      uploadCredScan: true
+      uploadFortifySCA: false
+      uploadFxCop: false
+      uploadModernCop: false
+      uploadPoliCheck: true
+      uploadPREfast: false
+      uploadRoslyn: false
+      uploadTSLint: false
+      uploadAsync: true
 
   - task: PowerShell@1
     displayName: 'Upload Artifacts'
+    condition: succeededOrFailed()
     inputs:
       scriptType: inlineScript
-      inlineScript: 'Write-Host "##vso[artifact.upload containerfolder=GraphicalTools-Signed;artifactname=GraphicalTools-Signed]$(System.ArtifactsDirectory)\GraphicalTools\GraphicalTools"'
+      inlineScript: 'Write-Host "##vso[artifact.upload containerfolder=GraphicalTools-Signed;artifactname=GraphicalTools-Signed]$(Build.ArtifactStagingDirectory)\GraphicalTools\GraphicalTools"'

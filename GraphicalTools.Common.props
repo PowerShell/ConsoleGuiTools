@@ -1,0 +1,11 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <HighEntropyVA>true</HighEntropyVA>
+        <Optimize>true</Optimize>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(IsWindows)' == 'true' ">
+        <!-- This is required to be full for compliance tools !-->
+        <DebugType>full</DebugType>
+    </PropertyGroup>
+</Project>

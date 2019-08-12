@@ -101,7 +101,12 @@ task Build {
 
 
     foreach ($targetPlatform in $script:TargetPlatforms) {
-        exec { & $script:dotnetExe publish -c $script:Configuration "$PSScriptRoot/src/OutGridView.Gui/OutGridView.Gui.csproj" -r $targetPlatform }
+        $buildPropertyParams = if ($targetPlatform -eq "win-x64") {
+            "/property:IsWindows=true"
+        } else {
+            "/property:IsWindows=false"
+        }
+        exec { & $script:dotnetExe publish -c $script:Configuration "$PSScriptRoot/src/OutGridView.Gui/OutGridView.Gui.csproj" -r $targetPlatform $buildPropertyParams }
     }
 }
 
