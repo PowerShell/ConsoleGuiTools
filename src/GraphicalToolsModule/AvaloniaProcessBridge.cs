@@ -19,6 +19,8 @@ namespace OutGridView.Cmdlet
         public static List<int> SelectedIndexes { get; set; }
         public static void Start(ApplicationData applicationData)
         {
+            SelectedIndexes = new List<int>();
+
             _process = new Process();
             _process.StartInfo.FileName = GetOutgridViewApplicationLocation();
 

@@ -98,7 +98,6 @@ namespace OutGridView.Cmdlet
 
         protected override void StopProcessing()
         {
-            WriteVerbose("Called Stop Processing");
             if (this.Wait || this.OutputMode != OutputModeOption.None)
             {
                 AvaloniaProcessBridge.CloseProcess();
@@ -131,6 +130,13 @@ namespace OutGridView.Cmdlet
         // This method will be called once at the end of pipeline execution; if no input is received, this method is not called
         protected override void EndProcessing()
         {
+            base.EndProcessing();
+
+            //Return if no objects
+            if (PSObjects.Count == 0)
+            {
+                return;
+            }
 
             //TODO: Inject current powershell runtime
             var TG = new TypeGetter(PowerShell.Create());
@@ -145,6 +151,7 @@ namespace OutGridView.Cmdlet
                 PassThru = PassThru,
                 DataTable = dataTable
             };
+
 
             AvaloniaProcessBridge.Start(applicationData);
 
