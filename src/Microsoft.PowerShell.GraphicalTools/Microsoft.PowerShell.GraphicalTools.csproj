@@ -13,6 +13,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <None Update="GraphicalTools.psd1" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Microsoft.PowerShell.GraphicalTools.psd1" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
 </Project>
