@@ -28,8 +28,6 @@ namespace OutGridView.Cmdlet
             _process.StartInfo.CreateNoWindow = true;
             _process.StartInfo.UseShellExecute = false;
 
-
-
             _process.StartInfo.RedirectStandardInput = true;
             _process.StartInfo.RedirectStandardOutput = true;
             _process.StartInfo.RedirectStandardError = true;

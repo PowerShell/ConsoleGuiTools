@@ -14,5 +14,6 @@
 
     <ItemGroup>
         <None Update="Microsoft.PowerShell.GraphicalTools.psd1" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Microsoft.PowerShell.GraphicalTools.psm1" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
 </Project>
