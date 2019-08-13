@@ -1,5 +1,10 @@
 # GraphicalTools
 
+## Installation
+```powershell
+Install-Module Microsoft.PowerShell.GraphicalTools
+```
+
 ## Features
 - Out-Gridview
     - View and filter objects
@@ -28,7 +33,7 @@ Now you're ready to build the code.  You can do so in one of two ways:
 ### Building the code from PowerShell
 
 ```powershell
-PS C:\path\to\PowerShellEditorServices> Invoke-Build Build
+PS C:\path\to\GraphicalTools> Invoke-Build Build
 ```
 
 ### Building the code from Visual Studio Code
