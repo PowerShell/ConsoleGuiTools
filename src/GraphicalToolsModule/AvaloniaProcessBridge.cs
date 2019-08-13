@@ -97,7 +97,7 @@ namespace OutGridView.Cmdlet
                 executableName = "OutGridView.Gui";
             }
 
-            return Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "OutGridView.Gui", osRid, executableName);
+            return Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "OutGridView.Gui", executableName);
         }
     }
 }

@@ -5,7 +5,6 @@ $script:ModuleBinPath = "$PSScriptRoot/module/GraphicalTools/"
 $script:TargetFramework = "netcoreapp3.0"
 $script:RequiredSdkVersion = "3.0.100-preview5-011568"
 $script:Configuration = "Debug"
-$script:TargetPlatforms = @("win-x64", "osx-x64", "linux-x64")
 
 $script:RequiredBuildAssets = @{
     $script:ModuleBinPath = @{
@@ -98,16 +97,7 @@ task Build {
 
     exec { & $script:dotnetExe publish -c $script:Configuration "$PSScriptRoot/src/GraphicalToolsModule/GraphicalToolsModule.csproj" }
     exec { & $script:dotnetExe publish -c $script:Configuration "$PSScriptRoot/src/OutGridView.Models/OutGridView.Models.csproj" }
-
-
-    foreach ($targetPlatform in $script:TargetPlatforms) {
-        $buildPropertyParams = if ($targetPlatform -eq "win-x64") {
-            "/property:IsWindows=true"
-        } else {
-            "/property:IsWindows=false"
-        }
-        exec { & $script:dotnetExe publish -c $script:Configuration "$PSScriptRoot/src/OutGridView.Gui/OutGridView.Gui.csproj" -r $targetPlatform $buildPropertyParams }
-    }
+    exec { & $script:dotnetExe publish -c $script:Configuration "$PSScriptRoot/src/OutGridView.Gui/OutGridView.Gui.csproj" $buildPropertyParams }
 }
 
 task Clean {
@@ -143,18 +133,16 @@ task LayoutModule -After Build {
     }
 
     foreach ($projectName in $script:NativeBuildAssets) {
-        foreach ($targetPlatform in $script:TargetPlatforms) {
-            $destDir = Join-Path $script:ModuleBinPath $projectName $targetPlatform
+        $destDir = Join-Path $script:ModuleBinPath $projectName
 
-            $null = New-Item -Force $destDir -Type Directory
+        $null = New-Item -Force $destDir -Type Directory
 
-            # Get the project build dir path
-            $publishPath = [System.IO.Path]::Combine($PSScriptRoot, 'src', $projectName, 'bin', $Configuration, $script:TargetFramework, $targetPlatform, "publish\*" )
+        # Get the project build dir path
+        $publishPath = [System.IO.Path]::Combine($PSScriptRoot, 'src', $projectName, 'bin', $Configuration, $script:TargetFramework, "publish\*" )
 
-            Write-Host $publishPath
-            # Binplace the asset
-            Copy-Item -Recurse -Force  $publishPath $destDir
-        }
+        Write-Host $publishPath
+        # Binplace the asset
+        Copy-Item -Recurse -Force  $publishPath $destDir
     }
 
     Copy-Item -Force "$PSScriptRoot/README.md" "$PSScriptRoot/module/GraphicalTools"
