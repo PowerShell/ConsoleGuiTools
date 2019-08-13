@@ -66,7 +66,7 @@ jobs:
     inputs:
       scriptType: inlineScript
       inlineScript: |
-        Expand-Archive -Path "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\GraphicalTools\GraphicalTools-Windows_NT.zip" -DestinationPath "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\GraphicalTools"
+        Expand-Archive -Path "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\Microsoft.PowerShell.GraphicalTools\Microsoft.PowerShell.GraphicalTools-Windows_NT.zip" -DestinationPath "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\Microsoft.PowerShell.GraphicalTools"
 
   - task: PkgESCodeSign@10
     displayName: 'CodeSign tools/releaseBuild/signing.xml'
@@ -82,8 +82,8 @@ jobs:
     inputs:
       scriptType: inlineScript
       inlineScript: |
-        $signed="$env:BUILD_ARTIFACTSTAGINGDIRECTORY\Signed\GraphicalTools\*"
-        $notSigned="$env:BUILD_ARTIFACTSTAGINGDIRECTORY\GraphicalTools"
+        $signed="$env:BUILD_ARTIFACTSTAGINGDIRECTORY\Signed\Microsoft.PowerShell.GraphicalTools\*"
+        $notSigned="$env:BUILD_ARTIFACTSTAGINGDIRECTORY\Microsoft.PowerShell.GraphicalTools"
         Copy-Item $signed $notSigned -Recurse -Force
 
   - task: PowerShell@1
@@ -91,8 +91,8 @@ jobs:
     inputs:
       scriptType: inlineScript
       inlineScript: |
-        $signedDir = "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\GraphicalTools\GraphicalTools"
-        New-FileCatalog -CatalogFilePath "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\GraphicalTools\GraphicalTools.cat" -Path "$signedDir"
+        $signedDir = "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\Microsoft.PowerShell.GraphicalTools\Microsoft.PowerShell.GraphicalTools"
+        New-FileCatalog -CatalogFilePath "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\Microsoft.PowerShell.GraphicalTools\Microsoft.PowerShell.GraphicalTools.cat" -Path "$signedDir"
 
   - task: PkgESCodeSign@10
     displayName: 'CodeSign tools/releaseBuild/FileCatalogSigning.xml'
@@ -137,7 +137,7 @@ jobs:
       InputType: 'Basic'
       Function: 'analyze'
       AnalyzeRecurse: true
-      AnalyzeTarget: '$(Build.ArtifactStagingDirectory)\GraphicalToolsModule.dll;$(Build.ArtifactStagingDirectory)\OutGridView*.dll'
+      AnalyzeTarget: '$(Build.ArtifactStagingDirectory)\Microsoft.PowerShell.GraphicalTools.dll;$(Build.ArtifactStagingDirectory)\OutGridView*.dll'
 
   # Publish results as artifacts
   - task: PublishSecurityAnalysisLogs@3
@@ -172,4 +172,4 @@ jobs:
     condition: succeededOrFailed()
     inputs:
       scriptType: inlineScript
-      inlineScript: 'Write-Host "##vso[artifact.upload containerfolder=GraphicalTools-Signed;artifactname=GraphicalTools-Signed]$(Build.ArtifactStagingDirectory)\GraphicalTools\GraphicalTools"'
+      inlineScript: 'Write-Host "##vso[artifact.upload containerfolder=Microsoft.PowerShell.GraphicalTools-Signed;artifactname=Microsoft.PowerShell.GraphicalTools-Signed]$(Build.ArtifactStagingDirectory)\Microsoft.PowerShell.GraphicalTools\Microsoft.PowerShell.GraphicalTools"'

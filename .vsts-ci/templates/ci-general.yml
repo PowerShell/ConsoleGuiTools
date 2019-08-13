@@ -21,5 +21,5 @@ steps:
     condition: succeededOrFailed()
   - task: PublishBuildArtifacts@1
     inputs:
-      ArtifactName: GraphicalTools
+      ArtifactName: Microsoft.PowerShell.GraphicalTools
       PathtoPublish: '$(Build.ArtifactStagingDirectory)'
