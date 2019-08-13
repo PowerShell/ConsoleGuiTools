@@ -28,7 +28,7 @@ namespace OutGridView.Cmdlet
             _process.StartInfo.CreateNoWindow = true;
             _process.StartInfo.UseShellExecute = false;
 
-
+            _process.StartInfo.Environment.Add("DOTNET_ROOT", "C:\\Program Files\\PowerShell\\7-preview");
 
             _process.StartInfo.RedirectStandardInput = true;
             _process.StartInfo.RedirectStandardOutput = true;
