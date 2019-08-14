@@ -13,7 +13,8 @@ $script:RequiredBuildAssets = @{
         $script:ModuleName = @(
             "publish/$script:ModuleName.dll",
             "publish/$script:ModuleName.pdb",
-            "publish/$script:ModuleName.psd1"
+            "publish/$script:ModuleName.psd1",
+            "publish/$script:ModuleName.psm1"
         )
 
         'OutGridView.Models'   = @(
