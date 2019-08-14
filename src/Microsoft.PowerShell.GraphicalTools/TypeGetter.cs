@@ -26,7 +26,6 @@ namespace OutGridView.Cmdlet
 
             Runspace.DefaultRunspace = rs;
         }
-
         public FormatViewDefinition GetFormatViewDefinitonForObject(PSObject obj)
         {
             var typeName = obj.BaseObject.GetType().FullName;
@@ -49,9 +48,17 @@ namespace OutGridView.Cmdlet
             //Just iterate properties if no type def is found
             if (fvd == null)
             {
-                foreach (var property in ps.Properties)
+                if (PSObjectIsPrimitive(ps))
                 {
-                    expressions.Add(new PSPropertyExpression(property.Name));
+                    //Just return self
+                    expressions.Add(new PSPropertyExpression(ScriptBlock.Create("$_")));
+                }
+                else
+                {
+                    foreach (var property in ps.Properties)
+                    {
+                        expressions.Add(new PSPropertyExpression(property.Name));
+                    }
                 }
             }
             else
@@ -131,8 +138,16 @@ namespace OutGridView.Cmdlet
 
             if (fvd == null)
             {
-                labels = ps.Properties.Select(x => x.Name).ToList();
-                propertyAccesors = ps.Properties.Select(x => $"$_.{x.Name}").ToList();
+                if (PSObjectIsPrimitive(ps))
+                {
+                    labels = new List<string> { ps.BaseObject.GetType().Name };
+                    propertyAccesors = new List<string> { "$_" };
+                }
+                else
+                {
+                    labels = ps.Properties.Select(x => x.Name).ToList();
+                    propertyAccesors = ps.Properties.Select(x => $"$_.{x.Name}").ToList();
+                }
             }
             else
             {
@@ -186,6 +201,24 @@ namespace OutGridView.Cmdlet
             var columnHeaders = GetDataColumnsForObject(psObjects.First(), fvd, columnTypes);
 
             return new DataTable(columnHeaders, formattedObjects);
+        }
+
+
+        //Types that are condisidered primitives to PowerShell but not C#
+        private readonly static List<string> additionalPrimitiveTypes = new List<string> { "System.String",
+            "System.Decimal",
+            "System.IntPtr",
+            "System.Security.SecureString",
+            "System.Numerics.BigInteger"
+        };
+        private static bool PSObjectIsPrimitive(PSObject ps)
+        {
+
+
+            var psBaseType = ps.BaseObject.GetType();
+
+
+            return psBaseType.IsPrimitive || psBaseType.IsEnum || additionalPrimitiveTypes.Contains(psBaseType.FullName);
         }
     }
 }
