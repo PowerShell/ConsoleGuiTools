@@ -48,7 +48,7 @@ PowerShellVersion = '6.2'
 # ProcessorArchitecture = ''
 
 # Modules that must be imported into the global environment prior to importing this module
-RequiredModules = @( 'Microsoft.PowerShell.GraphicalTools.psm1' )
+RequiredModules = @( './Microsoft.PowerShell.GraphicalTools.psm1' )
 
 # Assemblies that must be loaded prior to importing this module
 # RequiredAssemblies = @()
