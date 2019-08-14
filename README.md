@@ -53,7 +53,13 @@ Open the PowerShellGraphicalTools folder that you cloned locally and press <kbd>
 We would love to incorporate community contributions into this project.  If you would like to
 contribute code, documentation, tests, or bug reports, please read our [Contribution Guide](http://powershell.github.io/GraphicalTools/CONTRIBUTING.html) to learn more.
 
+## Architecture
 
+Due do the quirks of the PowerShell threading implementation the design of GUI's in this application is non-standard. The cmdlet invokes an avalonia application as a seperate process to guaranteee the GUI is runnning on the main thread. Graphical tools therefore consists of 3 .NET Projects. 
+
+- Microsoft.PowerShell.GraphicalTools - Cmdlet implementations
+- OutGridView.Gui - Implementation of the Out-GridView window
+- OutGridView.Models - Contains data contracts between the GUI & Cmdlet
 
 ## Maintainers
 
