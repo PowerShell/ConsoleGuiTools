@@ -213,10 +213,7 @@ namespace OutGridView.Cmdlet
         };
         private static bool PSObjectIsPrimitive(PSObject ps)
         {
-
-
             var psBaseType = ps.BaseObject.GetType();
-
 
             return psBaseType.IsPrimitive || psBaseType.IsEnum || additionalPrimitiveTypes.Contains(psBaseType.FullName);
         }
