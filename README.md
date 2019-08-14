@@ -6,9 +6,16 @@ Install-Module Microsoft.PowerShell.GraphicalTools
 ```
 
 ## Features
+
+### Cross-Platform
+|Linux   |Windows   |Mac   |
+|---|---|---|
+| ![linux-gif](https://powershell.github.io/PowerShell-Blog/Images/2019-08-13-OutGridView-Returns/OutGridViewLinux.gif) |  ![window-gif](https://powershell.github.io/PowerShell-Blog/Images/2019-08-13-OutGridView-Returns/OutGridViewWindows.gif) | ![macos-gif](https://powershell.github.io/PowerShell-Blog/Images/2019-08-13-OutGridView-Returns/OutGridViewMac.gif)|
+
 - Out-Gridview
     - View and filter objects
     - Generate resuable filter code
+
 
 ## Development
 
