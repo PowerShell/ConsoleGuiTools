@@ -25,7 +25,7 @@ $script:RequiredBuildAssets = @{
 }
 
 $script:NativeBuildAssets = @(
-    'OutGridView.Gui' 
+    'OutGridView.Gui'
 )
 
 task SetupDotNet -Before Clean, Build {
@@ -145,8 +145,9 @@ task LayoutModule -After Build {
     }
 
     foreach ($projectName in $script:NativeBuildAssets) {
+        $destDir = Join-Path $script:ModuleBinPath $projectName
         foreach ($targetPlatform in $script:TargetPlatforms) {
-            $destDir = Join-Path $script:ModuleBinPath $projectName $targetPlatform
+            $destDir = Join-Path $destDir $targetPlatform
 
             $null = New-Item -Force $destDir -Type Directory
 
