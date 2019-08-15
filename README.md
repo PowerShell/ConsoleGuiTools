@@ -14,7 +14,7 @@ Install-Module Microsoft.PowerShell.GraphicalTools
 
 - Out-Gridview
     - View and filter objects
-    - Generate resuable filter code
+    - Generate reusable filter code
 
 
 ## Development
@@ -55,7 +55,7 @@ contribute code, documentation, tests, or bug reports, please read our [Contribu
 
 ## Architecture
 
-Due do the quirks of the PowerShell threading implementation the design of GUI's in this application is non-standard. The cmdlet invokes an avalonia application as a seperate process to guaranteee the GUI is runnning on the main thread. Graphical tools therefore consists of 3 .NET Projects. 
+Due to the quirks of the PowerShell threading implementation, the design of GUIs in this application are non-standard. The cmdlet invokes an Avalonia application as a separate process to guarantee the GUI is running on the main thread. Graphical tools therefore consists of 3 .NET Projects. 
 
 - Microsoft.PowerShell.GraphicalTools - Cmdlet implementations
 - OutGridView.Gui - Implementation of the Out-GridView window
