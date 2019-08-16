@@ -37,7 +37,7 @@ namespace OutGridView.Application.Services
                     }
                     var rule = f.SelectedFilterOperator;
                     var value = dataList.Values[f.DataColumn.ToString()];
-                    return rule.Execute(value == null ? String.Empty : value.DisplayValue);
+                    return rule.Execute(value?.DisplayValue ?? String.Empty);
                 });
             });
         }
