@@ -13,7 +13,7 @@ namespace OutGridView.Application.Converters
         {
             var enumValue = value as Enum;
 
-            return  enumValue?.GetDescriptionFromEnumValue() ?? Avalonia.AvaloniaProperty.UnsetValue;
+            return enumValue?.GetDescriptionFromEnumValue() ?? Avalonia.AvaloniaProperty.UnsetValue;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo cultureInfo)
