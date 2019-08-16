@@ -14,7 +14,7 @@ $script:TargetPlatforms = @("win-x64", "osx-x64", "linux-x64")
 
 $script:RequiredBuildAssets = @{
     $script:ModuleBinPath = @{
-        $script:ModuleName   = @(
+        $script:ModuleName = @(
             "publish/$script:ModuleName.dll",
             "publish/$script:ModuleName.pdb",
             "publish/$script:ModuleName.psd1",
