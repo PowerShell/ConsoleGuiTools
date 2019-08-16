@@ -14,7 +14,7 @@ namespace OutGridView.Application.Converters
         public object Convert(object value, Type targetType, object parameter, CultureInfo cultureInfo)
         {
             IValue stringValue = value as IValue;
-            return stringValue.Value;
+            return stringValue.DisplayValue;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo cultureInfo)

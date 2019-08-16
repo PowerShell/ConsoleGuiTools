@@ -8,11 +8,11 @@ namespace OutGridView.Models
 {
     public interface IValue : IComparable
     {
-        string Value { get; set; }
+        string DisplayValue { get; set; }
     }
     public class DecimalValue : IValue
     {
-        public string Value { get; set; }
+        public string DisplayValue { get; set; }
         public decimal SortValue { get; set; }
 
         public int CompareTo(object obj)
@@ -24,12 +24,12 @@ namespace OutGridView.Models
     }
     public class StringValue : IValue
     {
-        public string Value { get; set; }
+        public string DisplayValue { get; set; }
         public int CompareTo(object obj)
         {
             StringValue otherStringValue = obj as StringValue;
             if (otherStringValue == null) return 1;
-            return Value.CompareTo(otherStringValue.Value);
+            return DisplayValue.CompareTo(otherStringValue.DisplayValue);
         }
     }
     public class DataTableRow

@@ -37,7 +37,7 @@ namespace OutGridView.Application.ViewModels
         public Boolean IsColumnSelectVisible { [ObservableAsProperty] get; }
 
         //Placeholder hack for combo box
-        private DataTableColumn placeholderColumn = new DataTableColumn("Add Column Filter", 1.GetType().FullName);
+        private DataTableColumn placeholderColumn = new DataTableColumn("Add Column Filter", "System.Int32");
 
         public FilterQueryBuilderViewModel(IObservableList<DataTableColumn> dataColumns)
         {

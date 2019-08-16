@@ -43,17 +43,17 @@ namespace OutGridView.Cmdlet
 
                 var result = expression.GetValues(ps).FirstOrDefault().Result;
 
-                var stringValue = result == null ? String.Empty : result.ToString();
+                var stringValue = result?.ToString() ?? String.Empty;
 
                 var isDecimal = decimal.TryParse(stringValue, NumberStyles.Any, CultureInfo.InvariantCulture.NumberFormat, out var decimalValue);
 
                 if (isDecimal)
                 {
-                    valuePairs[dataColumn.ToString()] = new DecimalValue { Value = stringValue, SortValue = decimalValue };
+                    valuePairs[dataColumn.ToString()] = new DecimalValue { DisplayValue = stringValue, SortValue = decimalValue };
                 }
                 else
                 {
-                    valuePairs[dataColumn.ToString()] = new StringValue { Value = stringValue };
+                    valuePairs[dataColumn.ToString()] = new StringValue { DisplayValue = stringValue };
                 }
             }
 
@@ -74,9 +74,10 @@ namespace OutGridView.Cmdlet
             {
                 foreach (var dataColumn in dataTableColumns)
                 {
-                    var isNumber = dataRow[dataColumn.ToString()] is DecimalValue;
-                    if (!isNumber) dataColumn.StringType = typeof(string).FullName;
-
+                    if (!(dataRow[dataColumn.ToString()] is DecimalValue))
+                    {
+                        dataColumn.StringType = typeof(string).FullName;
+                    }
                 }
             }
         }
