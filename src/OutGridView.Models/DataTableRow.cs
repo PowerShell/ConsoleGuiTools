@@ -8,11 +8,11 @@ namespace OutGridView.Models
 {
     public interface IValue : IComparable
     {
-        string Value { get; set; }
+        string DisplayValue { get; set; }
     }
     public class DecimalValue : IValue
     {
-        public string Value { get; set; }
+        public string DisplayValue { get; set; }
         public decimal SortValue { get; set; }
 
         public int CompareTo(object obj)
@@ -24,19 +24,21 @@ namespace OutGridView.Models
     }
     public class StringValue : IValue
     {
-        public string Value { get; set; }
-        public int CompareTo(object b)
+        public string DisplayValue { get; set; }
+        public int CompareTo(object obj)
         {
-            StringValue castB = b as StringValue;
-            if (castB == null) return 1;
-            return Value.CompareTo(castB.Value);
+            StringValue otherStringValue = obj as StringValue;
+            if (otherStringValue == null) return 1;
+            return DisplayValue.CompareTo(otherStringValue.DisplayValue);
         }
     }
     public class DataTableRow
     {
-        public List<IValue> Values { get; set; }
+        //key is datacolumn hash code
+        //have to do it this way because JSON can't serialize objects as keys
+        public Dictionary<string, IValue> Values { get; set; }
         public int OriginalObjectIndex { get; set; }
-        public DataTableRow(List<IValue> data, int originalObjectIndex)
+        public DataTableRow(Dictionary<string, IValue> data, int originalObjectIndex)
         {
             Values = data;
             OriginalObjectIndex = originalObjectIndex;
