@@ -36,7 +36,7 @@ namespace OutGridView.Application.Services
                         return true;
                     }
                     var rule = f.SelectedFilterOperator;
-                    var value = dataList.Values[f.DataColumn.Index];
+                    var value = dataList.Values[f.DataColumn.ToString()];
                     return rule.Execute(value == null ? String.Empty : value.Value);
                 });
             });
@@ -54,7 +54,7 @@ namespace OutGridView.Application.Services
             //For all terms at least-one property matches
             return dataList => tokens.All(t =>
             {
-                return dataList.Values.Any(data =>
+                return dataList.Values.Select(x => x.Value).Any(data =>
                     {
                         //Quick Search is NOT case-sensitive
                         return data != null && data.Value.ToLowerInvariant().Contains(t.ToLowerInvariant());

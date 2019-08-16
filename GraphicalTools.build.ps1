@@ -1,23 +1,27 @@
 
+param(
+    [ValidateSet("Debug", "Release")]
+    [string]$Configuration = "Debug"
+)
+
 $script:IsUnix = $PSVersionTable.PSEdition -and $PSVersionTable.PSEdition -eq "Core" -and !$IsWindows
 
 $script:ModuleName = "Microsoft.PowerShell.GraphicalTools"
 $script:ModuleBinPath = "$PSScriptRoot/module/$script:ModuleName/"
 $script:TargetFramework = "netcoreapp3.0"
 $script:RequiredSdkVersion = "3.0.100-preview5-011568"
-$script:Configuration = "Debug"
-$script:TargetPlatforms = @("win-x64", "osx-x64", "linux-x64")
+$script:TargetPlatforms = @("win-x64")#, "osx-x64", "linux-x64")
 
 $script:RequiredBuildAssets = @{
     $script:ModuleBinPath = @{
-        $script:ModuleName = @(
+        $script:ModuleName   = @(
             "publish/$script:ModuleName.dll",
             "publish/$script:ModuleName.pdb",
             "publish/$script:ModuleName.psd1",
             "publish/$script:ModuleName.psm1"
         )
 
-        'OutGridView.Models'   = @(
+        'OutGridView.Models' = @(
             'publish/OutGridView.Models.dll',
             'publish/OutGridView.Models.pdb'
         )
@@ -98,17 +102,18 @@ task SetupDotNet -Before Clean, Build {
 task Build {
     Remove-Item $PSScriptRoot/module -Recurse -Force -ErrorAction Ignore
 
-    exec { & $script:dotnetExe publish -c $script:Configuration "$PSScriptRoot/src/$script:ModuleName/$script:ModuleName.csproj" }
-    exec { & $script:dotnetExe publish -c $script:Configuration "$PSScriptRoot/src/OutGridView.Models/OutGridView.Models.csproj" }
+    exec { & $script:dotnetExe publish -c $Configuration "$PSScriptRoot/src/$script:ModuleName/$script:ModuleName.csproj" }
+    exec { & $script:dotnetExe publish -c $Configuration "$PSScriptRoot/src/OutGridView.Models/OutGridView.Models.csproj" }
 
 
     foreach ($targetPlatform in $script:TargetPlatforms) {
         $buildPropertyParams = if ($targetPlatform -eq "win-x64") {
             "/property:IsWindows=true"
-        } else {
+        }
+        else {
             "/property:IsWindows=false"
         }
-        exec { & $script:dotnetExe publish -c $script:Configuration "$PSScriptRoot/src/OutGridView.Gui/OutGridView.Gui.csproj" -r $targetPlatform $buildPropertyParams }
+        exec { & $script:dotnetExe publish -c $Configuration "$PSScriptRoot/src/OutGridView.Gui/OutGridView.Gui.csproj" -r $targetPlatform $buildPropertyParams }
     }
 }
 
@@ -116,9 +121,9 @@ task Clean {
     #Remove Module Build
     Remove-Item $PSScriptRoot/module -Recurse -Force -ErrorAction Ignore
 
-    exec { & $script:dotnetExe clean -c $script:Configuration "$PSScriptRoot/src/$script:ModuleName/$script:ModuleName.csproj" }
-    exec { & $script:dotnetExe clean -c $script:Configuration "$PSScriptRoot/src/OutGridView.Models/OutGridView.Models.csproj" }
-    exec { & $script:dotnetExe clean -c $script:Configuration "$PSScriptRoot/src/OutGridView.Gui/OutGridView.Gui.csproj" }
+    exec { & $script:dotnetExe clean -c $Configuration "$PSScriptRoot/src/$script:ModuleName/$script:ModuleName.csproj" }
+    exec { & $script:dotnetExe clean -c $Configuration "$PSScriptRoot/src/OutGridView.Models/OutGridView.Models.csproj" }
+    exec { & $script:dotnetExe clean -c $Configuration "$PSScriptRoot/src/OutGridView.Gui/OutGridView.Gui.csproj" }
 
     Get-ChildItem "$PSScriptRoot\module\$script:ModuleName\Commands\en-US\*-help.xml" -ErrorAction Ignore | Remove-Item -Force -ErrorAction Ignore
 }

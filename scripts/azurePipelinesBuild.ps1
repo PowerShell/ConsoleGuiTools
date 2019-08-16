@@ -8,5 +8,5 @@ if (!(Get-Module -ListAvailable PlatyPS)) {
     Install-Module PlatyPS -Force -Scope CurrentUser
 }
 
-Invoke-Build
+Invoke-Build -Configuration Release
 Pop-Location

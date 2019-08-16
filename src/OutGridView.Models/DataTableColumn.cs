@@ -2,9 +2,9 @@
 // Licensed under the MIT License.
 
 using System;
-using System.Linq;
-using System.Collections.Generic;
 using Newtonsoft.Json;
+using System.Text;
+
 namespace OutGridView.Models
 {
     public class DataTableColumn
@@ -15,13 +15,26 @@ namespace OutGridView.Models
         //Serializable Version of Type
         public string StringType { get; set; }
         public string PropertyScriptAccessor { get; set; }
-        public int Index { get; set; }
-        public DataTableColumn(string label, int index, string stringType, string propertyScriptAccessor)
+        public DataTableColumn(string label, string propertyScriptAccessor)
         {
             Label = label;
-            Index = index;
-            StringType = stringType;
             PropertyScriptAccessor = propertyScriptAccessor;
+        }
+
+        //Distinct column defined by Label, Prop Accessor
+        public override bool Equals(object obj)
+        {
+            DataTableColumn b = obj as DataTableColumn;
+            return b.Label == Label && b.PropertyScriptAccessor == PropertyScriptAccessor;
+        }
+        public override int GetHashCode()
+        {
+            return Label.GetHashCode() + PropertyScriptAccessor.GetHashCode();
+        }
+        public override string ToString()
+        {
+            //Needs to be encoded to embed safely in xaml
+            return Convert.ToBase64String(Encoding.UTF8.GetBytes(Label + PropertyScriptAccessor));
         }
     }
 }

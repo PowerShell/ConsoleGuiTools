@@ -138,12 +138,9 @@ namespace OutGridView.Cmdlet
                 return;
             }
 
-            //TODO: Inject current powershell runtime
-            var TG = new TypeGetter(PowerShell.Create());
+            var TG = new TypeGetter(this);
 
-            FormatViewDefinition fvd = TG.GetFormatViewDefinitonForObject(PSObjects.First());
-
-            var dataTable = TypeGetter.CastObjectsToTableView(PSObjects, fvd);
+            var dataTable = TG.CastObjectsToTableView(PSObjects);
             var applicationData = new ApplicationData
             {
                 Title = Title,

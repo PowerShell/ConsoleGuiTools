@@ -56,7 +56,7 @@ namespace OutGridView.Application.Views
         {
             var binding = new Binding
             {
-                Path = "Values[" + column.DataColumn.Index + "]",
+                Path = "Values[" + column.DataColumn.ToString() + "]",
                 Mode = BindingMode.OneTime
             };
 
