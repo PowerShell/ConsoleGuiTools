@@ -82,20 +82,20 @@ namespace OutGridView.Cmdlet
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 osRid = "win-x64";
-                executableName = "OutGridView.Gui.exe";
+                executableName = "GraphicalTools.Gui.exe";
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
                 osRid = "osx-x64";
-                executableName = "OutGridView.Gui";
+                executableName = "GraphicalTools.Gui";
             }
             else
             {
                 osRid = "linux-x64";
-                executableName = "OutGridView.Gui";
+                executableName = "GraphicalTools.Gui";
             }
 
-            return Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "OutGridView.Gui", osRid, executableName);
+            return Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "GraphicalTools.Gui", osRid, executableName);
         }
     }
 }

@@ -9,7 +9,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include ="../OutGridView.Models/OutGridView.Models.csproj" />
+        <ProjectReference Include ="../GraphicalTools.Models/GraphicalTools.Models.csproj" />
     </ItemGroup>
 
     <ItemGroup>

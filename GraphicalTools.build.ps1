@@ -21,15 +21,15 @@ $script:RequiredBuildAssets = @{
             "publish/$script:ModuleName.psm1"
         )
 
-        'OutGridView.Models' = @(
-            'publish/OutGridView.Models.dll',
-            'publish/OutGridView.Models.pdb'
+        'GraphicalTools.Models' = @(
+            'publish/GraphicalTools.Models.dll',
+            'publish/GraphicalTools.Models.pdb'
         )
     }
 }
 
 $script:NativeBuildAssets = @(
-    'OutGridView.Gui' 
+    'GraphicalTools.Gui' 
 )
 
 task SetupDotNet -Before Clean, Build {
@@ -103,7 +103,7 @@ task Build {
     Remove-Item $PSScriptRoot/module -Recurse -Force -ErrorAction Ignore
 
     exec { & $script:dotnetExe publish -c $Configuration "$PSScriptRoot/src/$script:ModuleName/$script:ModuleName.csproj" }
-    exec { & $script:dotnetExe publish -c $Configuration "$PSScriptRoot/src/OutGridView.Models/OutGridView.Models.csproj" }
+    exec { & $script:dotnetExe publish -c $Configuration "$PSScriptRoot/src/GraphicalTools.Models/GraphicalTools.Models.csproj" }
 
 
     foreach ($targetPlatform in $script:TargetPlatforms) {
@@ -113,7 +113,7 @@ task Build {
         else {
             "/property:IsWindows=false"
         }
-        exec { & $script:dotnetExe publish -c $Configuration "$PSScriptRoot/src/OutGridView.Gui/OutGridView.Gui.csproj" -r $targetPlatform $buildPropertyParams }
+        exec { & $script:dotnetExe publish -c $Configuration "$PSScriptRoot/src/GraphicalTools.Gui/GraphicalTools.Gui.csproj" -r $targetPlatform $buildPropertyParams }
     }
 }
 
@@ -122,8 +122,8 @@ task Clean {
     Remove-Item $PSScriptRoot/module -Recurse -Force -ErrorAction Ignore
 
     exec { & $script:dotnetExe clean -c $Configuration "$PSScriptRoot/src/$script:ModuleName/$script:ModuleName.csproj" }
-    exec { & $script:dotnetExe clean -c $Configuration "$PSScriptRoot/src/OutGridView.Models/OutGridView.Models.csproj" }
-    exec { & $script:dotnetExe clean -c $Configuration "$PSScriptRoot/src/OutGridView.Gui/OutGridView.Gui.csproj" }
+    exec { & $script:dotnetExe clean -c $Configuration "$PSScriptRoot/src/GraphicalTools.Models/GraphicalTools.Models.csproj" }
+    exec { & $script:dotnetExe clean -c $Configuration "$PSScriptRoot/src/GraphicalTools.Gui/GraphicalTools.Gui.csproj" }
 
     Get-ChildItem "$PSScriptRoot\module\$script:ModuleName\Commands\en-US\*-help.xml" -ErrorAction Ignore | Remove-Item -Force -ErrorAction Ignore
 }
