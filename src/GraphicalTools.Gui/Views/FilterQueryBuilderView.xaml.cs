@@ -4,10 +4,10 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
-using OutGridView.Application.ViewModels;
+using GraphicalTools.Application.ViewModels;
 using ReactiveUI;
 
-namespace OutGridView.Application.Views
+namespace GraphicalTools.Application.Views
 {
     public class FilterQueryBuilderView : ReactiveUserControl<FilterQueryBuilderViewModel>
     {

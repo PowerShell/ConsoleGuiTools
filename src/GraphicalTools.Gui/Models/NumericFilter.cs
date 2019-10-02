@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 using System;
-namespace OutGridView.Application.Models
+namespace GraphicalTools.Application.Models
 {
     public class NumericFilter
     {

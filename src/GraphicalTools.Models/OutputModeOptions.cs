@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-namespace OutGridView.Models
+namespace GraphicalTools.Models
 {
     public enum OutputModeOption
     {

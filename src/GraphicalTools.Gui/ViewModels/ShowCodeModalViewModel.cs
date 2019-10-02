@@ -3,7 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-using OutGridView.Application.Models;
+using GraphicalTools.Application.Models;
 using ReactiveUI;
 using DynamicData;
 using DynamicData.ReactiveUI;
@@ -12,7 +12,7 @@ using System.Reactive;
 using Avalonia;
 using System.Reactive.Disposables;
 
-namespace OutGridView.Application.ViewModels
+namespace GraphicalTools.Application.ViewModels
 {
     public class ShowCodeModalViewModel : ViewModelBase
     {

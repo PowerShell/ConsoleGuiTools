@@ -3,24 +3,24 @@
 
 using System;
 using System.Collections.Generic;
-using OutGridView.Application.Models;
+using GraphicalTools.Application.Models;
 using ReactiveUI;
 using System.Collections.ObjectModel;
 using System.Reactive.Disposables;
 using Avalonia.Controls;
 using DynamicData;
 using Avalonia;
-using OutGridView.Application.Views;
+using GraphicalTools.Application.Views;
 using DynamicData.ReactiveUI;
 using System.Reactive.Linq;
 using System.Reflection;
 using System.Linq;
 using System.Reactive;
 using System.Threading.Tasks;
-using OutGridView.Models;
+using GraphicalTools.Models;
 
 
-namespace OutGridView.Application.ViewModels
+namespace GraphicalTools.Application.ViewModels
 {
     public class DataGridViewModel : ViewModelBase
     {

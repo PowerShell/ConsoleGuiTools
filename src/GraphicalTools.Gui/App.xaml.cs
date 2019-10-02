@@ -3,7 +3,7 @@
 
 using Avalonia.Markup.Xaml;
 
-namespace OutGridView.Application
+namespace GraphicalTools.Application
 {
     public class App : Avalonia.Application
     {

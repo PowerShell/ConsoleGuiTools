@@ -7,7 +7,7 @@ using System.Text;
 using System.Collections.Generic;
 //TODO: swich to JSON.NET
 
-namespace OutGridView.Models
+namespace GraphicalTools.Models
 {
     public class Serializers
     {

@@ -1,10 +1,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-using OutGridView.Application.Models;
+using GraphicalTools.Application.Models;
 using System;
 
-namespace OutGridView.Application.Services.FilterOperators
+namespace GraphicalTools.Application.Services.FilterOperators
 {
     public static class FilterOperatorLookup
     {

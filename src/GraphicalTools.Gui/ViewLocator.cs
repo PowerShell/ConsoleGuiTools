@@ -7,9 +7,9 @@
 using System;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
-using OutGridView.Application.ViewModels;
+using GraphicalTools.Application.ViewModels;
 
-namespace OutGridView
+namespace GraphicalTools
 {
     public class ViewLocator : IDataTemplate
     {

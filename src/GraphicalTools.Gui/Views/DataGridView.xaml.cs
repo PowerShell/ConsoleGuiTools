@@ -4,19 +4,19 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
-using OutGridView.Application.ViewModels;
-using OutGridView.Application.Models;
+using GraphicalTools.Application.ViewModels;
+using GraphicalTools.Application.Models;
 using System.Reactive.Disposables;
 using ReactiveUI;
 using System.Collections.Generic;
 using System.Linq;
-using OutGridView.Application.Converters;
+using GraphicalTools.Application.Converters;
 using DynamicData;
 using Avalonia.Data;
-using OutGridView.Models;
+using GraphicalTools.Models;
 using System;
 
-namespace OutGridView.Application.Views
+namespace GraphicalTools.Application.Views
 {
     public class DataGridView : ReactiveUserControl<DataGridViewModel>
     {

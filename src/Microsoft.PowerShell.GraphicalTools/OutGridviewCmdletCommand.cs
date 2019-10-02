@@ -7,16 +7,16 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Management.Automation;
 using System.Management.Automation.Internal;
-using OutGridView.Models;
+using GraphicalTools.Models;
 using System.Linq;
 
-namespace OutGridView.Cmdlet
+namespace GraphicalTools.Cmdlet
 {
     /// Enum for SelectionMode parameter.
     /// </summary>
     [Cmdlet(VerbsData.Out, "GridView", DefaultParameterSetName = "PassThru")]
     [Alias("ogv")]
-    public class OutGridViewCmdletCommand : PSCmdlet
+    public class GraphicalToolsCmdletCommand : PSCmdlet
     {
         #region Properties
 

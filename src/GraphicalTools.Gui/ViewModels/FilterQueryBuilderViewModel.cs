@@ -3,7 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-using OutGridView.Application.Models;
+using GraphicalTools.Application.Models;
 using ReactiveUI;
 using DynamicData;
 using DynamicData.ReactiveUI;
@@ -14,10 +14,10 @@ using System.Reactive.Linq;
 using System.Collections.ObjectModel;
 using ReactiveUI.Fody.Helpers;
 using DynamicData.Aggregation;
-using OutGridView.Models;
-using OutGridView.Application.Services;
+using GraphicalTools.Models;
+using GraphicalTools.Application.Services;
 
-namespace OutGridView.Application.ViewModels
+namespace GraphicalTools.Application.ViewModels
 {
     public class FilterQueryBuilderViewModel : ViewModelBase
     {

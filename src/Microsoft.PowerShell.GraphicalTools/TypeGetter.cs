@@ -7,9 +7,9 @@ using System.Linq;
 using System.Globalization;
 using System.Collections.Generic;
 using Microsoft.PowerShell.Commands;
-using OutGridView.Models;
+using GraphicalTools.Models;
 
-namespace OutGridView.Cmdlet
+namespace GraphicalTools.Cmdlet
 {
     public class TypeGetter
     {

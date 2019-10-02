@@ -3,7 +3,7 @@
 
 using System.ComponentModel;
 
-namespace OutGridView.Application.Models
+namespace GraphicalTools.Application.Models
 {
     public enum StringFilterOperator
     {

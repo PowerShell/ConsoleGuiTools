@@ -9,10 +9,10 @@ using System.Reactive.Linq;
 using System.Reflection;
 using DynamicData.Binding;
 using ReactiveUI;
-using OutGridView.Models;
+using GraphicalTools.Models;
 
 
-namespace OutGridView.Application.Models
+namespace GraphicalTools.Application.Models
 {
     public class FilterGroup : ReactiveObject
     {

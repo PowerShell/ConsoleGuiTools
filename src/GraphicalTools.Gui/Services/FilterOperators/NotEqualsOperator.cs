@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 using System;
-namespace OutGridView.Application.Services.FilterOperators
+namespace GraphicalTools.Application.Services.FilterOperators
 {
     public class NotEqualsOperator : IStringFilterOperator
     {

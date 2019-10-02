@@ -4,16 +4,16 @@
 using System;
 using Avalonia;
 using Avalonia.Logging.Serilog;
-using OutGridView.Application.ViewModels;
-using OutGridView.Application.Views;
-using OutGridView.Application.Services;
+using GraphicalTools.Application.ViewModels;
+using GraphicalTools.Application.Views;
+using GraphicalTools.Application.Services;
 using System.Collections.Generic;
-using OutGridView.Models;
+using GraphicalTools.Models;
 using System.Text;
 using System.Diagnostics;
 
 //Used to run the module directly from Dotnet
-namespace OutGridView.Application
+namespace GraphicalTools.Application
 {
     public class Program
     {

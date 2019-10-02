@@ -8,10 +8,10 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Reactive.Linq;
-using OutGridView.Application.Services.FilterOperators;
-using OutGridView.Models;
+using GraphicalTools.Application.Services.FilterOperators;
+using GraphicalTools.Models;
 
-namespace OutGridView.Application.Models
+namespace GraphicalTools.Application.Models
 {
     public class Filter : ReactiveObject
     {

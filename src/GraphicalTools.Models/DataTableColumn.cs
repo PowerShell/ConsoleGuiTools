@@ -5,7 +5,7 @@ using System;
 using Newtonsoft.Json;
 using System.Text;
 
-namespace OutGridView.Models
+namespace GraphicalTools.Models
 {
     public class DataTableColumn
     {

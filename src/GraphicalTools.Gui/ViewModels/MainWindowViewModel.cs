@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 using System;
-using OutGridView.Application.Services;
+using GraphicalTools.Application.Services;
 using ReactiveUI;
 using System.Reactive.Disposables;
 using ReactiveUI.Fody.Helpers;
@@ -11,10 +11,10 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive;
 using Avalonia.Controls;
-using OutGridView.Models;
+using GraphicalTools.Models;
 using System.Collections.Generic;
 
-namespace OutGridView.Application.ViewModels
+namespace GraphicalTools.Application.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase
     {

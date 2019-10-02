@@ -10,17 +10,17 @@
     <!-- Microsoft.PowerShell.GraphicalTools Binary -->
     <file src="__INPATHROOT__\Microsoft.PowerShell.GraphicalTools\Microsoft.PowerShell.GraphicalTools\Microsoft.PowerShell.GraphicalTools.dll" signType="AuthenticodeFormer"
       dest="__OUTPATHROOT__\Microsoft.PowerShell.GraphicalTools\Microsoft.PowerShell.GraphicalTools\Microsoft.PowerShell.GraphicalTools.dll" />
-    <file src="__INPATHROOT__\Microsoft.PowerShell.GraphicalTools\Microsoft.PowerShell.GraphicalTools\OutGridView.Models.dll" signType="AuthenticodeFormer"
-      dest="__OUTPATHROOT__\Microsoft.PowerShell.GraphicalTools\Microsoft.PowerShell.GraphicalTools\OutGridView.Models.dll" />
-    <file src="__INPATHROOT__\Microsoft.PowerShell.GraphicalTools\Microsoft.PowerShell.GraphicalTools\OutGridView.Gui\linux-x64\OutGridView.Gui.dll" signType="AuthenticodeFormer"
-      dest="__OUTPATHROOT__\Microsoft.PowerShell.GraphicalTools\Microsoft.PowerShell.GraphicalTools\OutGridView.Gui\linux-x64\OutGridView.Gui.dll" />
-    <file src="__INPATHROOT__\Microsoft.PowerShell.GraphicalTools\Microsoft.PowerShell.GraphicalTools\OutGridView.Gui\win-x64\OutGridView.Gui.dll" signType="AuthenticodeFormer"
-      dest="__OUTPATHROOT__\Microsoft.PowerShell.GraphicalTools\Microsoft.PowerShell.GraphicalTools\OutGridView.Gui\win-x64\OutGridView.Gui.dll" />
-    <file src="__INPATHROOT__\Microsoft.PowerShell.GraphicalTools\Microsoft.PowerShell.GraphicalTools\OutGridView.Gui\osx-x64\OutGridView.Gui.dll" signType="AuthenticodeFormer"
-      dest="__OUTPATHROOT__\Microsoft.PowerShell.GraphicalTools\Microsoft.PowerShell.GraphicalTools\OutGridView.Gui\osx-x64\OutGridView.Gui.dll" />
+    <file src="__INPATHROOT__\Microsoft.PowerShell.GraphicalTools\Microsoft.PowerShell.GraphicalTools\GraphicalTools.Models.dll" signType="AuthenticodeFormer"
+      dest="__OUTPATHROOT__\Microsoft.PowerShell.GraphicalTools\Microsoft.PowerShell.GraphicalTools\GraphicalTools.Models.dll" />
+    <file src="__INPATHROOT__\Microsoft.PowerShell.GraphicalTools\Microsoft.PowerShell.GraphicalTools\GraphicalTools.Gui\linux-x64\GraphicalTools.Gui.dll" signType="AuthenticodeFormer"
+      dest="__OUTPATHROOT__\Microsoft.PowerShell.GraphicalTools\Microsoft.PowerShell.GraphicalTools\GraphicalTools.Gui\linux-x64\GraphicalTools.Gui.dll" />
+    <file src="__INPATHROOT__\Microsoft.PowerShell.GraphicalTools\Microsoft.PowerShell.GraphicalTools\GraphicalTools.Gui\win-x64\GraphicalTools.Gui.dll" signType="AuthenticodeFormer"
+      dest="__OUTPATHROOT__\Microsoft.PowerShell.GraphicalTools\Microsoft.PowerShell.GraphicalTools\GraphicalTools.Gui\win-x64\GraphicalTools.Gui.dll" />
+    <file src="__INPATHROOT__\Microsoft.PowerShell.GraphicalTools\Microsoft.PowerShell.GraphicalTools\GraphicalTools.Gui\osx-x64\GraphicalTools.Gui.dll" signType="AuthenticodeFormer"
+      dest="__OUTPATHROOT__\Microsoft.PowerShell.GraphicalTools\Microsoft.PowerShell.GraphicalTools\GraphicalTools.Gui\osx-x64\GraphicalTools.Gui.dll" />
 
     <!-- Microsoft.PowerShell.GraphicalTools Executables -->
-    <file src="__INPATHROOT__\Microsoft.PowerShell.GraphicalTools\Microsoft.PowerShell.GraphicalTools\OutGridView.Gui\win-x64\OutGridView.Gui.exe" signType="AuthenticodeFormer"
-      dest="__OUTPATHROOT__\Microsoft.PowerShell.GraphicalTools\Microsoft.PowerShell.GraphicalTools\OutGridView.Gui\win-x64\OutGridView.Gui.exe" />
+    <file src="__INPATHROOT__\Microsoft.PowerShell.GraphicalTools\Microsoft.PowerShell.GraphicalTools\GraphicalTools.Gui\win-x64\GraphicalTools.Gui.exe" signType="AuthenticodeFormer"
+      dest="__OUTPATHROOT__\Microsoft.PowerShell.GraphicalTools\Microsoft.PowerShell.GraphicalTools\GraphicalTools.Gui\win-x64\GraphicalTools.Gui.exe" />
   </job>
 </SignConfigXML>

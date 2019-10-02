@@ -3,7 +3,7 @@
 
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-namespace OutGridView.Models
+namespace GraphicalTools.Models
 {
     public class DataTable
     {

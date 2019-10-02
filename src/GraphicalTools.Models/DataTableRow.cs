@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace OutGridView.Models
+namespace GraphicalTools.Models
 {
     public interface IValue : IComparable
     {

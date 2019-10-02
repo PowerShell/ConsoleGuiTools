@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace OutGridView.Application.Services.FilterOperators
+namespace GraphicalTools.Application.Services.FilterOperators
 {
     public class ContainsOperator : IStringFilterOperator
     {

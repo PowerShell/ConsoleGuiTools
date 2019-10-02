@@ -3,11 +3,11 @@
 
 using System;
 using Avalonia.Data.Converters;
-using OutGridView.Application.Models;
+using GraphicalTools.Application.Models;
 using System.Globalization;
-using OutGridView.Models;
+using GraphicalTools.Models;
 
-namespace OutGridView.Application.Converters
+namespace GraphicalTools.Application.Converters
 {
     public class IValueToStringConverter : IValueConverter
     {

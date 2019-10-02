@@ -4,12 +4,12 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
-using OutGridView.Application.ViewModels;
+using GraphicalTools.Application.ViewModels;
 using System.Reactive.Disposables;
 using ReactiveUI;
 
 
-namespace OutGridView.Application.Views
+namespace GraphicalTools.Application.Views
 {
     public class MainWindow : ReactiveWindow<MainWindowViewModel>
     {

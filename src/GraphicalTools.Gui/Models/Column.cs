@@ -6,10 +6,10 @@ using ReactiveUI.Fody.Helpers;
 using ReactiveUI;
 using System;
 using System.Linq;
-using OutGridView.Models;
+using GraphicalTools.Models;
 using System.Collections.Generic;
 
-namespace OutGridView.Application.Models
+namespace GraphicalTools.Application.Models
 {
     public class Column : ReactiveObject
     {

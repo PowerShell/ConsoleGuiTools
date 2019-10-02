@@ -8,9 +8,9 @@ using System.IO;
 using System.Management.Automation;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using OutGridView.Models;
+using GraphicalTools.Models;
 
-namespace OutGridView.Cmdlet
+namespace GraphicalTools.Cmdlet
 {
     class AvaloniaProcessBridge
     {
@@ -22,7 +22,7 @@ namespace OutGridView.Cmdlet
             SelectedIndexes = new List<int>();
 
             _process = new Process();
-            _process.StartInfo.FileName = GetOutgridViewApplicationLocation();
+            _process.StartInfo.FileName = GetGraphicalToolsApplicationLocation();
 
 
             _process.StartInfo.CreateNoWindow = true;
@@ -75,7 +75,7 @@ namespace OutGridView.Cmdlet
             }
         }
 
-        public static string GetOutgridViewApplicationLocation()
+        public static string GetGraphicalToolsApplicationLocation()
         {
             string osRid;
             string executableName;

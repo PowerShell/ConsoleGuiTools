@@ -5,7 +5,7 @@ using System;
 using Avalonia.Data.Converters;
 using System.Globalization;
 
-namespace OutGridView.Application.Converters
+namespace GraphicalTools.Application.Converters
 {
     public class EnumToDescriptionConverter : IValueConverter
     {

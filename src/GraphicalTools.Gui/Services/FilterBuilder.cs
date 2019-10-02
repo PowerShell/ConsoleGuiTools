@@ -6,14 +6,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using OutGridView.Application.Models;
-using OutGridView.Application.Services.FilterOperators;
+using GraphicalTools.Application.Models;
+using GraphicalTools.Application.Services.FilterOperators;
 using System.Collections.ObjectModel;
 using DynamicData;
-using OutGridView.Models;
+using GraphicalTools.Models;
 
 
-namespace OutGridView.Application.Services
+namespace GraphicalTools.Application.Services
 {
     static class FilterBuilder
     {

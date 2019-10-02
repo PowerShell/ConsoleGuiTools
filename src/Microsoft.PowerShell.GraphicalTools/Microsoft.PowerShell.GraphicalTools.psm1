@@ -4,7 +4,7 @@
 #
 
 if($IsMacOS) {
-    chmod +x "$PSScriptRoot/OutGridView.Gui/osx-x64/OutGridView.Gui"
+    chmod +x "$PSScriptRoot/GraphicalTools.Gui/osx-x64/GraphicalTools.Gui"
 } elseif ($IsLinux) {
-    chmod +x "$PSScriptRoot/OutGridView.Gui/linux-x64/OutGridView.Gui"
+    chmod +x "$PSScriptRoot/GraphicalTools.Gui/linux-x64/GraphicalTools.Gui"
 }

@@ -7,7 +7,7 @@ using System.Text;
 using System.Reactive.Disposables;
 using ReactiveUI;
 
-namespace OutGridView.Application.ViewModels
+namespace GraphicalTools.Application.ViewModels
 {
     public partial class ViewModelBase : ReactiveObject, ISupportsActivation
     {

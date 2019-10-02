@@ -1,10 +1,10 @@
 <Window xmlns="https://github.com/avaloniaui" 
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
-    xmlns:vm="clr-namespace:OutGridView.Application.ViewModels;assembly=OutGridViewApplication" 
+    xmlns:vm="clr-namespace:GraphicalTools.Application.ViewModels;assembly=GraphicalToolsApplication" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-    xmlns:views="clr-namespace:OutGridView.Application.ViewModels" 
-    xmlns:converters="clr-namespace:OutGridView.Application.Converters" Name="MainWindow" 
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d" Height="600" Width="800" x:Class="OutGridView.Application.Views.MainWindow" Icon="/Assets/Powershell_black.ico" Title="{Binding Title}">
+    xmlns:views="clr-namespace:GraphicalTools.Application.ViewModels" 
+    xmlns:converters="clr-namespace:GraphicalTools.Application.Converters" Name="MainWindow" 
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d" Height="600" Width="800" x:Class="GraphicalTools.Application.Views.MainWindow" Icon="/Assets/Powershell_black.ico" Title="{Binding Title}">
     <Window.Resources>
         <converters:EnumToDescriptionConverter x:Key="EnumDescriptionConverter"/>
     </Window.Resources>

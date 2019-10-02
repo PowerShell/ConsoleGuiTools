@@ -5,18 +5,18 @@ using System;
 using Avalonia;
 using System.Collections.Generic;
 using Avalonia.Logging.Serilog;
-using OutGridView.Application.ViewModels;
-using OutGridView.Application.Views;
-using OutGridView.Application.Services;
+using GraphicalTools.Application.ViewModels;
+using GraphicalTools.Application.Views;
+using GraphicalTools.Application.Services;
 using System.Threading;
-using OutGridView.Application.Models;
+using GraphicalTools.Application.Models;
 using System.Linq;
 using ReactiveUI;
 using Avalonia.Threading;
 using Avalonia.Controls;
-using OutGridView.Models;
+using GraphicalTools.Models;
 
-namespace OutGridView.Application
+namespace GraphicalTools.Application
 {
     public static class AvaloniaAppRunner
     {

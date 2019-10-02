@@ -1,12 +1,12 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-using OutGridView.Application.Models;
+using GraphicalTools.Application.Models;
 using System;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace OutGridView.Application.Services
+namespace GraphicalTools.Application.Services
 {
     public static class PowerShellCodeGenerator
     {

@@ -1,7 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui" 
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d" x:Class="OutGridView.Application.Views.FilterQueryBuilderView" Padding="5" HorizontalAlignment="Stretch">
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d" x:Class="GraphicalTools.Application.Views.FilterQueryBuilderView" Padding="5" HorizontalAlignment="Stretch">
   <Grid RowDefinitions="auto,auto">
     <TextBlock Classes="h1" Grid.Row="0" Grid.Column="0" Text="Filters"/>
     <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto">
