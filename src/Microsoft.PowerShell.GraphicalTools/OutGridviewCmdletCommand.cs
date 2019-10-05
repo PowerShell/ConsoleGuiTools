@@ -16,7 +16,7 @@ namespace GraphicalTools.Cmdlet
     /// </summary>
     [Cmdlet(VerbsData.Out, "GridView", DefaultParameterSetName = "PassThru")]
     [Alias("ogv")]
-    public class GraphicalToolsCmdletCommand : PSCmdlet
+    public class OutGridViewCmdletCommand : PSCmdlet
     {
         #region Properties
 
