@@ -25,8 +25,17 @@ namespace OutGridView.Cmdlet
 
             var types = _cmdlet.InvokeCommand.InvokeScript("Get-FormatData " + typeName).ToList();
 
-            //No custom type definitions found
-            if (types == null || types.Count == 0) return null;
+            //No custom type definitions found - try the PowerShell specific format data
+            if (types == null || types.Count == 0) 
+            {
+                types = _cmdlet.InvokeCommand
+                    .InvokeScript("Get-FormatData -PowerShellVersion $PSVersionTable.PSVersion " + typeName).ToList();
+
+                if (types == null || types.Count == 0)
+                {
+                    return null;
+                }
+            }
 
             var extendedTypeDefinition = types[0].BaseObject as ExtendedTypeDefinition;
 
