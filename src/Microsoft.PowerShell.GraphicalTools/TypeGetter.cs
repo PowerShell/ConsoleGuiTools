@@ -23,13 +23,13 @@ namespace OutGridView.Cmdlet
         {
             var typeName = obj.BaseObject.GetType().FullName;
 
-            var types = _cmdlet.InvokeCommand.InvokeScript("Get-FormatData " + typeName).ToList();
+            var types = _cmdlet.InvokeCommand.InvokeScript(@"Microsoft.PowerShell.Utility\Get-FormatData " + typeName).ToList();
 
             //No custom type definitions found - try the PowerShell specific format data
             if (types == null || types.Count == 0) 
             {
                 types = _cmdlet.InvokeCommand
-                    .InvokeScript("Get-FormatData -PowerShellVersion $PSVersionTable.PSVersion " + typeName).ToList();
+                    .InvokeScript(@"Microsoft.PowerShell.Utility\Get-FormatData -PowerShellVersion $PSVersionTable.PSVersion " + typeName).ToList();
 
                 if (types == null || types.Count == 0)
                 {
