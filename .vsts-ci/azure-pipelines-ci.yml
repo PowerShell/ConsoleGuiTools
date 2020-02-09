@@ -42,7 +42,7 @@ jobs:
 - job: 'PS6_macOS'
   displayName: PowerShell 6 | macOS
   pool:
-    vmImage: 'macOS-10.13'
+    vmImage: 'macOS-10.14'
   steps:
   - template: templates/ci-general.yml
 
