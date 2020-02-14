@@ -1,36 +1,20 @@
 
 param(
     [ValidateSet("Debug", "Release")]
-    [string]$Configuration = "Debug"
+    [string]$Configuration = "Debug",
+
+    [string[]]$ModuleName = @( "Microsoft.PowerShell.GraphicalTools", "Microsoft.PowerShell.ConsoleGuiTools" ) 
 )
 
 $script:IsUnix = $PSVersionTable.PSEdition -and $PSVersionTable.PSEdition -eq "Core" -and !$IsWindows
 
-$script:ModuleName = "Microsoft.PowerShell.GraphicalTools"
-$script:ModuleBinPath = "$PSScriptRoot/module/$script:ModuleName/"
 $script:TargetFramework = "netcoreapp3.0"
 $script:RequiredSdkVersion = "3.0.100-preview5-011568"
-$script:TargetPlatforms = @("win-x64", "osx-x64", "linux-x64")
 
-$script:RequiredBuildAssets = @{
-    $script:ModuleBinPath = @{
-        $script:ModuleName = @(
-            "publish/$script:ModuleName.dll",
-            "publish/$script:ModuleName.pdb",
-            "publish/$script:ModuleName.psd1",
-            "publish/$script:ModuleName.psm1"
-        )
-
-        'OutGridView.Models' = @(
-            'publish/OutGridView.Models.dll',
-            'publish/OutGridView.Models.pdb'
-        )
-    }
+$script:ModuleLayouts = @{}
+foreach ($mn in $ModuleName) {
+    $script:ModuleLayouts.$mn = Import-PowerShellDataFile -Path "$PSScriptRoot/src/$mn/ModuleLayout.psd1"
 }
-
-$script:NativeBuildAssets = @(
-    'OutGridView.Gui' 
-)
 
 task SetupDotNet -Before Clean, Build {
 
@@ -102,18 +86,22 @@ task SetupDotNet -Before Clean, Build {
 task Build {
     Remove-Item $PSScriptRoot/module -Recurse -Force -ErrorAction Ignore
 
-    exec { & $script:dotnetExe publish -c $Configuration "$PSScriptRoot/src/$script:ModuleName/$script:ModuleName.csproj" }
-    exec { & $script:dotnetExe publish -c $Configuration "$PSScriptRoot/src/OutGridView.Models/OutGridView.Models.csproj" }
-
-
-    foreach ($targetPlatform in $script:TargetPlatforms) {
-        $buildPropertyParams = if ($targetPlatform -eq "win-x64") {
-            "/property:IsWindows=true"
+    foreach ($moduleLayout in $script:ModuleLayouts.Values) {
+        foreach ($projName in $moduleLayout.RequiredBuildAssets.Keys) {
+            exec { & $script:dotnetExe publish -c $Configuration "$PSScriptRoot/src/$projName/$projName.csproj" }
         }
-        else {
-            "/property:IsWindows=false"
+
+        foreach ($nativeProj in $moduleLayout.NativeBuildAssets.Keys) {
+            foreach ($targetPlatform in $moduleLayout.NativeBuildAssets[$nativeProj]) {
+                $buildPropertyParams = if ($targetPlatform -eq "win-x64") {
+                    "/property:IsWindows=true"
+                }
+                else {
+                    "/property:IsWindows=false"
+                }
+                exec { & $script:dotnetExe publish -c $Configuration "$PSScriptRoot/src/$nativeProj/$nativeProj.csproj" -r $targetPlatform $buildPropertyParams }
+            }
         }
-        exec { & $script:dotnetExe publish -c $Configuration "$PSScriptRoot/src/OutGridView.Gui/OutGridView.Gui.csproj" -r $targetPlatform $buildPropertyParams }
     }
 }
 
@@ -121,64 +109,81 @@ task Clean {
     #Remove Module Build
     Remove-Item $PSScriptRoot/module -Recurse -Force -ErrorAction Ignore
 
-    exec { & $script:dotnetExe clean -c $Configuration "$PSScriptRoot/src/$script:ModuleName/$script:ModuleName.csproj" }
-    exec { & $script:dotnetExe clean -c $Configuration "$PSScriptRoot/src/OutGridView.Models/OutGridView.Models.csproj" }
-    exec { & $script:dotnetExe clean -c $Configuration "$PSScriptRoot/src/OutGridView.Gui/OutGridView.Gui.csproj" }
+    foreach ($moduleLayout in $script:ModuleLayouts.Values) {
+        foreach ($projName in $moduleLayout.RequiredBuildAssets.Keys) {
+            exec { & $script:dotnetExe clean -c $Configuration "$PSScriptRoot/src/$projName/$projName.csproj" }
+        }
 
-    Get-ChildItem "$PSScriptRoot\module\$script:ModuleName\Commands\en-US\*-help.xml" -ErrorAction Ignore | Remove-Item -Force -ErrorAction Ignore
+        foreach ($projName in $moduleLayout.NativeBuildAssets.Keys) {
+            exec { & $script:dotnetExe clean -c $Configuration "$PSScriptRoot/src/$projName/$projName.csproj" }
+        }
+    }
+
+    foreach ($mn in $ModuleName) {
+        Get-ChildItem "$PSScriptRoot\module\$mn\Commands\en-US\*-help.xml" -ErrorAction Ignore | Remove-Item -Force -ErrorAction Ignore
+    }
 }
 
 task LayoutModule -After Build {
-    foreach ($destDir in $script:RequiredBuildAssets.Keys) {
+    foreach ($mn in $ModuleName) {
+        $moduleLayout = $script:ModuleLayouts[$mn]
+        $moduleBinPath = "$PSScriptRoot/module/$mn/"
+
         # Create the destination dir
-        $null = New-Item -Force $destDir -Type Directory
+        $null = New-Item -Force $moduleBinPath -Type Directory
 
         # For each PSES subproject
-        foreach ($projectName in $script:RequiredBuildAssets[$destDir].Keys) {
+        foreach ($projectName in $moduleLayout.RequiredBuildAssets.Keys) {
             # Get the project build dir path
             $basePath = [System.IO.Path]::Combine($PSScriptRoot, 'src', $projectName, 'bin', $Configuration, $script:TargetFramework)
 
             # For each asset in the subproject
-            foreach ($bin in $script:RequiredBuildAssets[$destDir][$projectName]) {
+            foreach ($bin in $moduleLayout.RequiredBuildAssets[$projectName]) {
                 # Get the asset path
                 $binPath = Join-Path $basePath $bin
 
                 # Binplace the asset
-                Copy-Item -Force -Verbose $binPath $destDir
+                Copy-Item -Force -Verbose $binPath $moduleBinPath
             }
         }
-    }
 
-    foreach ($projectName in $script:NativeBuildAssets) {
-        foreach ($targetPlatform in $script:TargetPlatforms) {
-            $destDir = Join-Path $script:ModuleBinPath $projectName $targetPlatform
-
-            $null = New-Item -Force $destDir -Type Directory
-
-            # Get the project build dir path
-            $publishPath = [System.IO.Path]::Combine($PSScriptRoot, 'src', $projectName, 'bin', $Configuration, $script:TargetFramework, $targetPlatform, "publish\*" )
-
-            Write-Host $publishPath
-            # Binplace the asset
-            Copy-Item -Recurse -Force  $publishPath $destDir
+        foreach ($projectName in $moduleLayout.NativeBuildAssets.Keys) {
+            foreach ($targetPlatform in $moduleLayout.NativeBuildAssets[$projectName]) {
+                $destDir = Join-Path $moduleBinPath $projectName $targetPlatform
+    
+                $null = New-Item -Force $destDir -Type Directory
+    
+                # Get the project build dir path
+                $publishPath = [System.IO.Path]::Combine($PSScriptRoot, 'src', $projectName, 'bin', $Configuration, $script:TargetFramework, $targetPlatform, "publish\*" )
+    
+                Write-Host $publishPath
+                # Binplace the asset
+                Copy-Item -Recurse -Force  $publishPath $destDir
+            }
         }
-    }
 
-    Copy-Item -Force "$PSScriptRoot/README.md" $script:ModuleBinPath
-    Copy-Item -Force "$PSScriptRoot/LICENSE.txt" $script:ModuleBinPath
+        Copy-Item -Force "$PSScriptRoot/README.md" $moduleBinPath
+        Copy-Item -Force "$PSScriptRoot/LICENSE.txt" $moduleBinPath
+    }
 }
 
 task BuildCmdletHelp {
-    New-ExternalHelp -Path "$PSScriptRoot/docs" -OutputPath "$script:ModuleBinPath/en-US" -Force
+    foreach ($mn in $ModuleName) {
+        New-ExternalHelp -Path "$PSScriptRoot/docs/$mn" -OutputPath "$PSScriptRoot/module/$mn/en-US" -Force
+    }
 }
 
 task PackageModule {
-    Remove-Item "$PSScriptRoot/$script:ModuleName.zip" -Force -ErrorAction Ignore
-    Compress-Archive -Path $script:ModuleBinPath -DestinationPath "$script:ModuleName.zip" -CompressionLevel Optimal -Force
+    foreach ($mn in $ModuleName) {
+        Remove-Item "$PSScriptRoot/$mn.zip" -Force -ErrorAction Ignore
+        Compress-Archive -Path "$PSScriptRoot/module/$mn/" -DestinationPath "$mn.zip" -CompressionLevel Optimal -Force
+    }
 }
 
 task UploadArtifacts -If ($null -ne $env:TF_BUILD) {
-    Copy-Item -Path ".\$script:ModuleName.zip" -Destination "$env:BUILD_ARTIFACTSTAGINGDIRECTORY/$script:ModuleName-$($env:AGENT_OS).zip"
+    foreach ($mn in $ModuleName) {
+        Copy-Item -Path "$PSScriptRoot/$mn.zip" -Destination "$env:BUILD_ARTIFACTSTAGINGDIRECTORY/$mn-$($env:AGENT_OS).zip"
+    }
 }
 
 task . Clean, Build, BuildCmdletHelp, PackageModule, UploadArtifacts
