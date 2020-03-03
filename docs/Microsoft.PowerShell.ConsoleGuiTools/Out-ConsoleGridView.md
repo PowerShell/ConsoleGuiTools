@@ -11,7 +11,7 @@ title: Out-ConsoleGridView
 # Out-ConsoleGridView
 
 ## SYNOPSIS
-Sends output to an interactive table in a separate window.
+Sends output to an interactive table in the same console window.
 
 ## SYNTAX
 
@@ -93,12 +93,12 @@ As a result, the output from the Get-ChildItem command is saved in the $A variab
 
 ### Example 5: Output processes for a specified computer to a grid view
 ```
-PS C:\> Get-Process -ComputerName "Server01" | ogv -Title "Processes - Server01"
+PS C:\> Get-Process -ComputerName "Server01" | ocgv -Title "Processes - Server01"
 ```
 
 This command displays the processes that are running on the Server01 computer in a grid view window.
 
-The command uses `ogv`, which is the built-in alias for the **Out-ConsoleGridView** cmdlet, it uses the *Title* parameter to specify the window title.
+The command uses `ocgv`, which is the built-in alias for the **Out-ConsoleGridView** cmdlet, it uses the *Title* parameter to specify the window title.
 
 ### Example 6: Output data from remote computers to a grid view
 ```
@@ -155,8 +155,6 @@ The values of this parameter determine how many items you can send down the pipe
 - Single.  Zero items or one item. Use this value when the next command can take only one input object.
 - Multiple.  Zero, one, or many items.  Use this value when the next command can take multiple input objects. This value is equivalent to the *Passthru* parameter.
 
-This parameter was introduced in Windows PowerShell 3.0.
-
 ```yaml
 Type: OutputModeOption
 Parameter Sets: OutputMode
@@ -177,8 +175,6 @@ This parameter is equivalent to using the Multiple value of the *OutputMode* par
 
 To send items from the interactive window down the pipeline, click to select the items and then click OK.
 Shift-click and Ctrl-click are supported.
-
-This parameter was introduced in Windows PowerShell 3.0.
 
 ```yaml
 Type: SwitchParameter
@@ -223,7 +219,6 @@ You can send any object to this cmdlet.
 **Out-ConsoleGridView** does not return any objects.
 
 ## NOTES
-* You cannot use a remote command to open a grid view window on another computer.
 * The command output that you send to **Out-ConsoleGridView** cannot be formatted, such as by using the Format-Table or Format-Wide cmdlets. To select properties, use the Select-Object cmdlet.
 * Deserialized output from remote commands might not be formatted correctly in the grid view window.
   How to Use the Grid View Window Features

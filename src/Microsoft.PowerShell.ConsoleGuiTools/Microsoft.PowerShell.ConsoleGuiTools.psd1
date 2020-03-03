@@ -1,6 +1,6 @@
 #
-# Copyright (c) Microsoft. All rights reserved.
-# Licensed under the MIT license. See LICENSE file in the project root for full license information.
+# Copyright (c) Microsoft.
+# Licensed under the MIT license.
 #
 
 @{
@@ -24,7 +24,7 @@ Author = 'PowerShell Team'
 CompanyName = 'Microsoft'
 
 # Copyright statement for this module
-Copyright = '(c) Microsoft Corporation. All rights reserved.'
+Copyright = '(c) Microsoft Corporation.'
 
 # Description of the functionality provided by this module
 Description = 'Cross-platform Console Gui Tools for PowerShell'

@@ -9,7 +9,7 @@ param(
 $script:IsUnix = $PSVersionTable.PSEdition -and $PSVersionTable.PSEdition -eq "Core" -and !$IsWindows
 
 $script:TargetFramework = "netcoreapp3.0"
-$script:RequiredSdkVersion = "3.0.100-preview5-011568"
+$script:RequiredSdkVersion = (Get-Content (Join-Path $PSScriptRoot 'global.json') | ConvertFrom-Json).sdk.version
 
 $script:ModuleLayouts = @{}
 foreach ($mn in $ModuleName) {
@@ -120,7 +120,7 @@ task Clean {
     }
 
     foreach ($mn in $ModuleName) {
-        Get-ChildItem "$PSScriptRoot\module\$mn\Commands\en-US\*-help.xml" -ErrorAction Ignore | Remove-Item -Force -ErrorAction Ignore
+        Get-ChildItem "$PSScriptRoot\module\$mn\Commands\en-US\*-help.xml" -ErrorAction Ignore | Remove-Item -Force
     }
 }
 

@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
 using System;
@@ -58,7 +58,8 @@ namespace OutGridView.Cmdlet
             top.Add(menu);
 
             var gridHeaders = applicationData.DataTable.DataColumns.Select((c) => c.Label).ToList();
-            win.Add(new Label(GetPaddedString(gridHeaders, top.Frame.Width - 3)));
+            // We add one as the offset here to line it up with the data.
+            win.Add(new Label(GetPaddedString(gridHeaders, top.Frame.Width - 3, offset: 1)));
             
 
             var items = new List<string>();
@@ -71,8 +72,8 @@ namespace OutGridView.Cmdlet
                 }
 
                 // If we have PassThru, then we want to make them selectable. If we make them selectable,
-                // they have a 7 character addition of a checkbox ("    [ ]") that we have to factor in.
-                int offset = applicationData.PassThru ? 7 : 3;
+                // they have a 8 character addition of a checkbox ("     [ ]") that we have to factor in.
+                int offset = applicationData.PassThru ? 8 : 4;
                 items.Add(GetPaddedString(valueList, top.Frame.Width - 3, offset));
             }
             var list = new ListView(items)
@@ -119,6 +120,20 @@ namespace OutGridView.Cmdlet
             var builder = new StringBuilder();
             foreach (var str in strings)
             {
+                // If the string won't fit in the column, append an ellipsis.
+                if (str.Length >= colWidth)
+                {
+                    builder.Append(' ');
+                    for (int i = 0; i < colWidth - 4; i++)
+                    {
+                        builder.Append(str[i]);
+                    }
+                    builder.Append("...");
+                    continue;
+                }
+
+                // For the case were the string is shorter than the column width,
+                // append spaces to the beginning.
                 for (int i = 0; i < colWidth - str.Length; i++)
                 {
                     builder.Append(' ');
