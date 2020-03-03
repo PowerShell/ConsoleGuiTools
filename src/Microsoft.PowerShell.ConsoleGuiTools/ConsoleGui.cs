@@ -41,7 +41,7 @@ namespace OutGridView.Cmdlet
             // Creates a menubar, the item "New" has a help menu.
             var menu = new MenuBar(new MenuBarItem []
             {
-                new MenuBarItem("_Options", 
+                new MenuBarItem("_Actions (F9)", 
                     applicationData.PassThru
                     ? new MenuItem []
                     {
