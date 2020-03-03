@@ -216,7 +216,8 @@ You can send any object to this cmdlet.
 ## OUTPUTS
 
 ### None
-**Out-ConsoleGridView** does not return any objects.
+
+Normally, `Out-ConsoleGridView` does not return any objects. When using the `PassThru` parameter, the objects representing the selected rows are returned to the pipeline.
 
 ## NOTES
 * The command output that you send to **Out-ConsoleGridView** cannot be formatted, such as by using the Format-Table or Format-Wide cmdlets. To select properties, use the Select-Object cmdlet.
