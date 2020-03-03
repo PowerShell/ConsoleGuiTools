@@ -1,14 +1,8 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Management.Automation;
-using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Text;
 using OutGridView.Models;
 using Terminal.Gui;
@@ -28,6 +22,10 @@ namespace OutGridView.Cmdlet
         {
             Application.Init();
             var top = Application.Top;
+
+            // Since top is static, state would be preserved in a PowerShell process
+            // so we remove everything from Top as a precaution.
+            top.RemoveAll();
 
             // Creates the top-level window to show
             var win = new Window(applicationData.Title ?? "Out-ConsoleGridView")
