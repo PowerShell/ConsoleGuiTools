@@ -114,7 +114,7 @@ namespace OutGridView.Cmdlet
                     else
                     {
                         labels = obj.Properties.Select(x => x.Name).ToList();
-                        propertyAccessors = obj.Properties.Select(x => $"$_.{x.Name}").ToList();
+                        propertyAccessors = obj.Properties.Select(x => $"$_.\"{x.Name}\"").ToList();
                     }
                 }
                 else
@@ -143,7 +143,7 @@ namespace OutGridView.Cmdlet
                            //If it's a propety access directly
                            if (x.ValueType == DisplayEntryValueType.Property)
                            {
-                               return $"$_.{x.Value}";
+                               return $"$_.\"{x.Value}\"";
                            }
                            //Otherwise return access script
                            return x.Value;
