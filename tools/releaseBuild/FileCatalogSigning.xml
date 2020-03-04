@@ -2,5 +2,6 @@
 <SignConfigXML>
   <job platform="" configuration="" dest="__OUTPATHROOT__" jobname="GraphicalTools File Catalog" approvers="vigarg;gstolt">
     <file src="__INPATHROOT__\Microsoft.PowerShell.GraphicalTools\Microsoft.PowerShell.GraphicalTools.cat" signType="AuthenticodeFormer" dest="__OUTPATHROOT__\Microsoft.PowerShell.GraphicalTools\Microsoft.PowerShell.GraphicalTools\Microsoft.PowerShell.GraphicalTools.cat" />
+    <file src="__INPATHROOT__\Microsoft.PowerShell.ConsoleGuiTools\Microsoft.PowerShell.ConsoleGuiTools.cat" signType="AuthenticodeFormer" dest="__OUTPATHROOT__\Microsoft.PowerShell.ConsoleGuiTools\Microsoft.PowerShell.ConsoleGuiTools\Microsoft.PowerShell.ConsoleGuiTools.cat" />
   </job>
 </SignConfigXML>

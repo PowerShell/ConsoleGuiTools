@@ -83,8 +83,8 @@ jobs:
     inputs:
       scriptType: inlineScript
       inlineScript: |
-        $signed="$env:BUILD_ARTIFACTSTAGINGDIRECTORY\Signed\GraphicalTools\*"
-        $notSigned="$env:BUILD_ARTIFACTSTAGINGDIRECTORY\GraphicalTools"
+        $signed="$env:BUILD_ARTIFACTSTAGINGDIRECTORY\Signed\*"
+        $notSigned="$env:BUILD_ARTIFACTSTAGINGDIRECTORY"
         Copy-Item $signed $notSigned -Recurse -Force
 
   - task: PowerShell@1
@@ -92,10 +92,10 @@ jobs:
     inputs:
       scriptType: inlineScript
       inlineScript: |
-        $signedDir = "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\GraphicalTools\Microsoft.PowerShell.GraphicalTools"
-        New-FileCatalog -CatalogFilePath "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\GraphicalTools\Microsoft.PowerShell.GraphicalTools.cat" -Path "$signedDir"
-        $signedDir = "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\GraphicalTools\Microsoft.PowerShell.ConsoleGuiTools"
-        New-FileCatalog -CatalogFilePath "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\GraphicalTools\Microsoft.PowerShell.ConsoleGuiTools.cat" -Path "$signedDir"
+        $signedDir = "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\Microsoft.PowerShell.GraphicalTools\Microsoft.PowerShell.GraphicalTools"
+        New-FileCatalog -CatalogFilePath "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\Microsoft.PowerShell.GraphicalTools\Microsoft.PowerShell.GraphicalTools.cat" -Path "$signedDir"
+        $signedDir = "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\Microsoft.PowerShell.ConsoleGuiTools\Microsoft.PowerShell.ConsoleGuiTools"
+        New-FileCatalog -CatalogFilePath "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\Microsoft.PowerShell.ConsoleGuiTools\Microsoft.PowerShell.ConsoleGuiTools.cat" -Path "$signedDir"
 
   - task: PkgESCodeSign@10
     displayName: 'CodeSign tools/releaseBuild/FileCatalogSigning.xml'
