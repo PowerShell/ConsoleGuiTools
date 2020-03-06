@@ -1,13 +1,27 @@
 # GraphicalTools
 
+The GraphicalTools repo contains several different graphical-related PowerShell modules including:
+
+* `Microsoft.PowerShell.GraphicalTools` - A module that provides GUI experiences based on Avalonia.
+* `Microsoft.PowerShell.ConsoleGuiTools` - A module that provides console-based GUI experiences based on gui.cs.
+
 ## Installation
+
+### Microsoft.PowerShell.GraphicalTools
+
 ```powershell
 Install-Module Microsoft.PowerShell.GraphicalTools
 ```
 
+### Microsoft.PowerShell.ConsoleGuiTools
+
+Not currently available on the PowerShell Gallery.
+
 ## Features
 
-### Cross-Platform
+### Microsoft.PowerShell.GraphicalTools
+
+#### Cross-Platform
 |Linux   |Windows   |Mac   |
 |---|---|---|
 | ![linux-gif](https://powershell.github.io/PowerShell-Blog/Images/2019-08-13-OutGridView-Returns/OutGridViewLinux.gif) |  ![window-gif](https://powershell.github.io/PowerShell-Blog/Images/2019-08-13-OutGridView-Returns/OutGridViewWindows.gif) | ![macos-gif](https://powershell.github.io/PowerShell-Blog/Images/2019-08-13-OutGridView-Returns/OutGridViewMac.gif)|
@@ -16,6 +30,12 @@ Install-Module Microsoft.PowerShell.GraphicalTools
     - View and filter objects
     - Generate reusable filter code
 
+### Microsoft.PowerShell.ConsoleGuiTools
+
+#### Cross-Platform
+
+- Out-ConsoleGridview
+    - View and filter objects
 
 ## Development
 
@@ -43,17 +63,33 @@ Now you're ready to build the code.  You can do so in one of two ways:
 PS C:\path\to\GraphicalTools> Invoke-Build Build
 ```
 
-### Building the code from Visual Studio Code
+> Note: You can build a single module using the -ModuleName parameter:
+>
+> ```powershell
+> Invoke-Build Build -ModuleName Microsoft.PowerShell.ConsoleGuiTools
+> ```
 
-Open the PowerShellGraphicalTools folder that you cloned locally and press <kbd>Ctrl+Shift+B</kbd>
-(or <kbd>Cmd+Shift+B</kbd> on macOS).
+From there you can import the module that you just built for example:
+
+```powershell
+Import-Module .\module\Microsoft.PowerShell.ConsoleGuiTools
+```
+
+And then run the cmdlet you want to test, for example:
+
+```powershell
+Get-Process | Out-ConsoleGridView
+```
+
+> NOTE: If you change the code and rebuild the project, you'll need to launch a
+> _new_ PowerShell process since the dll is already loaded and can't be unloaded.
 
 ## Contributions Welcome!
 
 We would love to incorporate community contributions into this project.  If you would like to
 contribute code, documentation, tests, or bug reports, please read our [Contribution Guide](http://powershell.github.io/GraphicalTools/CONTRIBUTING.html) to learn more.
 
-## Architecture
+## Microsoft.PowerShell.GraphicalTools Architecture
 
 Due to the quirks of the PowerShell threading implementation, the design of GUIs in this application are non-standard. The cmdlet invokes an Avalonia application as a separate process to guarantee the GUI is running on the main thread. Graphical tools therefore consists of 3 .NET Projects. 
 
