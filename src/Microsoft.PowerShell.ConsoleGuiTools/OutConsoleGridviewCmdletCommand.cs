@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Management.Automation;
 using System.Management.Automation.Internal;
 using OutGridView.Models;
-using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace OutGridView.Cmdlet
 {
@@ -20,9 +20,9 @@ namespace OutGridView.Cmdlet
         #region Properties
 
         private const string DataNotQualifiedForGridView = "DataNotQualifiedForGridView";
+        private const string OSNotSupportedForGridView = "OSNotSupportedForGridView";
 
-        private List<PSObject> PSObjects = new List<PSObject>();
-
+        private List<PSObject> _psObjects = new List<PSObject>();
         private ConsoleGui _consoleGui = new ConsoleGui();
 
         #endregion Properties
@@ -66,6 +66,16 @@ namespace OutGridView.Cmdlet
         // This method gets called once for each cmdlet in the pipeline when the pipeline starts executing
         protected override void BeginProcessing()
         {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                ErrorRecord error = new ErrorRecord(
+                    new FormatException("This cmdlet is not supported on this platform."),
+                    OSNotSupportedForGridView,
+                    ErrorCategory.InvalidOperation,
+                    null);
+
+                this.ThrowTerminatingError(error);
+            }
         }
 
         // This method will be called for each input received from the pipeline to this cmdlet; if no input is received, this method is not called
@@ -116,7 +126,7 @@ namespace OutGridView.Cmdlet
                 this.ThrowTerminatingError(error);
             }
 
-            PSObjects.Add(input);
+            _psObjects.Add(input);
         }
 
         // This method will be called once at the end of pipeline execution; if no input is received, this method is not called
@@ -125,14 +135,14 @@ namespace OutGridView.Cmdlet
             base.EndProcessing();
 
             //Return if no objects
-            if (PSObjects.Count == 0)
+            if (_psObjects.Count == 0)
             {
                 return;
             }
 
             var TG = new TypeGetter(this);
 
-            var dataTable = TG.CastObjectsToTableView(PSObjects);
+            var dataTable = TG.CastObjectsToTableView(_psObjects);
             var applicationData = new ApplicationData
             {
                 Title = Title,
@@ -154,7 +164,7 @@ namespace OutGridView.Cmdlet
 
             foreach (int idx in selectedIndexes)
             {
-                var selectedObject = PSObjects[idx];
+                var selectedObject = _psObjects[idx];
                 if (selectedObject == null)
                 {
                     continue;
