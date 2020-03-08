@@ -56,9 +56,46 @@ namespace OutGridView.Cmdlet
             top.Add(menu);
 
             var gridHeaders = applicationData.DataTable.DataColumns.Select((c) => c.Label).ToList();
-            // We add one as the offset here to line it up with the data.
-            win.Add(new Label(GetPaddedString(gridHeaders, top.Frame.Width - 3, offset: 1)));
-            
+            var columnWidths = new int[gridHeaders.Count];
+            int index = 0;
+            foreach (var header in gridHeaders)
+            {
+                columnWidths[index] = header.Length;
+                index++;
+            }
+
+
+            // calculate the width of each column based on longest string in each column for each row
+            foreach (var row in applicationData.DataTable.Data)
+            {
+                index = 0;
+                foreach (var col in row.Values)
+                {
+                    var len = col.Value.DisplayValue.Length;
+                    if (len > columnWidths[index])
+                    {
+                        columnWidths[index] = len;
+                    }
+                    
+                    index++;
+                }
+            }
+
+            // If we have PassThru, then we want to make them selectable. If we make them selectable,
+            // they have a 8 character addition of a checkbox ("     [ ]") that we have to factor in.
+            int offset = applicationData.PassThru ? 8 : 4;
+
+            // if the total width is wider than the usable width, remove 1 from widest column until it fits
+            // the gui loses 3 chars on the left and 2 chars on the right
+            int usableWidth = top.Frame.Width - 3 - columnWidths.Length - offset - 2;
+            while (columnWidths.Sum() >= usableWidth)
+            {
+                int maxWidth = columnWidths.Max();
+                int maxIndex = columnWidths.ToList().IndexOf(maxWidth);
+                columnWidths[maxIndex]--;
+            }
+
+            win.Add(new Label(GetPaddedString(gridHeaders, columnWidths, offset + offset - 1)));
 
             var items = new List<string>();
             foreach (DataTableRow dataTableRow in applicationData.DataTable.Data)
@@ -69,11 +106,9 @@ namespace OutGridView.Cmdlet
                     valueList.Add(dataTableRow.Values[dataTableColumn.ToString()].DisplayValue);
                 }
 
-                // If we have PassThru, then we want to make them selectable. If we make them selectable,
-                // they have a 8 character addition of a checkbox ("     [ ]") that we have to factor in.
-                int offset = applicationData.PassThru ? 8 : 4;
-                items.Add(GetPaddedString(valueList, top.Frame.Width - 3, offset));
+                items.Add(GetPaddedString(valueList, columnWidths, offset));
             }
+
             var list = new ListView(items)
             {
                 X = 3,
@@ -112,36 +147,34 @@ namespace OutGridView.Cmdlet
             return n == 0;
         }
 
-        private static string GetPaddedString(List<string> strings, int maxWidth, int offset = 0)
+        private static string GetPaddedString(List<string> strings, int[] colWidths, int offset = 0)
         {
-            int colWidth = maxWidth / strings.Count;
             var builder = new StringBuilder();
-            foreach (var str in strings)
-            {
-                // If the string won't fit in the column, append an ellipsis.
-                if (str.Length >= colWidth)
-                {
-                    builder.Append(' ');
-                    for (int i = 0; i < colWidth - 4; i++)
-                    {
-                        builder.Append(str[i]);
-                    }
-                    builder.Append("...");
-                    continue;
-                }
-
-                // For the case were the string is shorter than the column width,
-                // append spaces to the beginning.
-                for (int i = 0; i < colWidth - str.Length; i++)
-                {
-                    builder.Append(' ');
-                }
-                builder.Append(str);
-            }
-
             if (offset > 0)
             {
-                builder.Remove(0, offset);
+                builder.Append(string.Empty.PadRight(offset));
+            }
+
+            int index = 0;
+            foreach (var str in strings)
+            {
+                if (index > 0)
+                {
+                    builder.Append(' ');
+                }
+
+                // If the string won't fit in the column, append an ellipsis.
+                if (str.Length > colWidths[index])
+                {
+                    builder.Append(str.Substring(0, colWidths[index] - 4));
+                    builder.Append("...");
+                }
+                else
+                {
+                    builder.Append(str.PadRight(colWidths[index]));
+                }
+
+                index++;
             }
 
             return builder.ToString();
