@@ -89,8 +89,17 @@ namespace OutGridView.Cmdlet
             int columnWidthsSum = columnWidths.Sum();
             while (columnWidthsSum >= usableWidth)
             {
-                int maxWidth = columnWidths.Max();
-                int maxIndex = columnWidths.ToList().IndexOf(maxWidth);
+                int maxWidth = 0;
+                int maxIndex = 0;
+                for (int i = 0; i < columnWidths.Length; i++)
+                {
+                    if (columnWidths[i] > maxWidth)
+                    {
+                        maxWidth = columnWidths[i];
+                        maxIndex = i;
+                    }
+                }
+
                 columnWidths[maxIndex]--;
                 columnWidthsSum--;
             }
