@@ -57,19 +57,17 @@ namespace OutGridView.Cmdlet
 
             var gridHeaders = applicationData.DataTable.DataColumns.Select((c) => c.Label).ToList();
             var columnWidths = new int[gridHeaders.Count];
-            int index = 0;
-            foreach (var header in gridHeaders)
+            for (int i = 0; i < gridHeaders.Count; i++)
             {
-                columnWidths[index] = header.Length;
-                index++;
+                columnWidths[i] = gridHeaders[i].Length;
             }
-
 
             // calculate the width of each column based on longest string in each column for each row
             foreach (var row in applicationData.DataTable.Data)
             {
-                index = 0;
-                foreach (var col in row.Values)
+                int index = 0;
+                // use just the first 20 rows to calculate in case there is a large dataset
+                foreach (var col in row.Values.Take(20))
                 {
                     var len = col.Value.DisplayValue.Length;
                     if (len > columnWidths[index])
@@ -88,11 +86,13 @@ namespace OutGridView.Cmdlet
             // if the total width is wider than the usable width, remove 1 from widest column until it fits
             // the gui loses 3 chars on the left and 2 chars on the right
             int usableWidth = top.Frame.Width - 3 - columnWidths.Length - offset - 2;
-            while (columnWidths.Sum() >= usableWidth)
+            int columnWidthsSum = columnWidths.Sum();
+            while (columnWidthsSum >= usableWidth)
             {
                 int maxWidth = columnWidths.Max();
                 int maxIndex = columnWidths.ToList().IndexOf(maxWidth);
                 columnWidths[maxIndex]--;
+                columnWidthsSum--;
             }
 
             win.Add(new Label(GetPaddedString(gridHeaders, columnWidths, offset + offset - 1)));
@@ -155,26 +155,23 @@ namespace OutGridView.Cmdlet
                 builder.Append(string.Empty.PadRight(offset));
             }
 
-            int index = 0;
-            foreach (var str in strings)
+            for (int i = 0; i < strings.Count; i++)
             {
-                if (index > 0)
+                if (i > 0)
                 {
                     builder.Append(' ');
                 }
 
                 // If the string won't fit in the column, append an ellipsis.
-                if (str.Length > colWidths[index])
+                if (strings[i].Length > colWidths[i])
                 {
-                    builder.Append(str.Substring(0, colWidths[index] - 4));
+                    builder.Append(strings[i].Substring(0, colWidths[i] - 4));
                     builder.Append("...");
                 }
                 else
                 {
-                    builder.Append(str.PadRight(colWidths[index]));
+                    builder.Append(strings[i].PadRight(colWidths[i]));
                 }
-
-                index++;
             }
 
             return builder.ToString();
