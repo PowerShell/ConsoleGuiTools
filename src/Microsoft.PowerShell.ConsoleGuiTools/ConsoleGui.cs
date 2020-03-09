@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,6 +15,7 @@ namespace OutGridView.Cmdlet
         private const string ACCEPT_TEXT = "Are you sure you want to select\nthese items to send down the pipeline?";
         private const string CANCEL_TEXT = "Are you sure you want to cancel?\nNothing will be emitted to the pipeline.";
         private const string CLOSE_TEXT = "Are you sure you want to close?";
+        private readonly int NumberOfObjectsToInspect = Console.WindowHeight / 2;
 
         private bool _cancelled;
 
@@ -66,8 +68,7 @@ namespace OutGridView.Cmdlet
             foreach (var row in applicationData.DataTable.Data)
             {
                 int index = 0;
-                // use just the first 20 rows to calculate in case there is a large dataset
-                foreach (var col in row.Values.Take(20))
+                foreach (var col in row.Values.Take(NumberOfObjectsToInspect))
                 {
                     var len = col.Value.DisplayValue.Length;
                     if (len > columnWidths[index])
@@ -168,6 +169,7 @@ namespace OutGridView.Cmdlet
             {
                 if (i > 0)
                 {
+                    // Add a space between columns
                     builder.Append(' ');
                 }
 
