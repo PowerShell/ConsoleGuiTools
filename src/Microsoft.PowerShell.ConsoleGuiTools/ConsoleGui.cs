@@ -15,8 +15,6 @@ namespace OutGridView.Cmdlet
         private const string ACCEPT_TEXT = "Are you sure you want to select\nthese items to send down the pipeline?";
         private const string CANCEL_TEXT = "Are you sure you want to cancel?\nNothing will be emitted to the pipeline.";
         private const string CLOSE_TEXT = "Are you sure you want to close?";
-        private readonly int NumberOfObjectsToInspect = Console.WindowHeight / 2;
-
         private bool _cancelled;
 
         internal HashSet<int> SelectedIndexes { get; private set; } = new HashSet<int>();
@@ -68,7 +66,9 @@ namespace OutGridView.Cmdlet
             foreach (var row in applicationData.DataTable.Data)
             {
                 int index = 0;
-                foreach (var col in row.Values.Take(NumberOfObjectsToInspect))
+
+                // use half of the visible buffer height for the number of objects to inspect to calculate widths
+                foreach (var col in row.Values.Take(top.Frame.Height / 2))
                 {
                     var len = col.Value.DisplayValue.Length;
                     if (len > columnWidths[index])
