@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,7 +15,6 @@ namespace OutGridView.Cmdlet
         private const string ACCEPT_TEXT = "Are you sure you want to select\nthese items to send down the pipeline?";
         private const string CANCEL_TEXT = "Are you sure you want to cancel?\nNothing will be emitted to the pipeline.";
         private const string CLOSE_TEXT = "Are you sure you want to close?";
-
         private bool _cancelled;
 
         internal HashSet<int> SelectedIndexes { get; private set; } = new HashSet<int>();
@@ -56,9 +56,56 @@ namespace OutGridView.Cmdlet
             top.Add(menu);
 
             var gridHeaders = applicationData.DataTable.DataColumns.Select((c) => c.Label).ToList();
-            // We add one as the offset here to line it up with the data.
-            win.Add(new Label(GetPaddedString(gridHeaders, top.Frame.Width - 3, offset: 1)));
-            
+            var columnWidths = new int[gridHeaders.Count];
+            for (int i = 0; i < gridHeaders.Count; i++)
+            {
+                columnWidths[i] = gridHeaders[i].Length;
+            }
+
+            // calculate the width of each column based on longest string in each column for each row
+            foreach (var row in applicationData.DataTable.Data)
+            {
+                int index = 0;
+
+                // use half of the visible buffer height for the number of objects to inspect to calculate widths
+                foreach (var col in row.Values.Take(top.Frame.Height / 2))
+                {
+                    var len = col.Value.DisplayValue.Length;
+                    if (len > columnWidths[index])
+                    {
+                        columnWidths[index] = len;
+                    }
+                    
+                    index++;
+                }
+            }
+
+            // If we have PassThru, then we want to make them selectable. If we make them selectable,
+            // they have a 8 character addition of a checkbox ("     [ ]") that we have to factor in.
+            int offset = applicationData.PassThru ? 8 : 4;
+
+            // if the total width is wider than the usable width, remove 1 from widest column until it fits
+            // the gui loses 3 chars on the left and 2 chars on the right
+            int usableWidth = top.Frame.Width - 3 - columnWidths.Length - offset - 2;
+            int columnWidthsSum = columnWidths.Sum();
+            while (columnWidthsSum >= usableWidth)
+            {
+                int maxWidth = 0;
+                int maxIndex = 0;
+                for (int i = 0; i < columnWidths.Length; i++)
+                {
+                    if (columnWidths[i] > maxWidth)
+                    {
+                        maxWidth = columnWidths[i];
+                        maxIndex = i;
+                    }
+                }
+
+                columnWidths[maxIndex]--;
+                columnWidthsSum--;
+            }
+
+            win.Add(new Label(GetPaddedString(gridHeaders, columnWidths, offset + offset - 1)));
 
             var items = new List<string>();
             foreach (DataTableRow dataTableRow in applicationData.DataTable.Data)
@@ -69,11 +116,9 @@ namespace OutGridView.Cmdlet
                     valueList.Add(dataTableRow.Values[dataTableColumn.ToString()].DisplayValue);
                 }
 
-                // If we have PassThru, then we want to make them selectable. If we make them selectable,
-                // they have a 8 character addition of a checkbox ("     [ ]") that we have to factor in.
-                int offset = applicationData.PassThru ? 8 : 4;
-                items.Add(GetPaddedString(valueList, top.Frame.Width - 3, offset));
+                items.Add(GetPaddedString(valueList, columnWidths, offset));
             }
+
             var list = new ListView(items)
             {
                 X = 3,
@@ -112,36 +157,32 @@ namespace OutGridView.Cmdlet
             return n == 0;
         }
 
-        private static string GetPaddedString(List<string> strings, int maxWidth, int offset = 0)
+        private static string GetPaddedString(List<string> strings, int[] colWidths, int offset = 0)
         {
-            int colWidth = maxWidth / strings.Count;
             var builder = new StringBuilder();
-            foreach (var str in strings)
-            {
-                // If the string won't fit in the column, append an ellipsis.
-                if (str.Length >= colWidth)
-                {
-                    builder.Append(' ');
-                    for (int i = 0; i < colWidth - 4; i++)
-                    {
-                        builder.Append(str[i]);
-                    }
-                    builder.Append("...");
-                    continue;
-                }
-
-                // For the case were the string is shorter than the column width,
-                // append spaces to the beginning.
-                for (int i = 0; i < colWidth - str.Length; i++)
-                {
-                    builder.Append(' ');
-                }
-                builder.Append(str);
-            }
-
             if (offset > 0)
             {
-                builder.Remove(0, offset);
+                builder.Append(string.Empty.PadRight(offset));
+            }
+
+            for (int i = 0; i < strings.Count; i++)
+            {
+                if (i > 0)
+                {
+                    // Add a space between columns
+                    builder.Append(' ');
+                }
+
+                // If the string won't fit in the column, append an ellipsis.
+                if (strings[i].Length > colWidths[i])
+                {
+                    builder.Append(strings[i].Substring(0, colWidths[i] - 4));
+                    builder.Append("...");
+                }
+                else
+                {
+                    builder.Append(strings[i].PadRight(colWidths[i]));
+                }
             }
 
             return builder.ToString();
