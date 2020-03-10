@@ -66,16 +66,6 @@ namespace OutGridView.Cmdlet
         // This method gets called once for each cmdlet in the pipeline when the pipeline starts executing
         protected override void BeginProcessing()
         {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                ErrorRecord error = new ErrorRecord(
-                    new FormatException("This cmdlet is not supported on this platform."),
-                    OSNotSupportedForGridView,
-                    ErrorCategory.InvalidOperation,
-                    null);
-
-                this.ThrowTerminatingError(error);
-            }
         }
 
         // This method will be called for each input received from the pipeline to this cmdlet; if no input is received, this method is not called

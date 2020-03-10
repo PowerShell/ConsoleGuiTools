@@ -23,10 +23,6 @@ namespace OutGridView.Cmdlet
             Application.Init();
             var top = Application.Top;
 
-            // Since top is static, state would be preserved in a PowerShell process
-            // so we remove everything from Top as a precaution.
-            top.RemoveAll();
-
             // Creates the top-level window to show
             var win = new Window(applicationData.Title ?? "Out-ConsoleGridView")
             {
@@ -45,12 +41,12 @@ namespace OutGridView.Cmdlet
                     applicationData.PassThru
                     ? new MenuItem []
                     {
-                        new MenuItem("_Accept", "", () => { if (Quit("Accept", ACCEPT_TEXT)) top.Running = false; }),
-                        new MenuItem("_Cancel", "", () =>{ if (Quit("Cancel", CANCEL_TEXT)) _cancelled = true; top.Running = false; })
+                        new MenuItem("_Accept", "", () => { if (Quit("Accept", ACCEPT_TEXT)) Application.RequestStop(); }),
+                        new MenuItem("_Cancel", "", () =>{ if (Quit("Cancel", CANCEL_TEXT)) _cancelled = true; Application.RequestStop(); })
                     }
                     : new MenuItem []
                     {
-                        new MenuItem("_Close", "", () =>{ if (Quit("Close", CLOSE_TEXT)) top.Running = false; })
+                        new MenuItem("_Close", "", () =>{ if (Quit("Close", CLOSE_TEXT)) Application.RequestStop(); })
                     })
             });
             top.Add(menu);
