@@ -9,7 +9,7 @@
 RootModule = 'Microsoft.PowerShell.ConsoleGuiTools.dll'
 
 # Version number of this module.
-ModuleVersion = '0.2.0'
+ModuleVersion = '0.3.0'
 
 # Supported PSEditions
 CompatiblePSEditions = @( 'Core' )
@@ -104,7 +104,15 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = '# v0.1.0
+        ReleaseNotes = '# Release Notes
+
+## v0.3.0
+
+* Windows OS support (PS 6.2+)
+* dynamic column widths
+* Fix arrow key issue on non-Windows
+
+## v0.2.0
 
 Initial Release
 '
