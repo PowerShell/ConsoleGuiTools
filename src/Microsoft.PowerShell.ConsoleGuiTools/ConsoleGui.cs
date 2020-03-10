@@ -10,7 +10,7 @@ using Terminal.Gui;
 
 namespace OutGridView.Cmdlet
 {
-    internal class ConsoleGui
+    internal class ConsoleGui : IDisposable
     {
         private const string ACCEPT_TEXT = "Are you sure you want to select\nthese items to send down the pipeline?";
         private const string CANCEL_TEXT = "Are you sure you want to cancel?\nNothing will be emitted to the pipeline.";
@@ -132,12 +132,6 @@ namespace OutGridView.Cmdlet
 
             Application.Run();
 
-            // By emitting this, we fix an issue where arrow keys don't work in the console
-            // because .NET requires application mode to support Arrow key escape sequences
-            // Esc[?1h - Set cursor key to application mode
-            // See http://ascii-table.com/ansi-escape-sequences-vt-100.php
-            Console.Write("\u001b[?1h");
-
             if (_cancelled)
             {
                 return;
@@ -150,11 +144,6 @@ namespace OutGridView.Cmdlet
                     SelectedIndexes.Add(i);
                 }
             }
-        }
-
-        public void Close()
-        {
-            // top.Running = false;
         }
 
         private static bool Quit(string title, string text)
@@ -192,6 +181,15 @@ namespace OutGridView.Cmdlet
             }
 
             return builder.ToString();
+        }
+
+        public void Dispose()
+        {
+            // By emitting this, we fix an issue where arrow keys don't work in the console
+            // because .NET requires application mode to support Arrow key escape sequences
+            // Esc[?1h - Set cursor key to application mode
+            // See http://ascii-table.com/ansi-escape-sequences-vt-100.php
+            Console.Write("\u001b[?1h");
         }
     }
 }

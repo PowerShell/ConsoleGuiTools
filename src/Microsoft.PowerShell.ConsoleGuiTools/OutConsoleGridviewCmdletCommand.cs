@@ -15,7 +15,7 @@ namespace OutGridView.Cmdlet
     /// </summary>
     [Cmdlet(VerbsData.Out, "ConsoleGridView", DefaultParameterSetName = "PassThru")]
     [Alias("ocgv")]
-    public class OutConsoleGridViewCmdletCommand : PSCmdlet
+    public class OutConsoleGridViewCmdletCommand : PSCmdlet, IDisposable
     {
         #region Properties
 
@@ -101,11 +101,6 @@ namespace OutGridView.Cmdlet
             }
         }
 
-        protected override void StopProcessing()
-        {
-            _consoleGui.Close();
-        }
-
         private void ProcessObject(PSObject input)
         {
 
@@ -171,6 +166,11 @@ namespace OutGridView.Cmdlet
                 }
                 this.WriteObject(selectedObject, false);
             }
+        }
+
+        public void Dispose()
+        {
+            _consoleGui.Dispose();
         }
     }
 }
