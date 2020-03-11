@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using OutGridView.Models;
 using Terminal.Gui;
 
@@ -163,6 +164,11 @@ namespace OutGridView.Cmdlet
                     // Add a space between columns
                     builder.Append(' ');
                 }
+
+                // Replace any newlines with encoded newline (`n)
+                // Note we can't use Environment.Newline because we don't know that the
+                // Command honors that.
+                strings[i] = strings[i].Replace("\n", "`n");
 
                 // If the string won't fit in the column, append an ellipsis.
                 if (strings[i].Length > colWidths[i])
