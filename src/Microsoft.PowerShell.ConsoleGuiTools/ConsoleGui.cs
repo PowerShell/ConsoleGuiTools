@@ -167,6 +167,7 @@ namespace OutGridView.Cmdlet
                 // Replace any newlines with encoded newline (`n)
                 // Note we can't use Environment.Newline because we don't know that the
                 // Command honors that.
+                strings[i] = strings[i].Replace("\r\n", "`r`n");
                 strings[i] = strings[i].Replace("\n", "`n");
 
                 // If the string won't fit in the column, append an ellipsis.
