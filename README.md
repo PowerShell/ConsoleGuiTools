@@ -15,7 +15,9 @@ Install-Module Microsoft.PowerShell.GraphicalTools
 
 ### Microsoft.PowerShell.ConsoleGuiTools
 
-Not currently available on the PowerShell Gallery.
+```powershell
+Install-Module Microsoft.PowerShell.ConsoleGuiTools
+```
 
 ## Features
 
@@ -32,6 +34,8 @@ Not currently available on the PowerShell Gallery.
 
 ### Microsoft.PowerShell.ConsoleGuiTools
 
+![screenshot of Out-ConsoleGridView](https://pbs.twimg.com/media/ESyWfiqUYAA_t6q?format=jpg&name=medium)
+
 #### Cross-Platform
 
 - Out-ConsoleGridview
@@ -45,7 +49,7 @@ Install PowerShell 6.2+ with [these instructions](https://github.com/PowerShell/
 
 ### 3. Clone the GitHub repository:
 
-```
+```powershell
 git clone https://github.com/PowerShell/GraphicalTools.git
 ```
 
@@ -87,7 +91,7 @@ Get-Process | Out-ConsoleGridView
 ## Contributions Welcome!
 
 We would love to incorporate community contributions into this project.  If you would like to
-contribute code, documentation, tests, or bug reports, please read our [Contribution Guide](http://powershell.github.io/GraphicalTools/CONTRIBUTING.html) to learn more.
+contribute code, documentation, tests, or bug reports, please read the [development section above](https://github.com/PowerShell/GraphicalTools#development) to learn more.
 
 ## Microsoft.PowerShell.GraphicalTools Architecture
 
