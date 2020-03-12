@@ -45,16 +45,13 @@ namespace OutGridView.Cmdlet
         public void Start(ApplicationData applicationData)
         {
             Application.Init();
-            //Application.Run<ConsoleGuiTop>();
-
             var top = Application.Top;
-            //var top = new ConsoleGuiTop();
 
             // Creates the top-level window to show
             var win = new ConsoleGuiWindow(applicationData.Title ?? "Out-ConsoleGridView")
             {
                 X = 0,
-                Y = 1, // Leave one row for the toplevel menu
+                Y = 0, 
                 // By using Dim.Fill(), it will automatically resize without manual intervention
                 Width = Dim.Fill(),
                 Height = Dim.Fill()
@@ -127,32 +124,32 @@ namespace OutGridView.Cmdlet
             var list = new ListView(items)
             {
                 X = 3,
-                Y = 3,
+                Y = 1,
                 Width = Dim.Fill(2),
-                Height = Dim.Fill(2),
+                Height = Dim.Fill(0),
                 AllowsMarking = applicationData.PassThru
             };
             
             win.Add(list);
 
-            win.Enter_Pressed += () => 
+            win.Enter_Pressed += () =>
             {
-                // Regardless of whether the item was already marked, if the user pressees
+                // Regardless of whether the item was already marked, if the user presses
                 // ENTER, mark that item. This feels the most intuitive. The alternatives are:
-                // (a) Assume the user means to choose the item that's selected and mark it
+                // (a) Assume the user means to choose the item that's selected and mark it.
                 // (b) Act like ESC except Pass Through an marked items.
-                // (c) Toggle the selected item
+                // (c) Toggle the selected item.
                 // Option (c) violates the principle of least astonishment: If the user has an item marked, and selected
                 // and hits ENTER s/he would be surprised to see it not returned. Esp in the single choice (most common) case.
-                // Option (b) means in the most common case (a single item is wanted) ENTER does nothing. Again suprising.
-                // It seems a) is the most intuitive so that's what's implemented.
+                // Option (b) means in the most common case (a single item is wanted) ENTER does nothing. Again surprising.
+                // It seems (a) is the most intuitive so that's what's implemented.
                 list.Source.SetMark(list.SelectedItem, true);
                 Application.RequestStop();
             };
 
             win.Esc_Pressed += () => 
             {
-                _cancelled = true; 
+                _cancelled = true;
                 Application.RequestStop();
             };
             
