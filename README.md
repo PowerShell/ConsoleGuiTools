@@ -88,6 +88,35 @@ Get-Process | Out-ConsoleGridView
 > NOTE: If you change the code and rebuild the project, you'll need to launch a
 > _new_ PowerShell process since the dll is already loaded and can't be unloaded.
 
+### Debugging in Visual Studio Code
+
+
+```powershell
+PS C:\path\to\GraphicalTools> code .
+```
+
+Build by hitting `Ctrl-Shift-b` in VS Code.
+
+To debug:
+
+In a Powershell session in the `c:\path\to\GraphicalTools` directory, run `pwsh` (thus nesting powershell).
+
+Then do the folowing:
+
+```powershell
+Import-Module .\module\Microsoft.PowerShell.ConsoleGuiTools
+$pid
+```
+
+This will import the latest built DLL and output the process ID you'll need for debugging. Copy this ID to the clipboard.
+
+In VScode, set your breakpoints, etc... Then hit `F5`. In the VScode search box, paste the value printed by `$pid`. You'll see something like `pwsh.exe 18328`. Click that and the debug session will start.
+
+In the Powershell session run your commands; breakpoints will be hit, etc...
+
+When done, run `exit` to exit the nested PowerShell and run `pwsh` again. This unloads the DLL. Repeat.
+
+
 ## Contributions Welcome!
 
 We would love to incorporate community contributions into this project.  If you would like to
