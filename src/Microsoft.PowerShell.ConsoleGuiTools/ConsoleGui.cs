@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
+using NStack;
 using OutGridView.Models;
 using Terminal.Gui;
 
@@ -16,6 +18,8 @@ namespace OutGridView.Cmdlet
         private const string CANCEL_TEXT = "Are you sure you want to cancel?\nNothing will be emitted to the pipeline.";
         private const string CLOSE_TEXT = "Are you sure you want to close?";
         private bool _cancelled;
+        private List<string> _itemList;
+        private ListView _list;
 
         internal HashSet<int> SelectedIndexes { get; private set; } = new HashSet<int>();
         public void Start(ApplicationData applicationData)
@@ -41,12 +45,12 @@ namespace OutGridView.Cmdlet
                     applicationData.PassThru
                     ? new MenuItem []
                     {
-                        new MenuItem("_Accept", "", () => { if (Quit("Accept", ACCEPT_TEXT)) Application.RequestStop(); }),
-                        new MenuItem("_Cancel", "", () =>{ if (Quit("Cancel", CANCEL_TEXT)) _cancelled = true; Application.RequestStop(); })
+                        new MenuItem("_Accept", string.Empty, () => { if (Quit("Accept", ACCEPT_TEXT)) Application.RequestStop(); }),
+                        new MenuItem("_Cancel", string.Empty, () =>{ if (Quit("Cancel", CANCEL_TEXT)) _cancelled = true; Application.RequestStop(); })
                     }
                     : new MenuItem []
                     {
-                        new MenuItem("_Close", "", () =>{ if (Quit("Close", CLOSE_TEXT)) Application.RequestStop(); })
+                        new MenuItem("_Close", string.Empty, () =>{ if (Quit("Close", CLOSE_TEXT)) Application.RequestStop(); })
                     })
             });
             top.Add(menu);
@@ -101,7 +105,71 @@ namespace OutGridView.Cmdlet
                 columnWidthsSum--;
             }
 
-            win.Add(new Label(GetPaddedString(gridHeaders, columnWidths, offset + offset - 1)));
+            var filterLabel = new Label("Filter")
+            {
+                X = 2
+            };
+
+            // 7 here is to reserve space for the Apply button
+            var filterFieldWidth = usableWidth - filterLabel.Text.Length - 7;
+            var filterField = new TextField(".*")
+            {
+                X = Pos.Right(filterLabel) + 1,
+                Y = Pos.Top(filterLabel),
+                CanFocus = true,
+                Width = filterFieldWidth
+            };
+            filterField.Changed += FilterField_Changed;
+
+            var filterError = new Label(string.Empty)
+            {
+                X = Pos.Right(filterLabel) + 1,
+                Y = Pos.Top(filterLabel) + 1,
+                TextColor = Terminal.Gui.Attribute.Make(Color.Red, Color.Blue), // How to get window background color?
+                Width = filterFieldWidth
+            };
+
+            var filterApplyButton = new Button("Apply")
+            {
+                // Pos.Right(filterField) returns 0
+                X = Pos.Right(filterLabel) + 2 + filterFieldWidth,
+                Y = Pos.Top(filterLabel),
+                Clicked = () =>
+                {
+                    FilterData(applicationData, filterField.Text.ToString(), columnWidths, offset, filterError);
+                    _list.SetSource(_itemList);
+                }
+            };
+
+            var header = new Label(GetPaddedString(gridHeaders, columnWidths, offset + offset - 1))
+            {
+                X = 0,
+                Y = 2
+            };
+
+            win.Add(filterLabel, filterField, filterError, filterApplyButton, header);
+            var headerLineText = new StringBuilder();
+            foreach (char c in header.Text)
+            {
+                if (c.Equals(' '))
+                {
+                    headerLineText.Append(' ');
+                }
+                else
+                {
+                    // When gui.cs supports text decorations, should replace this with just underlining the header
+                    headerLineText.Append('-');
+                }
+            }
+
+            var headerLine = new Label(headerLineText.ToString())
+            {
+                X = 0,
+                Y = 3
+            };
+            win.Add(headerLine);
+
+            FilterData(applicationData, ".*", columnWidths, offset, filterError);
 
             var items = new List<string>();
             foreach (DataTableRow dataTableRow in applicationData.DataTable.Data)
@@ -115,16 +183,16 @@ namespace OutGridView.Cmdlet
                 items.Add(GetPaddedString(valueList, columnWidths, offset));
             }
 
-            var list = new ListView(items)
+            _list = new ListView(_itemList)
             {
                 X = 3,
-                Y = 3,
+                Y = 4,
                 Width = Dim.Fill(2),
                 Height = Dim.Fill(2),
                 AllowsMarking = applicationData.PassThru
             };
-            
-            win.Add(list);
+
+            win.Add(_list);
 
             Application.Run();
 
@@ -135,7 +203,7 @@ namespace OutGridView.Cmdlet
 
             for (int i = 0; i < applicationData.DataTable.Data.Count; i++)
             {
-                if(list.Source.IsMarked(i))
+                if(_list.Source.IsMarked(i))
                 {
                     SelectedIndexes.Add(i);
                 }
@@ -146,6 +214,56 @@ namespace OutGridView.Cmdlet
         {
             var n = MessageBox.Query(50, 7, title, text, "Yes", "No");
             return n == 0;
+        }
+
+        private void FilterData(ApplicationData applicationData, string filter, int[] columnWidths, int offset, Label filterError)
+        {
+            var items = new List<string>();
+            filterError.Text = " ";
+            filterError.TextColor = Terminal.Gui.Attribute.Make(Color.Red, Color.Blue);  // How to get window background color?
+            filterError.Redraw(filterError.Bounds);
+
+            foreach (DataTableRow dataTableRow in applicationData.DataTable.Data)
+            {
+                bool match = false;
+                var valueList = new List<string>();
+                foreach (var dataTableColumn in applicationData.DataTable.DataColumns)
+                {
+                    string dataValue = dataTableRow.Values[dataTableColumn.ToString()].DisplayValue;
+
+                    if (!match)
+                    {
+                        try
+                        {
+                            if (Regex.IsMatch(dataValue, filter, RegexOptions.IgnoreCase))
+                            {
+                                match = true;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            filterError.Text = ex.Message;  
+                            filterError.TextColor = Terminal.Gui.Attribute.Make(Color.Red, Color.Black);
+                            filterError.Redraw(filterError.Bounds);
+                            return;
+                        }
+                    }
+                    
+                    valueList.Add(dataValue);
+                }
+
+                if (match)
+                {
+                    items.Add(GetPaddedString(valueList, columnWidths, offset));
+                }
+            }
+
+            _itemList = items;
+        }
+
+        private void FilterField_Changed(object sender, ustring e)
+        {
+            // this doesn't get hit when field text is changed?
         }
 
         private static string GetPaddedString(List<string> strings, int[] colWidths, int offset = 0)
