@@ -10,11 +10,35 @@ using Terminal.Gui;
 
 namespace OutGridView.Cmdlet
 {
+    public class ConsoleGuiWindow : Window{
+        public Action Enter_Pressed;
+        public Action Esc_Pressed;
+
+        public ConsoleGuiWindow (string title = null) : base (title) {}
+
+        public override bool ProcessKey (KeyEvent keyEvent)
+        {
+            switch (keyEvent.Key)
+            {
+                case Key.Esc:
+                    if (Esc_Pressed != null)
+                        Esc_Pressed.Invoke ();
+                    break;
+
+                case Key.Enter:
+                    if (Enter_Pressed != null)
+                        Enter_Pressed.Invoke ();
+                    break;
+
+                default:
+                return base.ProcessKey(keyEvent);
+            }
+            return true;
+        }
+    }
+
     internal class ConsoleGui : IDisposable
     {
-        private const string ACCEPT_TEXT = "Are you sure you want to select\nthese items to send down the pipeline?";
-        private const string CANCEL_TEXT = "Are you sure you want to cancel?\nNothing will be emitted to the pipeline.";
-        private const string CLOSE_TEXT = "Are you sure you want to close?";
         private bool _cancelled;
 
         internal HashSet<int> SelectedIndexes { get; private set; } = new HashSet<int>();
@@ -24,32 +48,14 @@ namespace OutGridView.Cmdlet
             var top = Application.Top;
 
             // Creates the top-level window to show
-            var win = new Window(applicationData.Title ?? "Out-ConsoleGridView")
+            var win = new ConsoleGuiWindow(applicationData.Title ?? "Out-ConsoleGridView")
             {
                 X = 0,
-                Y = 1, // Leave one row for the toplevel menu
+                Y = 0, 
                 // By using Dim.Fill(), it will automatically resize without manual intervention
                 Width = Dim.Fill(),
                 Height = Dim.Fill()
             };
-            top.Add(win);
-
-            // Creates a menubar, the item "New" has a help menu.
-            var menu = new MenuBar(new MenuBarItem []
-            {
-                new MenuBarItem("_Actions (F9)", 
-                    applicationData.PassThru
-                    ? new MenuItem []
-                    {
-                        new MenuItem("_Accept", "", () => { if (Quit("Accept", ACCEPT_TEXT)) Application.RequestStop(); }),
-                        new MenuItem("_Cancel", "", () =>{ if (Quit("Cancel", CANCEL_TEXT)) _cancelled = true; Application.RequestStop(); })
-                    }
-                    : new MenuItem []
-                    {
-                        new MenuItem("_Close", "", () =>{ if (Quit("Close", CLOSE_TEXT)) Application.RequestStop(); })
-                    })
-            });
-            top.Add(menu);
 
             var gridHeaders = applicationData.DataTable.DataColumns.Select((c) => c.Label).ToList();
             var columnWidths = new int[gridHeaders.Count];
@@ -118,13 +124,36 @@ namespace OutGridView.Cmdlet
             var list = new ListView(items)
             {
                 X = 3,
-                Y = 3,
+                Y = 1,
                 Width = Dim.Fill(2),
-                Height = Dim.Fill(2),
+                Height = Dim.Fill(0),
                 AllowsMarking = applicationData.PassThru
             };
             
             win.Add(list);
+
+            win.Enter_Pressed += () =>
+            {
+                // Regardless of whether the item was already marked, if the user presses
+                // ENTER, mark that item. This feels the most intuitive. The alternatives are:
+                // (a) Assume the user means to choose the item that's selected and mark it.
+                // (b) Act like ESC except Pass Through an marked items.
+                // (c) Toggle the selected item.
+                // Option (c) violates the principle of least astonishment: If the user has an item marked, and selected
+                // and hits ENTER s/he would be surprised to see it not returned. Esp in the single choice (most common) case.
+                // Option (b) means in the most common case (a single item is wanted) ENTER does nothing. Again surprising.
+                // It seems (a) is the most intuitive so that's what's implemented.
+                list.Source.SetMark(list.SelectedItem, true);
+                Application.RequestStop();
+            };
+
+            win.Esc_Pressed += () => 
+            {
+                _cancelled = true;
+                Application.RequestStop();
+            };
+            
+            top.Add(win);
 
             Application.Run();
 
@@ -135,7 +164,7 @@ namespace OutGridView.Cmdlet
 
             for (int i = 0; i < applicationData.DataTable.Data.Count; i++)
             {
-                if(list.Source.IsMarked(i))
+                if (list.Source.IsMarked(i))
                 {
                     SelectedIndexes.Add(i);
                 }
