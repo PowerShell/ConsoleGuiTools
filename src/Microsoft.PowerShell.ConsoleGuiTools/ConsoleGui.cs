@@ -125,7 +125,7 @@ namespace OutGridView.Cmdlet
             {
                 X = Pos.Right(filterLabel) + 1,
                 Y = Pos.Top(filterLabel) + 1,
-                TextColor = Terminal.Gui.Attribute.Make(Color.Red, Color.Blue), // How to get window background color?
+                ColorScheme = Colors.Base,
                 Width = filterFieldWidth
             };
 
@@ -220,7 +220,7 @@ namespace OutGridView.Cmdlet
         {
             var items = new List<string>();
             filterError.Text = " ";
-            filterError.TextColor = Terminal.Gui.Attribute.Make(Color.Red, Color.Blue);  // How to get window background color?
+            filterError.ColorScheme = Colors.Base;
             filterError.Redraw(filterError.Bounds);
 
             foreach (DataTableRow dataTableRow in applicationData.DataTable.Data)
@@ -242,8 +242,8 @@ namespace OutGridView.Cmdlet
                         }
                         catch (Exception ex)
                         {
-                            filterError.Text = ex.Message;  
-                            filterError.TextColor = Terminal.Gui.Attribute.Make(Color.Red, Color.Black);
+                            filterError.Text = ex.Message;
+                            filterError.ColorScheme = Colors.Error;
                             filterError.Redraw(filterError.Bounds);
                             return;
                         }
