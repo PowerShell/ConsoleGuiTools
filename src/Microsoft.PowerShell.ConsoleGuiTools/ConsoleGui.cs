@@ -34,6 +34,10 @@ namespace OutGridView.Cmdlet
             var top = Application.Top;
             _applicationData = applicationData;
 
+            // If we have PassThru, then we want to make them selectable. If we make them selectable,
+            // they have a 8 character addition of a checkbox ("     [ ]") that we have to factor in.
+            _listViewOffset = _applicationData.PassThru ? 8 : 4;
+
             // Creates the top-level window to show
             var win = new Window(_applicationData.Title ?? "Out-ConsoleGridView")
             {
@@ -86,10 +90,6 @@ namespace OutGridView.Cmdlet
                     index++;
                 }
             }
-
-            // If we have PassThru, then we want to make them selectable. If we make them selectable,
-            // they have a 8 character addition of a checkbox ("     [ ]") that we have to factor in.
-            _listViewOffset = _applicationData.PassThru ? 8 : 4;
 
             // if the total width is wider than the usable width, remove 1 from widest column until it fits
             // the gui loses 3 chars on the left and 2 chars on the right
@@ -245,23 +245,20 @@ namespace OutGridView.Cmdlet
                 {
                     string dataValue = dataTableRow.Values[dataTableColumn.ToString()].DisplayValue;
 
-                    if (!match)
+                    try
                     {
-                        try
+                        if (!match && Regex.IsMatch(dataValue, filter, RegexOptions.IgnoreCase))
                         {
-                            if (Regex.IsMatch(dataValue, filter, RegexOptions.IgnoreCase))
-                            {
-                                match = true;
-                                // don't break out of loop as all data need to be collected to be rendered
-                            }
+                            match = true;
+                            // don't break out of loop as all data need to be collected to be rendered
                         }
-                        catch (Exception ex)
-                        {
-                            _filterErrorLabel.Text = ex.Message;
-                            _filterErrorLabel.ColorScheme = Colors.Error;
-                            _filterErrorLabel.Redraw(_filterErrorLabel.Bounds);
-                            return;
-                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _filterErrorLabel.Text = ex.Message;
+                        _filterErrorLabel.ColorScheme = Colors.Error;
+                        _filterErrorLabel.Redraw(_filterErrorLabel.Bounds);
+                        return;
                     }
                     
                     valueList.Add(dataValue);
