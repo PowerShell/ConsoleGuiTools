@@ -36,6 +36,7 @@ namespace OutGridView.Cmdlet
                 default:
                     return base.ProcessKey(keyEvent);
             }
+
             return true;
         }
     }
