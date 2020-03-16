@@ -116,6 +116,8 @@ In the Powershell session run your commands; breakpoints will be hit, etc...
 
 When done, run `exit` to exit the nested PowerShell and run `pwsh` again. This unloads the DLL. Repeat.
 
+See [this Stackoverflow answer](https://stackoverflow.com/questions/35917730/debugging-unloading-powershell-cmdlet) for setting up easy CmdLet debugging in Visual Studio.
+
 
 ## Contributions Welcome!
 
