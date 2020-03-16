@@ -34,7 +34,7 @@ namespace OutGridView.Cmdlet
                     break;
 
                 default:
-                return base.ProcessKey(keyEvent);
+                    return base.ProcessKey(keyEvent);
             }
             return true;
         }
