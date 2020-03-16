@@ -10,7 +10,8 @@ using Terminal.Gui;
 
 namespace OutGridView.Cmdlet
 {
-    public class ConsoleGuiWindow : Window{
+    public class ConsoleGuiWindow : Window
+    {
         public Action Enter_Pressed;
         public Action Esc_Pressed;
 
