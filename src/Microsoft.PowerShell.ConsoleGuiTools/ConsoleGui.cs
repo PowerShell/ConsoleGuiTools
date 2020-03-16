@@ -14,7 +14,7 @@ namespace OutGridView.Cmdlet
         public Action Enter_Pressed;
         public Action Esc_Pressed;
 
-        public ConsoleGuiWindow (string title = null) : base (title) {}
+        public ConsoleGuiWindow(string title = null) : base(title) {}
 
         public override bool ProcessKey (KeyEvent keyEvent)
         {
