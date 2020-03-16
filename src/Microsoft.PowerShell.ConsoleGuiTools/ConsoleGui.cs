@@ -28,7 +28,9 @@ namespace OutGridView.Cmdlet
 
                 case Key.Enter:
                     if (Enter_Pressed != null)
+                    {
                         Enter_Pressed.Invoke ();
+                    }
                     break;
 
                 default:
