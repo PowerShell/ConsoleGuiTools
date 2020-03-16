@@ -17,18 +17,25 @@ namespace OutGridView.Cmdlet
         private const string ACCEPT_TEXT = "Are you sure you want to select\nthese items to send down the pipeline?";
         private const string CANCEL_TEXT = "Are you sure you want to cancel?\nNothing will be emitted to the pipeline.";
         private const string CLOSE_TEXT = "Are you sure you want to close?";
+        private const string FILTER_LABEL = "Filter";
+        private const string APPLY_LABEL = "Apply";
         private bool _cancelled;
         private List<string> _itemList;
-        private ListView _list;
+        private ListView _listView;
+        private ApplicationData _applicationData;
+        private int[] _listViewColumnWidths;
+        private int _listViewOffset;
+        private Label _filterErrorLabel;
 
         internal HashSet<int> SelectedIndexes { get; private set; } = new HashSet<int>();
         public void Start(ApplicationData applicationData)
         {
             Application.Init();
             var top = Application.Top;
+            _applicationData = applicationData;
 
             // Creates the top-level window to show
-            var win = new Window(applicationData.Title ?? "Out-ConsoleGridView")
+            var win = new Window(_applicationData.Title ?? "Out-ConsoleGridView")
             {
                 X = 0,
                 Y = 1, // Leave one row for the toplevel menu
@@ -42,7 +49,7 @@ namespace OutGridView.Cmdlet
             var menu = new MenuBar(new MenuBarItem []
             {
                 new MenuBarItem("_Actions (F9)", 
-                    applicationData.PassThru
+                    _applicationData.PassThru
                     ? new MenuItem []
                     {
                         new MenuItem("_Accept", string.Empty, () => { if (Quit("Accept", ACCEPT_TEXT)) Application.RequestStop(); }),
@@ -55,15 +62,15 @@ namespace OutGridView.Cmdlet
             });
             top.Add(menu);
 
-            var gridHeaders = applicationData.DataTable.DataColumns.Select((c) => c.Label).ToList();
-            var columnWidths = new int[gridHeaders.Count];
+            var gridHeaders = _applicationData.DataTable.DataColumns.Select((c) => c.Label).ToList();
+            _listViewColumnWidths = new int[gridHeaders.Count];
             for (int i = 0; i < gridHeaders.Count; i++)
             {
-                columnWidths[i] = gridHeaders[i].Length;
+                _listViewColumnWidths[i] = gridHeaders[i].Length;
             }
 
             // calculate the width of each column based on longest string in each column for each row
-            foreach (var row in applicationData.DataTable.Data)
+            foreach (var row in _applicationData.DataTable.Data)
             {
                 int index = 0;
 
@@ -71,9 +78,9 @@ namespace OutGridView.Cmdlet
                 foreach (var col in row.Values.Take(top.Frame.Height / 2))
                 {
                     var len = col.Value.DisplayValue.Length;
-                    if (len > columnWidths[index])
+                    if (len > _listViewColumnWidths[index])
                     {
-                        columnWidths[index] = len;
+                        _listViewColumnWidths[index] = len;
                     }
                     
                     index++;
@@ -82,37 +89,37 @@ namespace OutGridView.Cmdlet
 
             // If we have PassThru, then we want to make them selectable. If we make them selectable,
             // they have a 8 character addition of a checkbox ("     [ ]") that we have to factor in.
-            int offset = applicationData.PassThru ? 8 : 4;
+            _listViewOffset = _applicationData.PassThru ? 8 : 4;
 
             // if the total width is wider than the usable width, remove 1 from widest column until it fits
             // the gui loses 3 chars on the left and 2 chars on the right
-            int usableWidth = top.Frame.Width - 3 - columnWidths.Length - offset - 2;
-            int columnWidthsSum = columnWidths.Sum();
+            int usableWidth = top.Frame.Width - 3 - _listViewColumnWidths.Length - _listViewOffset - 2;
+            int columnWidthsSum = _listViewColumnWidths.Sum();
             while (columnWidthsSum >= usableWidth)
             {
                 int maxWidth = 0;
                 int maxIndex = 0;
-                for (int i = 0; i < columnWidths.Length; i++)
+                for (int i = 0; i < _listViewColumnWidths.Length; i++)
                 {
-                    if (columnWidths[i] > maxWidth)
+                    if (_listViewColumnWidths[i] > maxWidth)
                     {
-                        maxWidth = columnWidths[i];
+                        maxWidth = _listViewColumnWidths[i];
                         maxIndex = i;
                     }
                 }
 
-                columnWidths[maxIndex]--;
+                _listViewColumnWidths[maxIndex]--;
                 columnWidthsSum--;
             }
 
-            var filterLabel = new Label("Filter")
+            var filterLabel = new Label(FILTER_LABEL)
             {
                 X = 2
             };
 
-            // 7 here is to reserve space for the Apply button
-            var filterFieldWidth = usableWidth - filterLabel.Text.Length - 7;
-            var filterField = new TextField(".*")
+            // 2 is for the square brackets added to buttons
+            var filterFieldWidth = usableWidth - filterLabel.Text.Length - APPLY_LABEL.Length - 2;
+            var filterField = new TextField(string.Empty)
             {
                 X = Pos.Right(filterLabel) + 1,
                 Y = Pos.Top(filterLabel),
@@ -121,7 +128,7 @@ namespace OutGridView.Cmdlet
             };
             filterField.Changed += FilterField_Changed;
 
-            var filterError = new Label(string.Empty)
+            _filterErrorLabel = new Label(string.Empty)
             {
                 X = Pos.Right(filterLabel) + 1,
                 Y = Pos.Top(filterLabel) + 1,
@@ -129,25 +136,27 @@ namespace OutGridView.Cmdlet
                 Width = filterFieldWidth
             };
 
-            var filterApplyButton = new Button("Apply")
+            var filterApplyButton = new Button(APPLY_LABEL)
             {
                 // Pos.Right(filterField) returns 0
-                X = Pos.Right(filterLabel) + 2 + filterFieldWidth,
+                X = Pos.Right(filterLabel) + filterFieldWidth + 2,
                 Y = Pos.Top(filterLabel),
                 Clicked = () =>
                 {
-                    FilterData(applicationData, filterField.Text.ToString(), columnWidths, offset, filterError);
-                    _list.SetSource(_itemList);
+                    FilterData(filterField.Text.ToString());
+                    _listView.SetSource(_itemList);
                 }
             };
 
-            var header = new Label(GetPaddedString(gridHeaders, columnWidths, offset + offset - 1))
+            var header = new Label(GetPaddedString(gridHeaders, _listViewOffset + _listViewOffset - 1))
             {
                 X = 0,
                 Y = 2
             };
 
-            win.Add(filterLabel, filterField, filterError, filterApplyButton, header);
+            win.Add(filterLabel, filterField, _filterErrorLabel, filterApplyButton, header);
+
+            // This renders dashes under the header to make it more clear what is header and what is data
             var headerLineText = new StringBuilder();
             foreach (char c in header.Text)
             {
@@ -169,30 +178,30 @@ namespace OutGridView.Cmdlet
             };
             win.Add(headerLine);
 
-            FilterData(applicationData, ".*", columnWidths, offset, filterError);
+            FilterData(string.Empty);
 
             var items = new List<string>();
-            foreach (DataTableRow dataTableRow in applicationData.DataTable.Data)
+            foreach (DataTableRow dataTableRow in _applicationData.DataTable.Data)
             {
                 var valueList = new List<string>();
-                foreach (var dataTableColumn in applicationData.DataTable.DataColumns)
+                foreach (var dataTableColumn in _applicationData.DataTable.DataColumns)
                 {
                     valueList.Add(dataTableRow.Values[dataTableColumn.ToString()].DisplayValue);
                 }
 
-                items.Add(GetPaddedString(valueList, columnWidths, offset));
+                items.Add(GetPaddedString(valueList));
             }
 
-            _list = new ListView(_itemList)
+            _listView = new ListView(_itemList)
             {
                 X = 3,
                 Y = 4,
                 Width = Dim.Fill(2),
                 Height = Dim.Fill(2),
-                AllowsMarking = applicationData.PassThru
+                AllowsMarking = _applicationData.PassThru
             };
 
-            win.Add(_list);
+            win.Add(_listView);
 
             Application.Run();
 
@@ -201,9 +210,9 @@ namespace OutGridView.Cmdlet
                 return;
             }
 
-            for (int i = 0; i < applicationData.DataTable.Data.Count; i++)
+            for (int i = 0; i < _applicationData.DataTable.Data.Count; i++)
             {
-                if(_list.Source.IsMarked(i))
+                if(_listView.Source.IsMarked(i))
                 {
                     SelectedIndexes.Add(i);
                 }
@@ -216,18 +225,23 @@ namespace OutGridView.Cmdlet
             return n == 0;
         }
 
-        private void FilterData(ApplicationData applicationData, string filter, int[] columnWidths, int offset, Label filterError)
+        private void FilterData(string filter)
         {
             var items = new List<string>();
-            filterError.Text = " ";
-            filterError.ColorScheme = Colors.Base;
-            filterError.Redraw(filterError.Bounds);
+            if (string.IsNullOrEmpty(filter))
+            {
+                filter = ".*";
+            }
 
-            foreach (DataTableRow dataTableRow in applicationData.DataTable.Data)
+            _filterErrorLabel.Text = " ";
+            _filterErrorLabel.ColorScheme = Colors.Base;
+            _filterErrorLabel.Redraw(_filterErrorLabel.Bounds);
+
+            foreach (DataTableRow dataTableRow in _applicationData.DataTable.Data)
             {
                 bool match = false;
                 var valueList = new List<string>();
-                foreach (var dataTableColumn in applicationData.DataTable.DataColumns)
+                foreach (var dataTableColumn in _applicationData.DataTable.DataColumns)
                 {
                     string dataValue = dataTableRow.Values[dataTableColumn.ToString()].DisplayValue;
 
@@ -238,13 +252,14 @@ namespace OutGridView.Cmdlet
                             if (Regex.IsMatch(dataValue, filter, RegexOptions.IgnoreCase))
                             {
                                 match = true;
+                                // don't break out of loop as all data need to be collected to be rendered
                             }
                         }
                         catch (Exception ex)
                         {
-                            filterError.Text = ex.Message;
-                            filterError.ColorScheme = Colors.Error;
-                            filterError.Redraw(filterError.Bounds);
+                            _filterErrorLabel.Text = ex.Message;
+                            _filterErrorLabel.ColorScheme = Colors.Error;
+                            _filterErrorLabel.Redraw(_filterErrorLabel.Bounds);
                             return;
                         }
                     }
@@ -254,7 +269,7 @@ namespace OutGridView.Cmdlet
 
                 if (match)
                 {
-                    items.Add(GetPaddedString(valueList, columnWidths, offset));
+                    items.Add(GetPaddedString(valueList));
                 }
             }
 
@@ -263,10 +278,17 @@ namespace OutGridView.Cmdlet
 
         private void FilterField_Changed(object sender, ustring e)
         {
-            // this doesn't get hit when field text is changed?
+            // TODO: remove Apply button and code when this starts working
+            FilterData(e.ToString());
+            _listView.SetSource(_itemList);
         }
 
-        private static string GetPaddedString(List<string> strings, int[] colWidths, int offset = 0)
+        private string GetPaddedString(List<string> strings)
+        {
+            return GetPaddedString(strings, _listViewOffset);
+        }
+
+        private string GetPaddedString(List<string> strings, int offset)
         {
             var builder = new StringBuilder();
             if (offset > 0)
@@ -283,14 +305,14 @@ namespace OutGridView.Cmdlet
                 }
 
                 // If the string won't fit in the column, append an ellipsis.
-                if (strings[i].Length > colWidths[i])
+                if (strings[i].Length > _listViewColumnWidths[i])
                 {
-                    builder.Append(strings[i].Substring(0, colWidths[i] - 4));
+                    builder.Append(strings[i].Substring(0, _listViewColumnWidths[i] - 4));
                     builder.Append("...");
                 }
                 else
                 {
-                    builder.Append(strings[i].PadRight(colWidths[i]));
+                    builder.Append(strings[i].PadRight(_listViewColumnWidths[i]));
                 }
             }
 
