@@ -23,7 +23,9 @@ namespace OutGridView.Cmdlet
             {
                 case Key.Esc:
                     if (Esc_Pressed != null)
+                    {
                         Esc_Pressed.Invoke ();
+                    }
                     break;
 
                 case Key.Enter:
