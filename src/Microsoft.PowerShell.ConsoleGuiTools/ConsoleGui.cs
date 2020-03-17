@@ -39,7 +39,7 @@ namespace OutGridView.Cmdlet
             _listViewOffset = _applicationData.PassThru ? 8 : 4;
 
             // Creates the top-level window to show
-            var win = new Window(_applicationData.Title ?? "Out-ConsoleGridView")
+            var win = new Window(_applicationData.Title)
             {
                 X = 0,
                 Y = 1, // Leave one row for the toplevel menu
