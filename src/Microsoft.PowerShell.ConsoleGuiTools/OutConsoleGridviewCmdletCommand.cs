@@ -130,7 +130,7 @@ namespace OutGridView.Cmdlet
             var dataTable = TG.CastObjectsToTableView(_psObjects);
             var applicationData = new ApplicationData
             {
-                Title = Title,
+                Title = Title ?? "Out-ConsoleGridView",
                 OutputMode = OutputMode,
                 PassThru = PassThru,
                 DataTable = dataTable
