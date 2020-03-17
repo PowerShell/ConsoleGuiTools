@@ -9,7 +9,7 @@
 RootModule = 'Microsoft.PowerShell.ConsoleGuiTools.dll'
 
 # Version number of this module.
-ModuleVersion = '0.3.0'
+ModuleVersion = '0.4.0'
 
 # Supported PSEditions
 CompatiblePSEditions = @( 'Core' )
@@ -105,6 +105,11 @@ PrivateData = @{
 
         # ReleaseNotes of this module
         ReleaseNotes = '# Release Notes
+
+## v0.4.0
+
+* Regex filter
+* Newlines rendering fix (Thanks @tig!)
 
 ## v0.3.0
 
