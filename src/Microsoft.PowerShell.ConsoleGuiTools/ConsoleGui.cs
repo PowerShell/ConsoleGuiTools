@@ -240,7 +240,7 @@ namespace OutGridView.Cmdlet
             _filterErrorLabel.Redraw(_filterErrorLabel.Bounds);
 
 
-            int index = 0;
+            int newIndex = 0;
             for (int i = 0; i < _applicationData.DataTable.Data.Count; i++)
             {
                 var dataTableRow = _applicationData.DataTable.Data[i];
@@ -272,8 +272,8 @@ namespace OutGridView.Cmdlet
                 if (match)
                 {
                     items.Add(GetPaddedString(valueList));
-                    _indexMap.Add(index, i);
-                    index++;
+                    _indexMap.Add(newIndex, i);
+                    newIndex++;
                 }
             }
 
