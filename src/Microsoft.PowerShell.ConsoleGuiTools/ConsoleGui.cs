@@ -26,6 +26,7 @@ namespace OutGridView.Cmdlet
         private int[] _listViewColumnWidths;
         private int _listViewOffset;
         private Label _filterErrorLabel;
+        private Dictionary<int, int> _indexMap = new Dictionary<int, int>();
 
         internal HashSet<int> SelectedIndexes { get; private set; } = new HashSet<int>();
         public void Start(ApplicationData applicationData)
@@ -214,7 +215,7 @@ namespace OutGridView.Cmdlet
             {
                 if(_listView.Source.IsMarked(i))
                 {
-                    SelectedIndexes.Add(i);
+                    SelectedIndexes.Add(_indexMap[i]);
                 }
             }
         }
@@ -228,6 +229,7 @@ namespace OutGridView.Cmdlet
         private void FilterData(string filter)
         {
             var items = new List<string>();
+            _indexMap.Clear();
             if (string.IsNullOrEmpty(filter))
             {
                 filter = ".*";
@@ -237,8 +239,11 @@ namespace OutGridView.Cmdlet
             _filterErrorLabel.ColorScheme = Colors.Base;
             _filterErrorLabel.Redraw(_filterErrorLabel.Bounds);
 
-            foreach (DataTableRow dataTableRow in _applicationData.DataTable.Data)
+
+            int index = 0;
+            for (int i = 0; i < _applicationData.DataTable.Data.Count; i++)
             {
+                var dataTableRow = _applicationData.DataTable.Data[i];
                 bool match = false;
                 var valueList = new List<string>();
                 foreach (var dataTableColumn in _applicationData.DataTable.DataColumns)
@@ -267,6 +272,8 @@ namespace OutGridView.Cmdlet
                 if (match)
                 {
                     items.Add(GetPaddedString(valueList));
+                    _indexMap.Add(index, i);
+                    index++;
                 }
             }
 
