@@ -230,6 +230,7 @@ namespace OutGridView.Cmdlet
         {
             var items = new List<string>();
             _indexMap.Clear();
+            SelectedIndexes.Clear();
             if (string.IsNullOrEmpty(filter))
             {
                 filter = ".*";
