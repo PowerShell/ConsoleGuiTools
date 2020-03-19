@@ -27,7 +27,7 @@ namespace OutGridView.Cmdlet
         private int _listViewOffset;
         private Label _filterErrorLabel;
         private Dictionary<int, int> _indexMap = new Dictionary<int, int>();
-        private List<int> _selectedIndexes = new List<int>();
+        private HashSet<int> _selectedIndexes = new HashSet<int>();
 
         internal HashSet<int> SelectedIndexes { get; private set; } = new HashSet<int>();
         public void Start(ApplicationData applicationData)
