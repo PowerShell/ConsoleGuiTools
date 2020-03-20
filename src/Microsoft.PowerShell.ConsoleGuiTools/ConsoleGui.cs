@@ -27,6 +27,7 @@ namespace OutGridView.Cmdlet
         private int _listViewOffset;
         private Label _filterErrorLabel;
         private Dictionary<int, int> _indexMap = new Dictionary<int, int>();
+        private HashSet<int> _selectedIndexes = new HashSet<int>();
 
         internal HashSet<int> SelectedIndexes { get; private set; } = new HashSet<int>();
         public void Start(ApplicationData applicationData)
@@ -146,6 +147,7 @@ namespace OutGridView.Cmdlet
                 {
                     FilterData(filterField.Text.ToString());
                     _listView.SetSource(_itemList);
+                    RefreshSelectedListView();
                 }
             };
 
@@ -229,16 +231,29 @@ namespace OutGridView.Cmdlet
         private void FilterData(string filter)
         {
             var items = new List<string>();
-            _indexMap.Clear();
+            _selectedIndexes.Clear();
             if (string.IsNullOrEmpty(filter))
             {
                 filter = ".*";
             }
 
+            var selectedList = new List<int>();
+            if (_listView != null)
+            {
+                // cache the currently selected items based on their original index
+                for (int i = 0; i < _listView.Source.Count; i++)
+                {
+                    if (_listView.Source.IsMarked(i))
+                    {
+                        selectedList.Add(_indexMap[i]);
+                    }
+                }
+            }
+
+            _indexMap.Clear();
             _filterErrorLabel.Text = " ";
             _filterErrorLabel.ColorScheme = Colors.Base;
             _filterErrorLabel.Redraw(_filterErrorLabel.Bounds);
-
 
             int newIndex = 0;
             for (int i = 0; i < _applicationData.DataTable.Data.Count; i++)
@@ -273,6 +288,13 @@ namespace OutGridView.Cmdlet
                 {
                     items.Add(GetPaddedString(valueList));
                     _indexMap.Add(newIndex, i);
+
+                    // if the original item was selected, we keep track of the new index to select it later
+                    if (selectedList.Contains(i))
+                    {
+                        _selectedIndexes.Add(newIndex);
+                    }
+
                     newIndex++;
                 }
             }
@@ -280,11 +302,20 @@ namespace OutGridView.Cmdlet
             _itemList = items;
         }
 
+        private void RefreshSelectedListView()
+        {
+            for (int i = 0; i < _listView.Source.Count; i++)
+            {
+                _listView.Source.SetMark(i, _selectedIndexes.Contains(i));
+            }
+        }
+
         private void FilterField_Changed(object sender, ustring e)
         {
             // TODO: remove Apply button and code when this starts working
             FilterData(e.ToString());
             _listView.SetSource(_itemList);
+            RefreshSelectedListView();
         }
 
         private string GetPaddedString(List<string> strings)
