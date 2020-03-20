@@ -32,23 +32,25 @@ namespace OutGridView.Cmdlet
             GridViewRowList[item].IsMarked = value;
         }
 
-        void RenderUstr (ConsoleDriver driver, ustring ustr, int col, int line, int width)
+        // A slightly adapted method from gui.cs: https://github.com/migueldeicaza/gui.cs/blob/fc1faba7452ccbdf49028ac49f0c9f0f42bbae91/Terminal.Gui/Views/ListView.cs#L433-L461
+        private void RenderUstr(ConsoleDriver driver, ustring ustr, int col, int line, int width)
         {
-            int byteLen = ustr.Length;
             int used = 0;
-            for (int i = 0; i < byteLen;)
+            int index = 0;
+            while (index < ustr.Length)
             {
-                (var rune, var size) = Utf8.DecodeRune(ustr, i, i - byteLen);
+                (var rune, var size) = Utf8.DecodeRune(ustr, index, index - ustr.Length);
                 var count = Rune.ColumnWidth(rune);
                 if (used + count >= width) break;
                 driver.AddRune(rune);
                 used += count;
-                i += size;
+                index += size;
             }
 
-            for (; used < width; used++)
+            while (used < width)
             {
                 driver.AddRune(' ');
+                used++;
             }
         }
     }
