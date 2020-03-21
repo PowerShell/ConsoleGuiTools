@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using NStack;
 using OutGridView.Models;
 using Terminal.Gui;
@@ -20,16 +19,15 @@ namespace OutGridView.Cmdlet
         private const string FILTER_LABEL = "Filter";
         private const string APPLY_LABEL = "Apply";
         private bool _cancelled;
-        private List<string> _itemList;
+        private GridViewDataSource _itemSource;
         private ListView _listView;
         private ApplicationData _applicationData;
         private int[] _listViewColumnWidths;
         private int _listViewOffset;
         private Label _filterErrorLabel;
-        private Dictionary<int, int> _indexMap = new Dictionary<int, int>();
-        private HashSet<int> _selectedIndexes = new HashSet<int>();
 
         internal HashSet<int> SelectedIndexes { get; private set; } = new HashSet<int>();
+
         public void Start(ApplicationData applicationData)
         {
             Application.Init();
@@ -145,13 +143,14 @@ namespace OutGridView.Cmdlet
                 Y = Pos.Top(filterLabel),
                 Clicked = () =>
                 {
-                    FilterData(filterField.Text.ToString());
-                    _listView.SetSource(_itemList);
-                    RefreshSelectedListView();
+                    FilterField_Changed(null, filterField.Text);
                 }
             };
 
-            var header = new Label(GetPaddedString(gridHeaders, _listViewOffset + _listViewOffset - 1))
+            var header = new Label(GridViewHelpers.GetPaddedString(
+                gridHeaders,
+                _listViewOffset + _listViewOffset - 1,
+                _listViewColumnWidths))
             {
                 X = 0,
                 Y = 2
@@ -181,21 +180,9 @@ namespace OutGridView.Cmdlet
             };
             win.Add(headerLine);
 
-            FilterData(string.Empty);
+            LoadData();
 
-            var items = new List<string>();
-            foreach (DataTableRow dataTableRow in _applicationData.DataTable.Data)
-            {
-                var valueList = new List<string>();
-                foreach (var dataTableColumn in _applicationData.DataTable.DataColumns)
-                {
-                    valueList.Add(dataTableRow.Values[dataTableColumn.ToString()].DisplayValue);
-                }
-
-                items.Add(GetPaddedString(valueList));
-            }
-
-            _listView = new ListView(_itemList)
+            _listView = new ListView(_itemSource)
             {
                 X = 3,
                 Y = 4,
@@ -205,7 +192,6 @@ namespace OutGridView.Cmdlet
             };
 
             win.Add(_listView);
-
             Application.Run();
 
             if (_cancelled)
@@ -213,11 +199,11 @@ namespace OutGridView.Cmdlet
                 return;
             }
 
-            for (int i = 0; i < _applicationData.DataTable.Data.Count; i++)
+            foreach (GridViewRow gvr in _itemSource.GridViewRowList)
             {
-                if(_listView.Source.IsMarked(i))
+                if (gvr.IsMarked)
                 {
-                    SelectedIndexes.Add(_indexMap[i]);
+                    SelectedIndexes.Add(gvr.OriginalIndex);
                 }
             }
         }
@@ -228,136 +214,53 @@ namespace OutGridView.Cmdlet
             return n == 0;
         }
 
-        private void FilterData(string filter)
+        private void LoadData()
         {
-            var items = new List<string>();
-            _selectedIndexes.Clear();
-            if (string.IsNullOrEmpty(filter))
-            {
-                filter = ".*";
-            }
-
-            var selectedList = new List<int>();
-            if (_listView != null)
-            {
-                // cache the currently selected items based on their original index
-                for (int i = 0; i < _listView.Source.Count; i++)
-                {
-                    if (_listView.Source.IsMarked(i))
-                    {
-                        selectedList.Add(_indexMap[i]);
-                    }
-                }
-            }
-
-            _indexMap.Clear();
-            _filterErrorLabel.Text = " ";
-            _filterErrorLabel.ColorScheme = Colors.Base;
-            _filterErrorLabel.Redraw(_filterErrorLabel.Bounds);
-
+            var items = new List<GridViewRow>();
             int newIndex = 0;
             for (int i = 0; i < _applicationData.DataTable.Data.Count; i++)
             {
                 var dataTableRow = _applicationData.DataTable.Data[i];
-                bool match = false;
                 var valueList = new List<string>();
                 foreach (var dataTableColumn in _applicationData.DataTable.DataColumns)
                 {
                     string dataValue = dataTableRow.Values[dataTableColumn.ToString()].DisplayValue;
-
-                    try
-                    {
-                        if (!match && Regex.IsMatch(dataValue, filter, RegexOptions.IgnoreCase))
-                        {
-                            match = true;
-                            // don't break out of loop as all data need to be collected to be rendered
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        _filterErrorLabel.Text = ex.Message;
-                        _filterErrorLabel.ColorScheme = Colors.Error;
-                        _filterErrorLabel.Redraw(_filterErrorLabel.Bounds);
-                        return;
-                    }
-                    
                     valueList.Add(dataValue);
                 }
 
-                if (match)
+                string displayString = GridViewHelpers.GetPaddedString(valueList, _listViewOffset, _listViewColumnWidths);
+
+                items.Add(new GridViewRow
                 {
-                    items.Add(GetPaddedString(valueList));
-                    _indexMap.Add(newIndex, i);
+                    DisplayString = displayString,
+                    OriginalIndex = i
+                });
 
-                    // if the original item was selected, we keep track of the new index to select it later
-                    if (selectedList.Contains(i))
-                    {
-                        _selectedIndexes.Add(newIndex);
-                    }
-
-                    newIndex++;
-                }
+                newIndex++;
             }
 
-            _itemList = items;
-        }
-
-        private void RefreshSelectedListView()
-        {
-            for (int i = 0; i < _listView.Source.Count; i++)
-            {
-                _listView.Source.SetMark(i, _selectedIndexes.Contains(i));
-            }
+            _itemSource = new GridViewDataSource(items);
         }
 
         private void FilterField_Changed(object sender, ustring e)
         {
             // TODO: remove Apply button and code when this starts working
-            FilterData(e.ToString());
-            _listView.SetSource(_itemList);
-            RefreshSelectedListView();
-        }
-
-        private string GetPaddedString(List<string> strings)
-        {
-            return GetPaddedString(strings, _listViewOffset);
-        }
-
-        private string GetPaddedString(List<string> strings, int offset)
-        {
-            var builder = new StringBuilder();
-            if (offset > 0)
+            try
             {
-                builder.Append(string.Empty.PadRight(offset));
-            }
+                _filterErrorLabel.Text = " ";
+                _filterErrorLabel.ColorScheme = Colors.Base;
+                _filterErrorLabel.Redraw(_filterErrorLabel.Bounds);
 
-            for (int i = 0; i < strings.Count; i++)
+                var itemList = GridViewHelpers.FilterData(_itemSource.GridViewRowList, e.ToString());
+                _listView.Source = new GridViewDataSource(itemList);
+            }
+            catch (Exception ex)
             {
-                if (i > 0)
-                {
-                    // Add a space between columns
-                    builder.Append(' ');
-                }
-
-                // Replace any newlines with encoded newline/linefeed (`n or `r)
-                // Note we can't use Environment.Newline because we don't know that the
-                // Command honors that.
-                strings[i] = strings[i].Replace("\r", "`r");
-                strings[i] = strings[i].Replace("\n", "`n");
-
-                // If the string won't fit in the column, append an ellipsis.
-                if (strings[i].Length > _listViewColumnWidths[i])
-                {
-                    builder.Append(strings[i].Substring(0, _listViewColumnWidths[i] - 4));
-                    builder.Append("...");
-                }
-                else
-                {
-                    builder.Append(strings[i].PadRight(_listViewColumnWidths[i]));
-                }
+                _filterErrorLabel.Text = ex.Message;
+                _filterErrorLabel.ColorScheme = Colors.Error;
+                _filterErrorLabel.Redraw(_filterErrorLabel.Bounds);
+                _listView.Source = _itemSource;
             }
-
-            return builder.ToString();
         }
 
         public void Dispose()
