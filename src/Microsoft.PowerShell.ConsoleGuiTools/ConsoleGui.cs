@@ -266,8 +266,7 @@ namespace OutGridView.Cmdlet
                     valueList.Add(dataValue);
                 }
 
-                string displayString = GridViewHelpers.GetPaddedString(
-                        valueList, _gridViewDetails.ListViewOffset, _gridViewDetails.ListViewColumnWidths);
+                string displayString = GridViewHelpers.GetPaddedString(valueList, _gridViewDetails.ListViewOffset, _gridViewDetails.ListViewColumnWidths);
 
                 items.Add(new GridViewRow
                 {
