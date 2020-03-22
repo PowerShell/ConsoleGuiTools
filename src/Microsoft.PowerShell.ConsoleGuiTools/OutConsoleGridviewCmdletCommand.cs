@@ -137,15 +137,13 @@ namespace OutGridView.Cmdlet
             };
 
 
-            _consoleGui.Start(applicationData);
+            var selectedIndexes = _consoleGui.Start(applicationData);
 
             // Don't write anything out to the pipeline if PassThru wasn't specified.
             if (!PassThru.IsPresent)
             {
                 return;
             }
-
-            var selectedIndexes = _consoleGui.SelectedIndexes;
 
             foreach (int idx in selectedIndexes)
             {
