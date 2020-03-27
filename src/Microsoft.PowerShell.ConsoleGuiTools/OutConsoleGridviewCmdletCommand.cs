@@ -19,8 +19,8 @@ namespace OutGridView.Cmdlet
     {
         #region Properties
 
-        private const string DataNotQualifiedForGridView = "DataNotQualifiedForGridView";
-        private const string OSNotSupportedForGridView = "OSNotSupportedForGridView";
+        private const string DataNotQualifiedForGridView = nameof(DataNotQualifiedForGridView);
+        private const string EnvironmentNotSupportedForGridView = nameof(EnvironmentNotSupportedForGridView);
 
         private List<PSObject> _psObjects = new List<PSObject>();
         private ConsoleGui _consoleGui = new ConsoleGui();
@@ -66,6 +66,16 @@ namespace OutGridView.Cmdlet
         // This method gets called once for each cmdlet in the pipeline when the pipeline starts executing
         protected override void BeginProcessing()
         {
+            if (Console.IsInputRedirected)
+            {
+                ErrorRecord error = new ErrorRecord(
+                    new PSNotSupportedException("Not supported in this environment (when input is redirected)."),
+                    EnvironmentNotSupportedForGridView,
+                    ErrorCategory.NotImplemented,
+                    null);
+
+                this.ThrowTerminatingError(error);
+            }
         }
 
         // This method will be called for each input received from the pipeline to this cmdlet; if no input is received, this method is not called
