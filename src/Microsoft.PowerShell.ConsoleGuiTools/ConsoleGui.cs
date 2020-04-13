@@ -11,6 +11,39 @@ using Terminal.Gui;
 
 namespace OutGridView.Cmdlet
 {
+    public class ConsoleGuiWindow : Window
+    {
+        public Action Accept;
+        public Action Close;
+
+        public ConsoleGuiWindow(string title = null) : base(title) {}
+
+        public override bool ProcessKey (KeyEvent keyEvent)
+        {
+            switch (keyEvent.Key)
+            {
+                case Key.Esc:
+                    if (Close != null)
+                    {
+                        Close.Invoke ();
+                    }
+                    break;
+
+                case Key.Enter:
+                    if (Accept != null)
+                    {
+                        Accept.Invoke ();
+                    }
+                    break;
+
+                default:
+                    return base.ProcessKey(keyEvent);
+            }
+
+            return true;
+        }
+    }
+
     internal class ConsoleGui : IDisposable
     {
         private const string FILTER_LABEL = "Filter";
@@ -67,10 +100,19 @@ namespace OutGridView.Cmdlet
             return selectedIndexes;
         }
 
+        private void Accept(){
+            Application.RequestStop();
+        }
+
+        private void Close(){
+            _cancelled = true;
+            Application.RequestStop();
+        }
+
         private Window AddTopLevelWindow()
         {
             // Creates the top-level window to show
-            var win = new Window(_applicationData.Title)
+            var win = new ConsoleGuiWindow(_applicationData.Title ?? "Out-ConsoleGridView")
             {
                 X = 0,
                 Y = 1, // Leave one row for the toplevel menu
@@ -78,6 +120,9 @@ namespace OutGridView.Cmdlet
                 Width = Dim.Fill(),
                 Height = Dim.Fill()
             };
+
+            win.Accept += () => Accept();
+            win.Close += () => Close();
 
             Application.Top.Add(win);
             return win;
@@ -91,12 +136,12 @@ namespace OutGridView.Cmdlet
                     _applicationData.PassThru
                     ? new MenuItem []
                     {
-                        new MenuItem("_Accept", string.Empty, () => { Application.RequestStop(); }),
-                        new MenuItem("_Cancel", string.Empty, () =>{ _cancelled = true; Application.RequestStop(); })
+                        new MenuItem("_Accept (ENTER)", string.Empty, () => Accept()),
+                        new MenuItem("_Close (ESC)", string.Empty, () => Close())
                     }
                     : new MenuItem []
                     {
-                        new MenuItem("_Close", string.Empty, () =>{ Application.RequestStop(); })
+                        new MenuItem("_Close (ESC)", string.Empty, () => Close())
                     })
             });
 

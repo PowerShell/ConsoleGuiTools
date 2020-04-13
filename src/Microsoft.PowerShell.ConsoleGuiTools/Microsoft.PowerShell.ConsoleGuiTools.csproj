@@ -12,6 +12,7 @@
 
     <ItemGroup>
         <ProjectReference Include ="../OutGridView.Models/OutGridView.Models.csproj" />
+        <!-- <ProjectReference Include="..\..\..\gui.cs\Terminal.Gui\Terminal.Gui.csproj" /> -->
     </ItemGroup>
 
     <ItemGroup>
