@@ -112,7 +112,7 @@ namespace OutGridView.Cmdlet
         private Window AddTopLevelWindow()
         {
             // Creates the top-level window to show
-            var win = new ConsoleGuiWindow(_applicationData.Title ?? "Out-ConsoleGridView")
+            var win = new ConsoleGuiWindow(_applicationData.Title)
             {
                 X = 0,
                 Y = 1, // Leave one row for the toplevel menu
