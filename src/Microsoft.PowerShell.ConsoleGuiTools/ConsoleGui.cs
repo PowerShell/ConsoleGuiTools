@@ -27,9 +27,8 @@ namespace OutGridView.Cmdlet
             _applicationData = applicationData;
             _gridViewDetails = new GridViewDetails
             {
-                // If we have PassThru, then we want to make them selectable. If we make them selectable,
-                // they have a 8 character addition of a checkbox ("     [ ]") that we have to factor in.
-                ListViewOffset = _applicationData.PassThru ? 8 : 4
+                // Have a 8 character addition of a checkbox ("     [ ]") that we have to factor in.
+                ListViewOffset = 8
             };
 
             AddMenu();
@@ -51,7 +50,7 @@ namespace OutGridView.Cmdlet
 
             // Return results of selection if required.
             HashSet<int> selectedIndexes = new HashSet<int>();
-            if (_cancelled || !_applicationData.PassThru)
+            if (_cancelled)
             {
                 return selectedIndexes;
             }
@@ -88,15 +87,10 @@ namespace OutGridView.Cmdlet
             var menu = new MenuBar(new MenuBarItem []
             {
                 new MenuBarItem("_Actions (F9)", 
-                    _applicationData.PassThru
-                    ? new MenuItem []
+                    new MenuItem []
                     {
                         new MenuItem("_Accept", string.Empty, () => { Application.RequestStop(); }),
                         new MenuItem("_Cancel", string.Empty, () =>{ _cancelled = true; Application.RequestStop(); })
-                    }
-                    : new MenuItem []
-                    {
-                        new MenuItem("_Close", string.Empty, () =>{ Application.RequestStop(); })
                     })
             });
 
@@ -288,7 +282,7 @@ namespace OutGridView.Cmdlet
                 Y = 4,
                 Width = Dim.Fill(2),
                 Height = Dim.Fill(2),
-                AllowsMarking = _applicationData.PassThru
+                AllowsMarking = true
             };
 
             win.Add(_listView);
