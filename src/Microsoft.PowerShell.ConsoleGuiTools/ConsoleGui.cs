@@ -31,9 +31,9 @@ namespace OutGridView.Cmdlet
                 // they have a 8 character addition of a checkbox ("     [ ]") that we have to factor in.
                 ListViewOffset = _applicationData.OutputMode != OutputModeOption.None ? 8 : 4
             };
-
+            
+            AddMenu();
             Window win = AddTopLevelWindow();
-            AddStatusBar();
 
             // GridView header logic
             List<string> gridHeaders = _applicationData.DataTable.DataColumns.Select((c) => c.Label).ToList();
@@ -67,50 +67,35 @@ namespace OutGridView.Cmdlet
             return selectedIndexes;
         }
 
-        private void Accept(){
-            Application.RequestStop();
-        }
-
-        private void Close(){
-            _cancelled = true;
-            Application.RequestStop();
-        }
-
         private Window AddTopLevelWindow()
         {
             // Creates the top-level window to show
             var win = new Window(_applicationData.Title)
             {
                 X = 0,
-                Y = 0, 
+                Y = 1, // Leave one row for the toplevel menu
                 // By using Dim.Fill(), it will automatically resize without manual intervention
                 Width = Dim.Fill(),
                 Height = Dim.Fill()
             };
 
-            // win.Accept += () => Accept();
-            // win.Close += () => Close();
-
             Application.Top.Add(win);
             return win;
         }
 
-        private void AddStatusBar()
+        private void AddMenu()
         {
-            var statusBar = new StatusBar(
-                    _applicationData.OutputMode != OutputModeOption.None
-                    ? new StatusItem []
+            var menu = new MenuBar(new MenuBarItem []
+            {
+                new MenuBarItem("_Actions (F9)", 
+                    new MenuItem []
                     {
-                        new StatusItem(Key.Enter, "~ENTER~ Accept", () => Accept()),
-                        new StatusItem(Key.Esc, "~ESC~ Close", () => Close())
-                    }
-                    : new StatusItem []
-                    {
-                        new StatusItem(Key.Esc, "~ESC~ Close",  () => Close())
-                    }
-            );
+                        new MenuItem("_Accept", string.Empty, () => { Application.RequestStop(); }),
+                        new MenuItem("_Cancel", string.Empty, () =>{ _cancelled = true; Application.RequestStop(); })
+                    })
+            });
 
-            Application.Top.Add(statusBar);
+            Application.Top.Add(menu);
         }
 
         private void CalculateColumnWidths(List<string> gridHeaders)
@@ -170,15 +155,14 @@ namespace OutGridView.Cmdlet
                 X = 2
             };
 
-            // 1 is for space between filterField and applyButton
             // 2 is for the square brackets added to buttons
-            var filterLabelAndApplyButtonWidth = filterLabel.Text.Length + 1 + APPLY_LABEL.Length;
+            var filterFieldWidth = _gridViewDetails.UsableWidth - filterLabel.Text.Length - APPLY_LABEL.Length - 2;
             var filterField = new TextField(string.Empty)
             {
                 X = Pos.Right(filterLabel) + 1,
                 Y = Pos.Top(filterLabel),
                 CanFocus = true,
-                Width = Dim.Fill() - filterLabelAndApplyButtonWidth
+                Width = filterFieldWidth
             };
 
             var filterErrorLabel = new Label(string.Empty)
@@ -186,7 +170,7 @@ namespace OutGridView.Cmdlet
                 X = Pos.Right(filterLabel) + 1,
                 Y = Pos.Top(filterLabel) + 1,
                 ColorScheme = Colors.Base,
-                Width = Dim.Fill() - filterLabelAndApplyButtonWidth
+                Width = filterFieldWidth
             };
 
             EventHandler<ustring> filterChanged = (object sender, ustring e) =>
@@ -215,7 +199,7 @@ namespace OutGridView.Cmdlet
             var filterApplyButton = new Button(APPLY_LABEL)
             {
                 // Pos.Right(filterField) returns 0
-                X = Pos.Right(filterField) + 1,
+                X = Pos.Right(filterLabel) + filterFieldWidth + 2,
                 Y = Pos.Top(filterLabel),
                 Clicked = () =>
                 {
