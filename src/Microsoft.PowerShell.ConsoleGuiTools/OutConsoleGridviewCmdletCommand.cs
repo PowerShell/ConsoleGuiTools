@@ -47,7 +47,7 @@ namespace OutGridView.Cmdlet
         /// and if it should be possible to select multiple or single list items.
         /// </summary>
         [Parameter()]
-        public OutputModeOption OutputMode { set; get; }
+        public OutputModeOption OutputMode { set; get; } = OutputModeOption.Multiple;
 
         #endregion Input Parameters
 

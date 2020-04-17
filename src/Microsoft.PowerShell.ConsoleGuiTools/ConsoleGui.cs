@@ -27,12 +27,13 @@ namespace OutGridView.Cmdlet
             _applicationData = applicationData;
             _gridViewDetails = new GridViewDetails
             {
-                // Have a 8 character addition of a checkbox ("     [ ]") that we have to factor in.
-                ListViewOffset = 8
+                // If we have an OutputMode, then we want to make them selectable. If we make them selectable,
+                // they have a 8 character addition of a checkbox ("     [ ]") that we have to factor in.
+                ListViewOffset = _applicationData.OutputMode != OutputModeOption.None ? 8 : 4
             };
 
-            AddMenu();
             Window win = AddTopLevelWindow();
+            AddStatusBar();
 
             // GridView header logic
             List<string> gridHeaders = _applicationData.DataTable.DataColumns.Select((c) => c.Label).ToList();
@@ -66,35 +67,50 @@ namespace OutGridView.Cmdlet
             return selectedIndexes;
         }
 
+        private void Accept(){
+            Application.RequestStop();
+        }
+
+        private void Close(){
+            _cancelled = true;
+            Application.RequestStop();
+        }
+
         private Window AddTopLevelWindow()
         {
             // Creates the top-level window to show
             var win = new Window(_applicationData.Title)
             {
                 X = 0,
-                Y = 1, // Leave one row for the toplevel menu
+                Y = 0, 
                 // By using Dim.Fill(), it will automatically resize without manual intervention
                 Width = Dim.Fill(),
                 Height = Dim.Fill()
             };
 
+            // win.Accept += () => Accept();
+            // win.Close += () => Close();
+
             Application.Top.Add(win);
             return win;
         }
 
-        private void AddMenu()
+        private void AddStatusBar()
         {
-            var menu = new MenuBar(new MenuBarItem []
-            {
-                new MenuBarItem("_Actions (F9)", 
-                    new MenuItem []
+            var statusBar = new StatusBar(
+                    _applicationData.OutputMode != OutputModeOption.None
+                    ? new StatusItem []
                     {
-                        new MenuItem("_Accept", string.Empty, () => { Application.RequestStop(); }),
-                        new MenuItem("_Cancel", string.Empty, () =>{ _cancelled = true; Application.RequestStop(); })
-                    })
-            });
+                        new StatusItem(Key.Enter, "~ENTER~ Accept", () => Accept()),
+                        new StatusItem(Key.Esc, "~ESC~ Close", () => Close())
+                    }
+                    : new StatusItem []
+                    {
+                        new StatusItem(Key.Esc, "~ESC~ Close",  () => Close())
+                    }
+            );
 
-            Application.Top.Add(menu);
+            Application.Top.Add(statusBar);
         }
 
         private void CalculateColumnWidths(List<string> gridHeaders)
@@ -282,7 +298,7 @@ namespace OutGridView.Cmdlet
                 Y = 4,
                 Width = Dim.Fill(2),
                 Height = Dim.Fill(2),
-                AllowsMarking = true
+                AllowsMarking = _applicationData.OutputMode != OutputModeOption.None,
             };
 
             win.Add(_listView);
