@@ -31,7 +31,7 @@ namespace OutGridView.Cmdlet
                 // they have a 8 character addition of a checkbox ("     [ ]") that we have to factor in.
                 ListViewOffset = _applicationData.OutputMode != OutputModeOption.None ? 8 : 4
             };
-            
+
             AddMenu();
             Window win = AddTopLevelWindow();
 
@@ -45,7 +45,7 @@ namespace OutGridView.Cmdlet
             // GridView row logic
             LoadData();
             AddRows(win);
-            
+
             // Run the GUI.
             Application.Run();
 
@@ -87,7 +87,7 @@ namespace OutGridView.Cmdlet
         {
             var menu = new MenuBar(new MenuBarItem []
             {
-                new MenuBarItem("_Actions (F9)", 
+                new MenuBarItem("_Actions (F9)",
                     new MenuItem []
                     {
                         new MenuItem("_Accept", string.Empty, () => { Application.RequestStop(); }),
@@ -121,7 +121,7 @@ namespace OutGridView.Cmdlet
                     {
                         listViewColumnWidths[index] = len;
                     }
-                    
+
                     index++;
                 }
             }
