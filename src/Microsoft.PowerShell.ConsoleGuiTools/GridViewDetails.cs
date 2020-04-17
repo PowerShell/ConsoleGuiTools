@@ -9,8 +9,7 @@ namespace OutGridView.Cmdlet
         public int[] ListViewColumnWidths { get; set; }
 
         // Dictates where the grid should actually start considering
-        // some offset is needed to factor in the checkboxes if using
-        // PassThru.
+        // some offset is needed to factor in the checkboxes
         public int ListViewOffset { get; set; }
 
         // The width that is actually useable on the screen after
