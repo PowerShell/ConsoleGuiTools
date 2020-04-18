@@ -45,7 +45,7 @@ namespace OutGridView.Cmdlet
             // GridView row logic
             LoadData();
             AddRows(win);
-            
+
             // Run the GUI.
             Application.Run();
 
@@ -82,14 +82,11 @@ namespace OutGridView.Cmdlet
             var win = new Window(_applicationData.Title)
             {
                 X = 0,
-                Y = 0, 
+                Y = 0,
                 // By using Dim.Fill(), it will automatically resize without manual intervention
                 Width = Dim.Fill(),
                 Height = Dim.Fill()
             };
-
-            // win.Accept += () => Accept();
-            // win.Close += () => Close();
 
             Application.Top.Add(win);
             return win;
@@ -136,7 +133,7 @@ namespace OutGridView.Cmdlet
                     {
                         listViewColumnWidths[index] = len;
                     }
-                    
+
                     index++;
                 }
             }
