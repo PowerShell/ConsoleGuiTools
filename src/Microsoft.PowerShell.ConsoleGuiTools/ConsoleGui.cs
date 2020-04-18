@@ -154,14 +154,15 @@ namespace OutGridView.Cmdlet
                 X = 2
             };
 
+            // 1 is for space between filterField and applyButton
             // 2 is for the square brackets added to buttons
-            var filterFieldWidth = _gridViewDetails.UsableWidth - filterLabel.Text.Length - APPLY_LABEL.Length - 2;
+            var filterLabelAndApplyButtonWidth = filterLabel.Text.Length + 1 + APPLY_LABEL.Length;
             var filterField = new TextField(string.Empty)
             {
                 X = Pos.Right(filterLabel) + 1,
                 Y = Pos.Top(filterLabel),
                 CanFocus = true,
-                Width = filterFieldWidth
+                Width = Dim.Fill() - filterLabelAndApplyButtonWidth
             };
 
             var filterErrorLabel = new Label(string.Empty)
@@ -169,7 +170,7 @@ namespace OutGridView.Cmdlet
                 X = Pos.Right(filterLabel) + 1,
                 Y = Pos.Top(filterLabel) + 1,
                 ColorScheme = Colors.Base,
-                Width = filterFieldWidth
+                Width = Dim.Fill() - filterLabelAndApplyButtonWidth
             };
 
             EventHandler<ustring> filterChanged = (object sender, ustring e) =>
@@ -198,7 +199,7 @@ namespace OutGridView.Cmdlet
             var filterApplyButton = new Button(APPLY_LABEL)
             {
                 // Pos.Right(filterField) returns 0
-                X = Pos.Right(filterLabel) + filterFieldWidth + 2,
+                X = Pos.Right(filterField) + 1,
                 Y = Pos.Top(filterLabel),
                 Clicked = () =>
                 {
