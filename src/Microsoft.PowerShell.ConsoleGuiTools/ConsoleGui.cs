@@ -98,7 +98,7 @@ namespace OutGridView.Cmdlet
                     _applicationData.OutputMode != OutputModeOption.None
                     ? new StatusItem []
                     {
-                        // Use Key.Unknown for SPACE with no delgate because ListView already
+                        // Use Key.Unknown for SPACE with no delegate because ListView already
                         // handles SPACE
                         new StatusItem(Key.Unknown, "~SPACE~ Mark Item", null),
                         new StatusItem(Key.Enter, "~ENTER~ Accept", () => Accept()),
