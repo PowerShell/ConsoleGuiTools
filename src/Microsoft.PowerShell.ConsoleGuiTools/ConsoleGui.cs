@@ -14,7 +14,6 @@ namespace OutGridView.Cmdlet
     internal class ConsoleGui : IDisposable
     {
         private const string FILTER_LABEL = "Filter";
-        private const string APPLY_LABEL = "Apply";
         private bool _cancelled;
         private GridViewDataSource _itemSource;
         private ListView _listView;
@@ -170,15 +169,13 @@ namespace OutGridView.Cmdlet
                 X = 2
             };
 
-            // 1 is for space between filterField and applyButton
-            // 2 is for the square brackets added to buttons
-            var filterLabelAndApplyButtonWidth = filterLabel.Text.Length + 1 + APPLY_LABEL.Length;
+            var filterLabelWidth = filterLabel.Text.Length + 1;
             var filterField = new TextField(string.Empty)
             {
                 X = Pos.Right(filterLabel) + 1,
                 Y = Pos.Top(filterLabel),
                 CanFocus = true,
-                Width = Dim.Fill() - filterLabelAndApplyButtonWidth
+                Width = Dim.Fill() - filterLabelWidth
             };
 
             var filterErrorLabel = new Label(string.Empty)
@@ -186,12 +183,11 @@ namespace OutGridView.Cmdlet
                 X = Pos.Right(filterLabel) + 1,
                 Y = Pos.Top(filterLabel) + 1,
                 ColorScheme = Colors.Base,
-                Width = Dim.Fill() - filterLabelAndApplyButtonWidth
+                Width = Dim.Fill() - filterLabelWidth
             };
 
             EventHandler<ustring> filterChanged = (object sender, ustring e) =>
             {
-                // TODO: remove Apply button and code when this starts working
                 try
                 {
                     filterErrorLabel.Text = " ";
@@ -212,18 +208,7 @@ namespace OutGridView.Cmdlet
 
             filterField.Changed += filterChanged;
 
-            var filterApplyButton = new Button(APPLY_LABEL)
-            {
-                // Pos.Right(filterField) returns 0
-                X = Pos.Right(filterField) + 1,
-                Y = Pos.Top(filterLabel),
-                Clicked = () =>
-                {
-                    filterChanged.Invoke(null, filterField.Text);
-                }
-            };
-
-            win.Add(filterLabel, filterField, filterErrorLabel, filterApplyButton);
+            win.Add(filterLabel, filterField, filterErrorLabel);
         }
 
         private void AddHeaders(Window win, List<string> gridHeaders)
