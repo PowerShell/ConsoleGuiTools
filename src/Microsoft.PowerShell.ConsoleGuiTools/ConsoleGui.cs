@@ -169,13 +169,12 @@ namespace OutGridView.Cmdlet
                 X = 2
             };
 
-            var filterLabelWidth = filterLabel.Text.Length + 1;
             var filterField = new TextField(string.Empty)
             {
                 X = Pos.Right(filterLabel) + 1,
                 Y = Pos.Top(filterLabel),
                 CanFocus = true,
-                Width = Dim.Fill() - filterLabelWidth
+                Width = Dim.Fill() - filterLabel.Text.Length
             };
 
             var filterErrorLabel = new Label(string.Empty)
@@ -183,18 +182,21 @@ namespace OutGridView.Cmdlet
                 X = Pos.Right(filterLabel) + 1,
                 Y = Pos.Top(filterLabel) + 1,
                 ColorScheme = Colors.Base,
-                Width = Dim.Fill() - filterLabelWidth
+                Width = Dim.Fill() - filterLabel.Text.Length
             };
 
-            EventHandler<ustring> filterChanged = (object sender, ustring e) =>
+            filterField.Changed += (object sender, ustring e) =>
             {
+                // NOTE: `ustring e` seems to contain the text _before_ the added character...
+                // so we convert the `sender` into a TextField and grab the text from that.
+                string filterText = (sender as TextField)?.Text?.ToString();
                 try
                 {
                     filterErrorLabel.Text = " ";
                     filterErrorLabel.ColorScheme = Colors.Base;
                     filterErrorLabel.Redraw(filterErrorLabel.Bounds);
 
-                    var itemList = GridViewHelpers.FilterData(_itemSource.GridViewRowList, e.ToString());
+                    List<GridViewRow> itemList = GridViewHelpers.FilterData(_itemSource.GridViewRowList, filterText);
                     _listView.Source = new GridViewDataSource(itemList);
                 }
                 catch (Exception ex)
@@ -205,8 +207,6 @@ namespace OutGridView.Cmdlet
                     _listView.Source = _itemSource;
                 }
             };
-
-            filterField.Changed += filterChanged;
 
             win.Add(filterLabel, filterField, filterErrorLabel);
         }
