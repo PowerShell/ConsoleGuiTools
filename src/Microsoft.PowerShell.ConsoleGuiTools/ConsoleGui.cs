@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using NStack;
 using OutGridView.Models;
 using Terminal.Gui;
 
@@ -12,177 +13,289 @@ namespace OutGridView.Cmdlet
 {
     internal class ConsoleGui : IDisposable
     {
-        private const string ACCEPT_TEXT = "Are you sure you want to select\nthese items to send down the pipeline?";
-        private const string CANCEL_TEXT = "Are you sure you want to cancel?\nNothing will be emitted to the pipeline.";
-        private const string CLOSE_TEXT = "Are you sure you want to close?";
+        private const string FILTER_LABEL = "Filter";
         private bool _cancelled;
+        private GridViewDataSource _itemSource;
+        private TextField _filterField;
+        private ListView _listView;
+        private ApplicationData _applicationData;
+        private GridViewDetails _gridViewDetails;
 
-        internal HashSet<int> SelectedIndexes { get; private set; } = new HashSet<int>();
-        public void Start(ApplicationData applicationData)
+        public HashSet<int> Start(ApplicationData applicationData)
         {
             Application.Init();
-            var top = Application.Top;
+            _applicationData = applicationData;
+            _gridViewDetails = new GridViewDetails
+            {
+                // If we have an OutputMode, then we want to make them selectable. If we make them selectable,
+                // they have a 8 character addition of a checkbox ("     [ ]") that we have to factor in.
+                ListViewOffset = _applicationData.OutputMode != OutputModeOption.None ? 8 : 4
+            };
 
+            Window win = AddTopLevelWindow();
+            AddStatusBar();
+
+            // GridView header logic
+            List<string> gridHeaders = _applicationData.DataTable.DataColumns.Select((c) => c.Label).ToList();
+            CalculateColumnWidths(gridHeaders);
+
+            AddFilter(win);
+            AddHeaders(win, gridHeaders);
+
+            // GridView row logic
+            LoadData();
+            AddRows(win);
+
+            // Run the GUI.
+            Application.Run();
+
+            // Return results of selection if required.
+            HashSet<int> selectedIndexes = new HashSet<int>();
+            if (_cancelled)
+            {
+                return selectedIndexes;
+            }
+
+            foreach (GridViewRow gvr in _itemSource.GridViewRowList)
+            {
+                if (gvr.IsMarked)
+                {
+                    selectedIndexes.Add(gvr.OriginalIndex);
+                }
+            }
+
+            return selectedIndexes;
+        }
+
+        private void Accept(){
+            Application.RequestStop();
+        }
+
+        private void Close(){
+            _cancelled = true;
+            Application.RequestStop();
+        }
+
+        private Window AddTopLevelWindow()
+        {
             // Creates the top-level window to show
-            var win = new Window(applicationData.Title ?? "Out-ConsoleGridView")
+            var win = new Window(_applicationData.Title)
             {
                 X = 0,
-                Y = 1, // Leave one row for the toplevel menu
+                Y = 0,
                 // By using Dim.Fill(), it will automatically resize without manual intervention
                 Width = Dim.Fill(),
                 Height = Dim.Fill()
             };
-            top.Add(win);
 
-            // Creates a menubar, the item "New" has a help menu.
-            var menu = new MenuBar(new MenuBarItem []
-            {
-                new MenuBarItem("_Actions (F9)", 
-                    applicationData.PassThru
-                    ? new MenuItem []
+            Application.Top.Add(win);
+            return win;
+        }
+
+        private void AddStatusBar()
+        {
+            var statusBar = new StatusBar(
+                    _applicationData.OutputMode != OutputModeOption.None
+                    ? new StatusItem []
                     {
-                        new MenuItem("_Accept", "", () => { if (Quit("Accept", ACCEPT_TEXT)) Application.RequestStop(); }),
-                        new MenuItem("_Cancel", "", () =>{ if (Quit("Cancel", CANCEL_TEXT)) _cancelled = true; Application.RequestStop(); })
+                        // Use Key.Unknown for SPACE with no delegate because ListView already
+                        // handles SPACE
+                        new StatusItem(Key.Unknown, "~SPACE~ Mark Item", null),
+                        new StatusItem(Key.Enter, "~ENTER~ Accept", () => { 
+                            if (Application.Top.MostFocused == _listView){
+                                Accept();
+                            }
+                            else if (Application.Top.MostFocused == _filterField){
+                                Application.Top.SetFocus(_listView);
+                            }
+                        }),
+                        new StatusItem(Key.Esc, "~ESC~ Close", () => Close())
                     }
-                    : new MenuItem []
+                    : new StatusItem []
                     {
-                        new MenuItem("_Close", "", () =>{ if (Quit("Close", CLOSE_TEXT)) Application.RequestStop(); })
-                    })
-            });
-            top.Add(menu);
+                        new StatusItem(Key.Esc, "~ESC~ Close",  () => Close())
+                    }
+            );
 
-            var gridHeaders = applicationData.DataTable.DataColumns.Select((c) => c.Label).ToList();
-            var columnWidths = new int[gridHeaders.Count];
+            Application.Top.Add(statusBar);
+        }
+
+        private void CalculateColumnWidths(List<string> gridHeaders)
+        {
+            _gridViewDetails.ListViewColumnWidths = new int[gridHeaders.Count];
+            var listViewColumnWidths = _gridViewDetails.ListViewColumnWidths;
+
             for (int i = 0; i < gridHeaders.Count; i++)
             {
-                columnWidths[i] = gridHeaders[i].Length;
+                listViewColumnWidths[i] = gridHeaders[i].Length;
             }
 
             // calculate the width of each column based on longest string in each column for each row
-            foreach (var row in applicationData.DataTable.Data)
+            foreach (var row in _applicationData.DataTable.Data)
             {
                 int index = 0;
 
                 // use half of the visible buffer height for the number of objects to inspect to calculate widths
-                foreach (var col in row.Values.Take(top.Frame.Height / 2))
+                foreach (var col in row.Values.Take(Application.Top.Frame.Height / 2))
                 {
                     var len = col.Value.DisplayValue.Length;
-                    if (len > columnWidths[index])
+                    if (len > listViewColumnWidths[index])
                     {
-                        columnWidths[index] = len;
+                        listViewColumnWidths[index] = len;
                     }
-                    
+
                     index++;
                 }
             }
 
-            // If we have PassThru, then we want to make them selectable. If we make them selectable,
-            // they have a 8 character addition of a checkbox ("     [ ]") that we have to factor in.
-            int offset = applicationData.PassThru ? 8 : 4;
-
             // if the total width is wider than the usable width, remove 1 from widest column until it fits
             // the gui loses 3 chars on the left and 2 chars on the right
-            int usableWidth = top.Frame.Width - 3 - columnWidths.Length - offset - 2;
-            int columnWidthsSum = columnWidths.Sum();
-            while (columnWidthsSum >= usableWidth)
+            _gridViewDetails.UsableWidth = Application.Top.Frame.Width - 3 - listViewColumnWidths.Length - _gridViewDetails.ListViewOffset - 2;
+            int columnWidthsSum = listViewColumnWidths.Sum();
+            while (columnWidthsSum >= _gridViewDetails.UsableWidth)
             {
                 int maxWidth = 0;
                 int maxIndex = 0;
-                for (int i = 0; i < columnWidths.Length; i++)
+                for (int i = 0; i < listViewColumnWidths.Length; i++)
                 {
-                    if (columnWidths[i] > maxWidth)
+                    if (listViewColumnWidths[i] > maxWidth)
                     {
-                        maxWidth = columnWidths[i];
+                        maxWidth = listViewColumnWidths[i];
                         maxIndex = i;
                     }
                 }
 
-                columnWidths[maxIndex]--;
+                listViewColumnWidths[maxIndex]--;
                 columnWidthsSum--;
             }
+        }
 
-            win.Add(new Label(GetPaddedString(gridHeaders, columnWidths, offset + offset - 1)));
-
-            var items = new List<string>();
-            foreach (DataTableRow dataTableRow in applicationData.DataTable.Data)
+        private void AddFilter(Window win)
+        {
+            var filterLabel = new Label(FILTER_LABEL)
             {
-                var valueList = new List<string>();
-                foreach (var dataTableColumn in applicationData.DataTable.DataColumns)
-                {
-                    valueList.Add(dataTableRow.Values[dataTableColumn.ToString()].DisplayValue);
-                }
-
-                items.Add(GetPaddedString(valueList, columnWidths, offset));
-            }
-
-            var list = new ListView(items)
-            {
-                X = 3,
-                Y = 3,
-                Width = Dim.Fill(2),
-                Height = Dim.Fill(2),
-                AllowsMarking = applicationData.PassThru
+                X = 2
             };
-            
-            win.Add(list);
 
-            Application.Run();
-
-            if (_cancelled)
+            _filterField = new TextField(string.Empty)
             {
-                return;
-            }
+                X = Pos.Right(filterLabel) + 1,
+                Y = Pos.Top(filterLabel),
+                CanFocus = true,
+                Width = Dim.Fill() - filterLabel.Text.Length
+            };
 
-            for (int i = 0; i < applicationData.DataTable.Data.Count; i++)
+            var filterErrorLabel = new Label(string.Empty)
             {
-                if(list.Source.IsMarked(i))
+                X = Pos.Right(filterLabel) + 1,
+                Y = Pos.Top(filterLabel) + 1,
+                ColorScheme = Colors.Base,
+                Width = Dim.Fill() - filterLabel.Text.Length
+            };
+
+            _filterField.Changed += (object sender, ustring e) =>
+            {
+                // NOTE: `ustring e` seems to contain the text _before_ the added character...
+                // so we convert the `sender` into a TextField and grab the text from that.
+                string filterText = (sender as TextField)?.Text?.ToString();
+                try
                 {
-                    SelectedIndexes.Add(i);
+                    filterErrorLabel.Text = " ";
+                    filterErrorLabel.ColorScheme = Colors.Base;
+                    filterErrorLabel.Redraw(filterErrorLabel.Bounds);
+
+                    List<GridViewRow> itemList = GridViewHelpers.FilterData(_itemSource.GridViewRowList, filterText);
+                    _listView.Source = new GridViewDataSource(itemList);
                 }
-            }
+                catch (Exception ex)
+                {
+                    filterErrorLabel.Text = ex.Message;
+                    filterErrorLabel.ColorScheme = Colors.Error;
+                    filterErrorLabel.Redraw(filterErrorLabel.Bounds);
+                    _listView.Source = _itemSource;
+                }
+            };
+
+            win.Add(filterLabel, _filterField, filterErrorLabel);
         }
 
-        private static bool Quit(string title, string text)
+        private void AddHeaders(Window win, List<string> gridHeaders)
         {
-            var n = MessageBox.Query(50, 7, title, text, "Yes", "No");
-            return n == 0;
-        }
-
-        private static string GetPaddedString(List<string> strings, int[] colWidths, int offset = 0)
-        {
-            var builder = new StringBuilder();
-            if (offset > 0)
+            var header = new Label(GridViewHelpers.GetPaddedString(
+                gridHeaders,
+                _gridViewDetails.ListViewOffset + _gridViewDetails.ListViewOffset - 1,
+                _gridViewDetails.ListViewColumnWidths))
             {
-                builder.Append(string.Empty.PadRight(offset));
-            }
+                X = 0,
+                Y = 2
+            };
 
-            for (int i = 0; i < strings.Count; i++)
+            win.Add(header);
+
+            // This renders dashes under the header to make it more clear what is header and what is data
+            var headerLineText = new StringBuilder();
+            foreach (char c in header.Text)
             {
-                if (i > 0)
+                if (c.Equals(' '))
                 {
-                    // Add a space between columns
-                    builder.Append(' ');
-                }
-
-                // Replace any newlines with encoded newline/linefeed (`n or `r)
-                // Note we can't use Environment.Newline because we don't know that the
-                // Command honors that.
-                strings[i] = strings[i].Replace("\r", "`r");
-                strings[i] = strings[i].Replace("\n", "`n");
-
-                // If the string won't fit in the column, append an ellipsis.
-                if (strings[i].Length > colWidths[i])
-                {
-                    builder.Append(strings[i].Substring(0, colWidths[i] - 4));
-                    builder.Append("...");
+                    headerLineText.Append(' ');
                 }
                 else
                 {
-                    builder.Append(strings[i].PadRight(colWidths[i]));
+                    // When gui.cs supports text decorations, should replace this with just underlining the header
+                    headerLineText.Append('-');
                 }
             }
 
-            return builder.ToString();
+            var headerLine = new Label(headerLineText.ToString())
+            {
+                X = 0,
+                Y = 3
+            };
+
+            win.Add(headerLine);
+        }
+
+        private void LoadData()
+        {
+            var items = new List<GridViewRow>();
+            int newIndex = 0;
+            for (int i = 0; i < _applicationData.DataTable.Data.Count; i++)
+            {
+                var dataTableRow = _applicationData.DataTable.Data[i];
+                var valueList = new List<string>();
+                foreach (var dataTableColumn in _applicationData.DataTable.DataColumns)
+                {
+                    string dataValue = dataTableRow.Values[dataTableColumn.ToString()].DisplayValue;
+                    valueList.Add(dataValue);
+                }
+
+                string displayString = GridViewHelpers.GetPaddedString(valueList, _gridViewDetails.ListViewOffset, _gridViewDetails.ListViewColumnWidths);
+
+                items.Add(new GridViewRow
+                {
+                    DisplayString = displayString,
+                    OriginalIndex = i
+                });
+
+                newIndex++;
+            }
+
+            _itemSource = new GridViewDataSource(items);
+        }
+
+        private void AddRows(Window win)
+        {
+            _listView = new ListView(_itemSource)
+            {
+                X = 3,
+                Y = 4,
+                Width = Dim.Fill(2),
+                Height = Dim.Fill(2),
+                AllowsMarking = _applicationData.OutputMode != OutputModeOption.None,
+            };
+
+            win.Add(_listView);
         }
 
         public void Dispose()

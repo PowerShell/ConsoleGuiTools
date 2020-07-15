@@ -13,14 +13,14 @@ namespace OutGridView.Cmdlet
 {
     /// Enum for SelectionMode parameter.
     /// </summary>
-    [Cmdlet(VerbsData.Out, "ConsoleGridView", DefaultParameterSetName = "PassThru")]
+    [Cmdlet(VerbsData.Out, "ConsoleGridView")]
     [Alias("ocgv")]
     public class OutConsoleGridViewCmdletCommand : PSCmdlet, IDisposable
     {
         #region Properties
 
-        private const string DataNotQualifiedForGridView = "DataNotQualifiedForGridView";
-        private const string OSNotSupportedForGridView = "OSNotSupportedForGridView";
+        private const string DataNotQualifiedForGridView = nameof(DataNotQualifiedForGridView);
+        private const string EnvironmentNotSupportedForGridView = nameof(EnvironmentNotSupportedForGridView);
 
         private List<PSObject> _psObjects = new List<PSObject>();
         private ConsoleGui _consoleGui = new ConsoleGui();
@@ -46,26 +46,24 @@ namespace OutGridView.Cmdlet
         /// Get or sets a value indicating whether the selected items should be written to the pipeline
         /// and if it should be possible to select multiple or single list items.
         /// </summary>
-        [Parameter(ParameterSetName = "OutputMode")]
-        public OutputModeOption OutputMode { set; get; }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether the selected items should be written to the pipeline.
-        /// Setting this to true is the same as setting the OutputMode to Multiple.
-        /// </summary>
-        [Parameter(ParameterSetName = "PassThru")]
-        public SwitchParameter PassThru
-        {
-            set { this.OutputMode = value.IsPresent ? OutputModeOption.Multiple : OutputModeOption.None; }
-
-            get { return OutputMode == OutputModeOption.Multiple ? new SwitchParameter(true) : new SwitchParameter(false); }
-        }
+        [Parameter()]
+        public OutputModeOption OutputMode { set; get; } = OutputModeOption.Multiple;
 
         #endregion Input Parameters
 
         // This method gets called once for each cmdlet in the pipeline when the pipeline starts executing
         protected override void BeginProcessing()
         {
+            if (Console.IsInputRedirected)
+            {
+                ErrorRecord error = new ErrorRecord(
+                    new PSNotSupportedException("Not supported in this environment (when input is redirected)."),
+                    EnvironmentNotSupportedForGridView,
+                    ErrorCategory.NotImplemented,
+                    null);
+
+                this.ThrowTerminatingError(error);
+            }
         }
 
         // This method will be called for each input received from the pipeline to this cmdlet; if no input is received, this method is not called
@@ -130,22 +128,13 @@ namespace OutGridView.Cmdlet
             var dataTable = TG.CastObjectsToTableView(_psObjects);
             var applicationData = new ApplicationData
             {
-                Title = Title,
+                Title = Title ?? "Out-ConsoleGridView",
                 OutputMode = OutputMode,
-                PassThru = PassThru,
                 DataTable = dataTable
             };
 
 
-            _consoleGui.Start(applicationData);
-
-            // Don't write anything out to the pipeline if PassThru wasn't specified.
-            if (!PassThru.IsPresent)
-            {
-                return;
-            }
-
-            var selectedIndexes = _consoleGui.SelectedIndexes;
+            var selectedIndexes = _consoleGui.Start(applicationData);
 
             foreach (int idx in selectedIndexes)
             {
