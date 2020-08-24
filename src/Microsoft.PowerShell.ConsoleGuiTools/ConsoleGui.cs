@@ -16,6 +16,7 @@ namespace OutGridView.Cmdlet
         private const string FILTER_LABEL = "Filter";
         private bool _cancelled;
         private GridViewDataSource _itemSource;
+        private TextField _filterField;
         private ListView _listView;
         private ApplicationData _applicationData;
         private GridViewDetails _gridViewDetails;
@@ -100,7 +101,14 @@ namespace OutGridView.Cmdlet
                         // Use Key.Unknown for SPACE with no delegate because ListView already
                         // handles SPACE
                         new StatusItem(Key.Unknown, "~SPACE~ Mark Item", null),
-                        new StatusItem(Key.Enter, "~ENTER~ Accept", () => Accept()),
+                        new StatusItem(Key.Enter, "~ENTER~ Accept", () => { 
+                            if (Application.Top.MostFocused == _listView){
+                                Accept();
+                            }
+                            else if (Application.Top.MostFocused == _filterField){
+                                Application.Top.SetFocus(_listView);
+                            }
+                        }),
                         new StatusItem(Key.Esc, "~ESC~ Close", () => Close())
                     }
                     : new StatusItem []
@@ -169,7 +177,7 @@ namespace OutGridView.Cmdlet
                 X = 2
             };
 
-            var filterField = new TextField(string.Empty)
+            _filterField = new TextField(string.Empty)
             {
                 X = Pos.Right(filterLabel) + 1,
                 Y = Pos.Top(filterLabel),
@@ -185,7 +193,7 @@ namespace OutGridView.Cmdlet
                 Width = Dim.Fill() - filterLabel.Text.Length
             };
 
-            filterField.Changed += (object sender, ustring e) =>
+            _filterField.Changed += (object sender, ustring e) =>
             {
                 // NOTE: `ustring e` seems to contain the text _before_ the added character...
                 // so we convert the `sender` into a TextField and grab the text from that.
@@ -208,7 +216,7 @@ namespace OutGridView.Cmdlet
                 }
             };
 
-            win.Add(filterLabel, filterField, filterErrorLabel);
+            win.Add(filterLabel, _filterField, filterErrorLabel);
         }
 
         private void AddHeaders(Window win, List<string> gridHeaders)
