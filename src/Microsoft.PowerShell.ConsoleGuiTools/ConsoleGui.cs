@@ -193,11 +193,11 @@ namespace OutGridView.Cmdlet
                 Width = Dim.Fill() - filterLabel.Text.Length
             };
 
-            _filterField.Changed += (object sender, ustring e) =>
+            _filterField.TextChanged += (str) =>
             {
-                // NOTE: `ustring e` seems to contain the text _before_ the added character...
-                // so we convert the `sender` into a TextField and grab the text from that.
-                string filterText = (sender as TextField)?.Text?.ToString();
+                // NOTE: `str` seems to contain the text _before_ the added character...
+                // so we go direct to Text
+                string filterText = _filterField.Text?.ToString();
                 try
                 {
                     filterErrorLabel.Text = " ";
