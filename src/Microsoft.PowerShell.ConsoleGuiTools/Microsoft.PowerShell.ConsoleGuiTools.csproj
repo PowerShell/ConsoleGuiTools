@@ -6,12 +6,11 @@
 
     <ItemGroup>
         <PackageReference Include="Nstack.Core" Version="0.14.0" />
-        <!-- <PackageReference Include="Terminal.Gui" Version="0.81.0" /> -->
+        <PackageReference Include="Terminal.Gui" Version="0.89.3" />
         <PackageReference Include="Microsoft.PowerShell.SDK" Version="6.2.1" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include ="../../../gui.cs/Terminal.Gui/Terminal.Gui.csproj" />
         <ProjectReference Include ="../OutGridView.Models/OutGridView.Models.csproj" />
     </ItemGroup>
 

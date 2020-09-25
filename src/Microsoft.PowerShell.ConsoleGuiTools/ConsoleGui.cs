@@ -106,7 +106,7 @@ namespace OutGridView.Cmdlet
                                 Accept();
                             }
                             else if (Application.Top.MostFocused == _filterField){
-                                Application.Top.SetFocus(_listView);
+                                _listView.SetFocus();
                             }
                         }),
                         new StatusItem(Key.Esc, "~ESC~ Close", () => Close())
