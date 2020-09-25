@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "Microsoft.PowerShell.ConsoleGuiTools": {
+      "commandName": "Executable"
+    }
+  }
+}

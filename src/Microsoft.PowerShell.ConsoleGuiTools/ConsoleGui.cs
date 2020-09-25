@@ -48,6 +48,7 @@ namespace OutGridView.Cmdlet
 
             // Run the GUI.
             Application.Run();
+            Application.Shutdown();
 
             // Return results of selection if required.
             HashSet<int> selectedIndexes = new HashSet<int>();
