@@ -27,8 +27,9 @@ namespace OutGridView.Cmdlet
             _applicationData = applicationData;
             _gridViewDetails = new GridViewDetails
             {
-                // If we have an OutputMode, then we want to make them selectable. If we make them selectable,
-                // they have a 8 character addition of a checkbox ("     [ ]") that we have to factor in.
+                // If OutputMode is Single or Multiple, then we make items selectable. If we make them selectable,
+                // they have a 8 character addition of a checkbox ("     [ ]" or ".....( )")
+                // that we have to factor in.
                 ListViewOffset = _applicationData.OutputMode != OutputModeOption.None ? 8 : 4
             };
 
@@ -104,6 +105,13 @@ namespace OutGridView.Cmdlet
                         new StatusItem(Key.Unknown, "~SPACE~ Mark Item", null),
                         new StatusItem(Key.Enter, "~ENTER~ Accept", () => { 
                             if (Application.Top.MostFocused == _listView){
+                                // If nothing was explicitly marked, we return the item that was selected
+                                // when ENTER is pressed in Single mode. If something was previously selected
+                                // (using SPACE) then honor that as the single item to return
+                                if (_applicationData.OutputMode == OutputModeOption.Single &&
+                                    _itemSource.GridViewRowList.Find(i => i.IsMarked) == null) {
+                                    _listView.MarkUnmarkRow();
+                                }
                                 Accept();
                             }
                             else if (Application.Top.MostFocused == _filterField){
@@ -293,6 +301,7 @@ namespace OutGridView.Cmdlet
                 Width = Dim.Fill(2),
                 Height = Dim.Fill(2),
                 AllowsMarking = _applicationData.OutputMode != OutputModeOption.None,
+                AllowsMultipleSelection = _applicationData.OutputMode == OutputModeOption.Multiple,
             };
 
             win.Add(_listView);
