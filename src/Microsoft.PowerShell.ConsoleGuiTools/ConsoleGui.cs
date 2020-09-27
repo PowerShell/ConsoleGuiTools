@@ -27,8 +27,9 @@ namespace OutGridView.Cmdlet
             _applicationData = applicationData;
             _gridViewDetails = new GridViewDetails
             {
-                // If OutputMode is Multiple, then we make items selectable. If we make them selectable,
-                // they have a 8 character addition of a checkbox ("     [ ]") that we have to factor in.
+                // If OutputMode is Single or Multiple, then we make items selectable. If we make them selectable,
+                // they have a 8 character addition of a checkbox ("     [ ]" or ".....( )")
+                // that we have to factor in.
                 ListViewOffset = _applicationData.OutputMode != OutputModeOption.None ? 8 : 4
             };
 
