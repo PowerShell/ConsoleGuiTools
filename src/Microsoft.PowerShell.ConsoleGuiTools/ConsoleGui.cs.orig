@@ -28,7 +28,11 @@ namespace OutGridView.Cmdlet
             _gridViewDetails = new GridViewDetails
             {
                 // If OutputMode is Single or Multiple, then we make items selectable. If we make them selectable,
+<<<<<<< HEAD
+                // they have a 8 character addition of a checkbox ("     [ ]" or ".....( )")
+=======
                 // they have a 8 character addition of a checkbox (".....[ ]" or ".....( )")
+>>>>>>> master
                 // that we have to factor in.
                 ListViewOffset = _applicationData.OutputMode != OutputModeOption.None ? 8 : 4
             };
@@ -107,16 +111,25 @@ namespace OutGridView.Cmdlet
                         // Use Key.Unknown for SPACE with no delegate because ListView already
                         // handles SPACE
                         new StatusItem(Key.Unknown, "~SPACE~ Mark Item", null),
+<<<<<<< HEAD
+                        new StatusItem(Key.Enter, "~ENTER~ Accept", () => { 
+                            if (Application.Top.MostFocused == _listView){
+=======
                         new StatusItem(Key.Enter, "~ENTER~ Accept", () =>
                         {
                             if (Application.Top.MostFocused == _listView)
                             {
+>>>>>>> master
                                 // If nothing was explicitly marked, we return the item that was selected
                                 // when ENTER is pressed in Single mode. If something was previously selected
                                 // (using SPACE) then honor that as the single item to return
                                 if (_applicationData.OutputMode == OutputModeOption.Single &&
+<<<<<<< HEAD
+                                    _itemSource.GridViewRowList.Find(i => i.IsMarked) == null) {
+=======
                                     _itemSource.GridViewRowList.Find(i => i.IsMarked) == null)
                                 {
+>>>>>>> master
                                     _listView.MarkUnmarkRow();
                                 }
                                 Accept();

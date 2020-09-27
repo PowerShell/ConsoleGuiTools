@@ -9,7 +9,7 @@
 RootModule = 'Microsoft.PowerShell.ConsoleGuiTools.dll'
 
 # Version number of this module.
-ModuleVersion = '0.4.1'
+ModuleVersion = '0.5.0'
 
 # Supported PSEditions
 CompatiblePSEditions = @( 'Core' )
@@ -105,6 +105,15 @@ PrivateData = @{
 
         # ReleaseNotes of this module
         ReleaseNotes = '# Release Notes
+
+## v0.5.0
+
+`Out-ConsoleGridView` has been totally refactored!
+
+First off, no more silly F9 menu to accept!
+All you have to do is hit `ENTER` to accept your selection or `ESC` to cancel.
+
+Also, `-OutputMode` works as expected now. `Single` lets you only select one item. `Multiple` is the default.
 
 ## v0.4.1
 
