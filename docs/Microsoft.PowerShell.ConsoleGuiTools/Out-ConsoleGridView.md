@@ -127,7 +127,7 @@ $parameters = @{
   LongDescription = 'Show History using Out-ConsoleGridView'
   ScriptBlock = {
     param($key, $arg)   # The arguments are ignored in this example
-    $history = Get-History -Count 100 | Out-ConsoleGridView -Title "Select Command" -OutputMode Single
+    $history = Get-History -Count 100 | Sort-Object -Property Id -Descending | Out-ConsoleGridView -Title "Select Command" -OutputMode Single
     if (-Not [string]::IsNullOrWhiteSpace($history)){
         [Microsoft.PowerShell.PSConsoleReadLine]::Insert($history)
     }
