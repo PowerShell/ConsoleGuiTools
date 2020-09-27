@@ -15,14 +15,8 @@ Sends output to an interactive table in the same console window.
 
 ## SYNTAX
 
-### PassThru (Default)
-```
-Out-ConsoleGridView [-InputObject <PSObject>] [-Title <String>] [-PassThru] [<CommonParameters>]
-```
-
-### OutputMode
-```
-Out-ConsoleGridView [-InputObject <PSObject>] [-Title <String>] [-OutputMode <OutputModeOption>] [<CommonParameters>]
+```PowerShell
+Out-ConsoleGridView [-InputObject <psobject>] [-Title <string>] [-OutputMode {None | Single | Multiple}] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -40,14 +34,14 @@ For instructions for using these features, type `Get-Help Out-ConsoleGridView -F
 ## EXAMPLES
 
 ### Example 1: Output processes to a grid view
-```
+```PowerShell
 PS C:\> Get-Process | Out-ConsoleGridView
 ```
 
 This command gets the processes running on the local computer and sends them to a grid view window.
 
 ### Example 2: Use a variable to output processes to a grid view
-```
+```PowerShell
 PS C:\> $P = Get-Process
 PS C:\> $P | Out-ConsoleGridView
 ```
@@ -123,6 +117,24 @@ The processes that you select are passed to the **Export-Csv** command and writt
 
 The command uses the *PassThru* parameter of **Out-ConsoleGridView**, which lets you send multiple items down the pipeline.
 The *PassThru* parameter is equivalent to using the Multiple value of the *OutputMode* parameter.
+
+### Example 8: Use F7 as "Show Command History"
+
+```PowerShell
+$parameters = @{
+  Key = 'F7'
+  BriefDescription = 'ShowHistoryOcgv'
+  LongDescription = 'Show History using Out-ConsoleGridView'
+  ScriptBlock = {
+    param($key, $arg)   # The arguments are ignored in this example
+    $history = Get-History -Count 100 | Out-ConsoleGridView -Title "Select Command" -OutputMode Single
+    if (-Not [string]::IsNullOrWhiteSpace($history)){
+        [Microsoft.PowerShell.PSConsoleReadLine]::Insert($history)
+    }
+  }
+}
+Set-PSReadLineKeyHandler @parameters
+```
 
 ## PARAMETERS
 
