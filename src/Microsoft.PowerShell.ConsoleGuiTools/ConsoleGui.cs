@@ -27,9 +27,9 @@ namespace OutGridView.Cmdlet
             _applicationData = applicationData;
             _gridViewDetails = new GridViewDetails
             {
-                // If we have an OutputMode, then we want to make them selectable. If we make them selectable,
+                // If OutputMode is Multiple, then we make items selectable. If we make them selectable,
                 // they have a 8 character addition of a checkbox ("     [ ]") that we have to factor in.
-                ListViewOffset = _applicationData.OutputMode != OutputModeOption.None ? 8 : 4
+                ListViewOffset = _applicationData.OutputMode == OutputModeOption.Multiple ? 8 : 4
             };
 
             Window win = AddTopLevelWindow();
@@ -104,6 +104,11 @@ namespace OutGridView.Cmdlet
                         new StatusItem(Key.Unknown, "~SPACE~ Mark Item", null),
                         new StatusItem(Key.Enter, "~ENTER~ Accept", () => { 
                             if (Application.Top.MostFocused == _listView){
+                                // In Single mode the selection marks are not shown, but we can still
+                                // set a mark on the underlying item source
+                                if (_applicationData.OutputMode == OutputModeOption.Single){
+                                    _itemSource.SetMark(_listView.SelectedItem, true);
+                                }
                                 Accept();
                             }
                             else if (Application.Top.MostFocused == _filterField){
@@ -292,7 +297,7 @@ namespace OutGridView.Cmdlet
                 Y = 4,
                 Width = Dim.Fill(2),
                 Height = Dim.Fill(2),
-                AllowsMarking = _applicationData.OutputMode != OutputModeOption.None,
+                AllowsMarking = _applicationData.OutputMode == OutputModeOption.Multiple,
             };
 
             win.Add(_listView);
