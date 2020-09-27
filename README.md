@@ -3,7 +3,7 @@
 The GraphicalTools repo contains several different graphical-related PowerShell modules including:
 
 * `Microsoft.PowerShell.GraphicalTools` - A module that provides GUI experiences based on Avalonia.
-* `Microsoft.PowerShell.ConsoleGuiTools` - A module that provides console-based GUI experiences based on gui.cs.
+* `Microsoft.PowerShell.ConsoleGuiTools` - A module that provides console-based GUI experiences based on [Terminal.Gui (gui.cs)](https://github.com/migueldeicaza/gui.cs).
 
 ## Installation
 
@@ -23,6 +23,8 @@ Install-Module Microsoft.PowerShell.ConsoleGuiTools
 
 ### Microsoft.PowerShell.GraphicalTools
 
+[Out-GridView documentation](docs/Microsoft.PowerShell.ConsoleGuiTools/Out-GridView.md)
+
 #### Cross-Platform
 |Linux   |Windows   |Mac   |
 |---|---|---|
@@ -34,7 +36,9 @@ Install-Module Microsoft.PowerShell.ConsoleGuiTools
 
 ### Microsoft.PowerShell.ConsoleGuiTools
 
-![screenshot of Out-ConsoleGridView](https://pbs.twimg.com/media/ESyWfiqUYAA_t6q?format=jpg&name=medium)
+[Out-ConsoleGridView documentation](docs/Microsoft.PowerShell.ConsoleGuiTools/Out-ConsoleGridView.md)
+
+![screenshot of Out-ConsoleGridView](docs/Microsoft.PowerShell.ConsoleGuiTools/ocgv.gif)
 
 #### Cross-Platform
 
@@ -115,7 +119,6 @@ In VScode, set your breakpoints, etc... Then hit `F5`. In the VScode search box,
 In the Powershell session run your commands; breakpoints will be hit, etc...
 
 When done, run `exit` to exit the nested PowerShell and run `pwsh` again. This unloads the DLL. Repeat.
-
 
 ## Contributions Welcome!
 
