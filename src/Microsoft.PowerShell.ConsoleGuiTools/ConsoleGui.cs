@@ -47,6 +47,8 @@ namespace OutGridView.Cmdlet
             LoadData();
             AddRows(win);
 
+            _filterField.Text = _applicationData.Filter;
+            _filterField.CursorPosition = _applicationData.Filter.Length;
             // Run the GUI.
             Application.Run();
             Application.Shutdown();
