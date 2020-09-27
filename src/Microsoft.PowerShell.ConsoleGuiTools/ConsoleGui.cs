@@ -28,7 +28,7 @@ namespace OutGridView.Cmdlet
             _gridViewDetails = new GridViewDetails
             {
                 // If OutputMode is Single or Multiple, then we make items selectable. If we make them selectable,
-                // they have a 8 character addition of a checkbox ("     [ ]" or ".....( )")
+                // they have a 8 character addition of a checkbox (".....[ ]" or ".....( )")
                 // that we have to factor in.
                 ListViewOffset = _applicationData.OutputMode != OutputModeOption.None ? 8 : 4
             };
@@ -69,11 +69,13 @@ namespace OutGridView.Cmdlet
             return selectedIndexes;
         }
 
-        private void Accept(){
+        private void Accept()
+        {
             Application.RequestStop();
         }
 
-        private void Close(){
+        private void Close()
+        {
             _cancelled = true;
             Application.RequestStop();
         }
@@ -98,29 +100,33 @@ namespace OutGridView.Cmdlet
         {
             var statusBar = new StatusBar(
                     _applicationData.OutputMode != OutputModeOption.None
-                    ? new StatusItem []
+                    ? new StatusItem[]
                     {
                         // Use Key.Unknown for SPACE with no delegate because ListView already
                         // handles SPACE
                         new StatusItem(Key.Unknown, "~SPACE~ Mark Item", null),
-                        new StatusItem(Key.Enter, "~ENTER~ Accept", () => { 
-                            if (Application.Top.MostFocused == _listView){
+                        new StatusItem(Key.Enter, "~ENTER~ Accept", () =>
+                        {
+                            if (Application.Top.MostFocused == _listView)
+                            {
                                 // If nothing was explicitly marked, we return the item that was selected
                                 // when ENTER is pressed in Single mode. If something was previously selected
                                 // (using SPACE) then honor that as the single item to return
                                 if (_applicationData.OutputMode == OutputModeOption.Single &&
-                                    _itemSource.GridViewRowList.Find(i => i.IsMarked) == null) {
+                                    _itemSource.GridViewRowList.Find(i => i.IsMarked) == null)
+                                {
                                     _listView.MarkUnmarkRow();
                                 }
                                 Accept();
                             }
-                            else if (Application.Top.MostFocused == _filterField){
+                            else if (Application.Top.MostFocused == _filterField)
+                            {
                                 _listView.SetFocus();
                             }
                         }),
                         new StatusItem(Key.Esc, "~ESC~ Close", () => Close())
                     }
-                    : new StatusItem []
+                    : new StatusItem[]
                     {
                         new StatusItem(Key.Esc, "~ESC~ Close",  () => Close())
                     }
