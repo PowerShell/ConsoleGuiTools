@@ -48,6 +48,7 @@ namespace OutGridView.Cmdlet
 
             // Run the GUI.
             Application.Run();
+            Application.Shutdown();
 
             // Return results of selection if required.
             HashSet<int> selectedIndexes = new HashSet<int>();
@@ -106,7 +107,7 @@ namespace OutGridView.Cmdlet
                                 Accept();
                             }
                             else if (Application.Top.MostFocused == _filterField){
-                                Application.Top.SetFocus(_listView);
+                                _listView.SetFocus();
                             }
                         }),
                         new StatusItem(Key.Esc, "~ESC~ Close", () => Close())
@@ -193,11 +194,10 @@ namespace OutGridView.Cmdlet
                 Width = Dim.Fill() - filterLabel.Text.Length
             };
 
-            _filterField.Changed += (object sender, ustring e) =>
+            _filterField.TextChanged += (str) =>
             {
-                // NOTE: `ustring e` seems to contain the text _before_ the added character...
-                // so we convert the `sender` into a TextField and grab the text from that.
-                string filterText = (sender as TextField)?.Text?.ToString();
+                // str is the OLD value
+                string filterText = _filterField.Text?.ToString();
                 try
                 {
                     filterErrorLabel.Text = " ";
