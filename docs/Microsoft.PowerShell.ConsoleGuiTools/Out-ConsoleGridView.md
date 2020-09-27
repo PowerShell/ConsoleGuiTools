@@ -15,14 +15,8 @@ Sends output to an interactive table in the same console window.
 
 ## SYNTAX
 
-### PassThru (Default)
-```
-Out-ConsoleGridView [-InputObject <PSObject>] [-Title <String>] [-PassThru] [<CommonParameters>]
-```
-
-### OutputMode
-```
-Out-ConsoleGridView [-InputObject <PSObject>] [-Title <String>] [-OutputMode <OutputModeOption>] [<CommonParameters>]
+```PowerShell
+Out-ConsoleGridView [-InputObject <psobject>] [-Title <string>] [-OutputMode {None | Single | Multiple}] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -40,14 +34,14 @@ For instructions for using these features, type `Get-Help Out-ConsoleGridView -F
 ## EXAMPLES
 
 ### Example 1: Output processes to a grid view
-```
+```PowerShell
 PS C:\> Get-Process | Out-ConsoleGridView
 ```
 
 This command gets the processes running on the local computer and sends them to a grid view window.
 
 ### Example 2: Use a variable to output processes to a grid view
-```
+```PowerShell
 PS C:\> $P = Get-Process
 PS C:\> $P | Out-ConsoleGridView
 ```
