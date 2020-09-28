@@ -226,7 +226,9 @@ You can send any object to this cmdlet.
 
 ## OUTPUTS
 
-By default, `Out-ConsoleGridView` objects representing the selected rows are returned to the pipeline. Use `-OutputMode` to change this behavior.
+### System.Object
+
+By default `Out-ConsoleGridView` returns objects representing the selected rows to the pipeline. Use `-OutputMode` to change this behavior.
 
 ## NOTES
 
