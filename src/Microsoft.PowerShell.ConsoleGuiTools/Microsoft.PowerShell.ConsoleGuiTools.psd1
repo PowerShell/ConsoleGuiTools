@@ -110,7 +110,7 @@ PrivateData = @{
 
 Now supports `-Filter` parameter.
 
-Updated to use the final release of `Terminal.Gui` v0.90 (which is feature compelte for 1.0).
+Updated to use the final release of `Terminal.Gui` v0.90 (which is feature complete for 1.0).
 
 ## v0.5.0
 
