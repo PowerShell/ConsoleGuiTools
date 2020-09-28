@@ -11,29 +11,32 @@ title: Out-ConsoleGridView
 # Out-ConsoleGridView
 
 ## SYNOPSIS
+
 Sends output to an interactive table in the same console window.
 
 ## SYNTAX
 
 ```PowerShell
-Out-ConsoleGridView [-InputObject <psobject>] [-Title <string>] [-OutputMode {None | Single | Multiple}] [<CommonParameters>]
+ Out-ConsoleGridView [-InputObject <psobject>] [-Title <string>] [-OutputMode {None | Single |
+    Multiple}] [-Filter <string>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
+
 The **Out-ConsoleGridView** cmdlet sends the output from a command to a grid view window where the output is displayed in an interactive table.
 
 You can use the following features of the table to examine your data:
 
-- Hide, Show, and Reorder Columns: To hide, show, use the columns dropdown. Drag and drop column headers to reorder.
-- Sort. To sort the data, click a column header. Click again to toggle from ascending to descending order.
-- Quick Filter. Use the Filter box at the top of the window to search the text in the table. You can search for text in a particular column, search for literals, and search for multiple words.
-- Column Filter. Use the Add Column Filter drop-down to create rules to filter the data. This is very useful for very large data sets, such as event logs.
+- Quick Filter. Use the Filter box at the top of the window to search the text in the table. You can search for text in a particular column, search for literals, and search for multiple words. You can use the `-Filter` command to pre-populate the Filter box.
 
 For instructions for using these features, type `Get-Help Out-ConsoleGridView -Full` and see How to Use the Grid View Window Features in the Notes section.
+
+To send items from the interactive window down the pipeline, click to select the items (either the the mouse in terminals that support mouse or the `SPACE` key) and then press `ENTER`. `ESC` cancels.
 
 ## EXAMPLES
 
 ### Example 1: Output processes to a grid view
+
 ```PowerShell
 PS C:\> Get-Process | Out-ConsoleGridView
 ```
@@ -41,9 +44,10 @@ PS C:\> Get-Process | Out-ConsoleGridView
 This command gets the processes running on the local computer and sends them to a grid view window.
 
 ### Example 2: Use a variable to output processes to a grid view
+
 ```PowerShell
 PS C:\> $P = Get-Process
-PS C:\> $P | Out-ConsoleGridView
+PS C:\> $P | Out-ConsoleGridView -OutputMode Single
 ```
 
 This command also gets the processes running on the local computer and sends them to a grid view window.
@@ -52,8 +56,11 @@ The first command uses the Get-Process cmdlet to get the processes on the comput
 
 The second command uses a pipeline operator to send the $P variable to **Out-ConsoleGridView**.
 
+By specifying `-OutputMode Single` the grid view window will be restricted to a single selection, ensuring now more than a single object is returned.
+
 ### Example 3: Display a formatted table in a grid view
-```
+
+```PowerShell
 PS C:\> Get-Process | Select-Object -Property Name, WorkingSet, PeakWorkingSet | Sort-Object -Property WorkingSet -Descending | Out-ConsoleGridView
 ```
 
@@ -71,7 +78,8 @@ The final part of the command uses a pipeline operator (|) to send the formatted
 You can now use the features of the grid view to search, sort, and filter the data.
 
 ### Example 4: Save output to a variable, and then output a grid view
-```
+
+```PowerShell
 PS C:\> ($A = Get-ChildItem -Path $pshome -Recurse) | Out-ConsoleGridView
 ```
 
@@ -86,7 +94,8 @@ The parentheses in the command establish the order of operations.
 As a result, the output from the Get-ChildItem command is saved in the $A variable before it is sent to **Out-ConsoleGridView**.
 
 ### Example 5: Output processes for a specified computer to a grid view
-```
+
+```PowerShell
 PS C:\> Get-Process -ComputerName "Server01" | ocgv -Title "Processes - Server01"
 ```
 
@@ -94,21 +103,19 @@ This command displays the processes that are running on the Server01 computer in
 
 The command uses `ocgv`, which is the built-in alias for the **Out-ConsoleGridView** cmdlet, it uses the *Title* parameter to specify the window title.
 
-### Example 6: Output data from remote computers to a grid view
+### Example 6: Define a function to kill processes using a graphical chooser
+
+```PowerShell
+PS C:\> function killp { Get-Process | Out-ConsoleGridView -OutputMode Single -Filter $args[0] | Stop-Process -Id {$_.Id} }
+PS C:\> killp note
 ```
-PS C:\> Invoke-Command -ComputerName S1, S2, S3 -ScriptBlock {Get-Culture} | Out-ConsoleGridView
-```
+This example shows defining a function named `killp` that shows a grid view of all running processes and allows the user to select one to kill it.
 
-This example shows the correct format for sending data collected from remote computers to the **Out-ConsoleGridView** cmdlet.
-
-The command uses the Invoke-Command cmdlet to run a Get-Culture command on three remote computers.
-It uses a pipeline operator to send the data that is returned to the **Out-ConsoleGridView** cmdlet.
-
-Notice that the script block that contains the commands that are run remotely does not include the **Out-ConsoleGridView** command.
-If it did, the command would fail when it tried to open a grid view window on each of the remote computers.
+The example uses the `-Filter` paramter to filter for all proceses with a name that includes `note` (thus highlighting `Notepad` if it were running. Selecting an item in the grid view and pressing `ENTER` will kill that process. 
 
 ### Example 7: Pass multiple items through Out-ConsoleGridView
-```
+
+```PowerShell
 PS C:\> Get-Process | Out-ConsoleGridView -PassThru | Export-Csv -Path .\ProcessLog.csv
 ```
 
@@ -120,28 +127,38 @@ The *PassThru* parameter is equivalent to using the Multiple value of the *Outpu
 
 ### Example 8: Use F7 as "Show Command History"
 
-```PowerShell
-$parameters = @{
-  Key = 'F7'
-  BriefDescription = 'ShowHistoryOcgv'
-  LongDescription = 'Show History using Out-ConsoleGridView'
-  ScriptBlock = {
-    param($key, $arg)   # The arguments are ignored in this example
-    $history = Get-History -Count 100 | Sort-Object -Property Id -Descending | Out-ConsoleGridView -Title "Select Command" -OutputMode Single
-    if (-Not [string]::IsNullOrWhiteSpace($history)){
-        [Microsoft.PowerShell.PSConsoleReadLine]::Insert($history)
-    }
-  }
-}
-Set-PSReadLineKeyHandler @parameters
-```
+Save See [this gist](https://gist.github.com/tig/cbbeab7f53efd73e329afd6d4b838191) as `F7History.ps111 and run `F7History.ps1` in your `$profile`.
+
+Press `F7` to see the history for the current PowerShell instance
+
+Press `Shift-F7` to see the history for all PowerShell instances.
+
+Whatever you select within `Out-ConsoleGridView` will be inserted on your command line. 
+
+Whatever was typed on the command line prior to hitting `F7` or `Shift-F7` will be used as a filter.
 
 ## PARAMETERS
+
+### -Filter
+Pre-populates the Filter edit box, allowing filtering to be specified on the command line.
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
 
 ### -InputObject
 Specifies that the cmdlet accepts input for **Out-ConsoleGridView**.
 
 When you use the **InputObject** parameter to send a collection of objects to **Out-ConsoleGridView**, **Out-ConsoleGridView** treats the collection as one collection object, and it displays one row that represents the collection.
+
 To display the each object in the collection, use a pipeline operator (|) to send objects to **Out-ConsoleGridView**.
 
 ```yaml
@@ -159,13 +176,14 @@ Accept wildcard characters: False
 ### -OutputMode
 Specifies the items that the interactive window sends down the pipeline as input to other commands.
 By default, this cmdlet does not generate any output.
-To send items from the interactive window down the pipeline, click to select the items and then click OK.
+
+To send items from the interactive window down the pipeline, click to select the items (either the the mouse in terminals that support mouse or the `SPACE` key) and then press `ENTER`. `ESC` cancels.
 
 The values of this parameter determine how many items you can send down the pipeline.
 
-- None.  No items. This is the default value.
+- None. No items. 
 - Single.  Zero items or one item. Use this value when the next command can take only one input object.
-- Multiple.  Zero, one, or many items.  Use this value when the next command can take multiple input objects. This value is equivalent to the *Passthru* parameter.
+- Multiple.  Zero, one, or many items.  Use this value when the next command can take multiple input objects. This is the default value.
 
 ```yaml
 Type: OutputModeOption
@@ -175,27 +193,7 @@ Accepted values: None, Single, Multiple
 
 Required: False
 Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -PassThru
-Indicates that the cmdlet sends items from the interactive window down the pipeline as input to other commands.
-By default, this cmdlet does not generate any output.
-This parameter is equivalent to using the Multiple value of the *OutputMode* parameter.
-
-To send items from the interactive window down the pipeline, click to select the items and then click OK.
-Shift-click and Ctrl-click are supported.
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: PassThru
-Aliases:
-
-Required: False
-Position: Named
-Default value: None
+Default value: Multiple
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
@@ -223,95 +221,22 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 ## INPUTS
 
 ### System.Management.Automation.PSObject
+
 You can send any object to this cmdlet.
 
 ## OUTPUTS
 
-### None
-
-Normally, `Out-ConsoleGridView` does not return any objects. When using the `PassThru` parameter, the objects representing the selected rows are returned to the pipeline.
+By default, `Out-ConsoleGridView` objects representing the selected rows are returned to the pipeline. Use `-OutputMode` to change this behavior.
 
 ## NOTES
-* The command output that you send to **Out-ConsoleGridView** cannot be formatted, such as by using the Format-Table or Format-Wide cmdlets. To select properties, use the Select-Object cmdlet.
+
+* The command output that you send to **Out-ConsoleGridView** should not be formatted, such as by using the Format-Table or Format-Wide cmdlets. To select properties, use the Select-Object cmdlet.
+
 * Deserialized output from remote commands might not be formatted correctly in the grid view window.
-  How to Use the Grid View Window Features
-
-  The following topics explain how to use the features of the window that **Out-ConsoleGridView** displays.
-
-  **How to Hide, Show, and Reorder Columns**
-
-  **To hide or show a column:**
-
-  1. Click on the Columns expander.
-
-  2. In the Columns expander, toggle Columns that should appear.
-    Only selected columns appear in the grid view window.
-
-  **To reorder columns:**
-
-  - Drag and drop the column into the desired location.
-
-  **How to Sort Table Data**
-
-  - To sort the data, click a column header.
-
-  - To change the sort order, click the column header again.
-Each time you click the same header, the sort order toggles between ascending to descending order.
-The current order is indicated by a triangle in the column header.
-
-  **How to Search in the Table (Quick Filter)**
-
-  Use the Filter box to search for data in the table.
-When you type in the box, only items that include the typed text appear in the table.
-
-  - Search for text.
-To search for text in the table, in the Filter box, type the text to find.
-
-  - Search for multiple words.
-To search for multiple words in the table, type the words separated by spaces.
-**Out-ConsoleGridView** displays rows that include all of the words (logical AND).
-
-  - Search for literal phrases.
-To search for phrases that include spaces or special characters, enclose the phrase in quotation marks.
-**Out-ConsoleGridView** displays rows that include an exact match for the phrase.
-
-  **Use Column Filters to Filter the Table**
-
-  You can use column filters to determine which items are displayed in the table.
-  Items appear only when they satisfy all of the column filters that you establish.
-
-  Each column filter has the following format:
-
-  \<column\> \<operator\> \<value\>
-
-  Column filters for different properties are connected by AND.
-Column filters for the same property are connected by OR.
-You cannot change the logical connectors.
-
-  The column filters only affects the display.
-It does not delete items from the table.
-
-  **How to Add Column Filters**
-
-  1. Click the Add Column Filters menu button.
-
-  2. Click the column (property) you wish to add.
-
-  **How to Edit a Column Filter**
-
-  - To change an operator, click the operator drop down, and then click to select a different operator from the drop-down list.
-
-  - To enter or change a value, type a value in the value box.
-
-  - To create an OR statement, add a column filter with the same property.
-
-  **How to Delete Column Filters**
-
-  - To delete selected column filters, click the remove button beside each column filter.
-
-  - To delete all column filters, click the Clear Filters button.
 
 ## RELATED LINKS
+
+[Out-GridView](Out-GridView.md)
 
 [Out-File](Out-File.md)
 
