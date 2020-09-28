@@ -92,7 +92,7 @@ PrivateData = @{
     PSData = @{
 
         # Tags applied to this module. These help with module discovery in online galleries.
-        Tags = @('Console', 'Gui', 'Out-GridView', 'MacOS', 'Windows', 'Linux', 'PSEdition_Core')
+        Tags = @('Console', 'Gui', 'Out-GridView', 'Out-ConsoleGridView', 'Terminal.Gui', 'gui.cs', 'MacOS', 'Windows', 'Linux', 'PSEdition_Core')
 
         # A URL to the license for this module.
         LicenseUri = 'https://github.com/PowerShell/GraphicalTools/blob/master/LICENSE.txt'
@@ -108,7 +108,7 @@ PrivateData = @{
 
 ## v0.6.0
 
-Now supports `-Filter` paramter.
+Now supports `-Filter` parameter.
 
 Updated to use the final release of `Terminal.Gui` v0.90 (which is feature compelte for 1.0).
 
