@@ -9,7 +9,7 @@
 RootModule = 'Microsoft.PowerShell.ConsoleGuiTools.dll'
 
 # Version number of this module.
-ModuleVersion = '0.5.0'
+ModuleVersion = '0.6.0'
 
 # Supported PSEditions
 CompatiblePSEditions = @( 'Core' )
@@ -105,6 +105,12 @@ PrivateData = @{
 
         # ReleaseNotes of this module
         ReleaseNotes = '# Release Notes
+
+## v0.6.0
+
+Now supports `-Filter` paramter.
+
+Updated to use the final release of `Terminal.Gui` v0.90 (which is feature compelte for 1.0).
 
 ## v0.5.0
 
