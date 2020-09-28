@@ -9,7 +9,7 @@
 RootModule = 'Microsoft.PowerShell.ConsoleGuiTools.dll'
 
 # Version number of this module.
-ModuleVersion = '0.5.0'
+ModuleVersion = '0.6.0'
 
 # Supported PSEditions
 CompatiblePSEditions = @( 'Core' )
@@ -92,7 +92,7 @@ PrivateData = @{
     PSData = @{
 
         # Tags applied to this module. These help with module discovery in online galleries.
-        Tags = @('Console', 'Gui', 'Out-GridView', 'MacOS', 'Windows', 'Linux', 'PSEdition_Core')
+        Tags = @('Console', 'Gui', 'Out-GridView', 'Out-ConsoleGridView', 'Terminal.Gui', 'gui.cs', 'MacOS', 'Windows', 'Linux', 'PSEdition_Core')
 
         # A URL to the license for this module.
         LicenseUri = 'https://github.com/PowerShell/GraphicalTools/blob/master/LICENSE.txt'
@@ -105,6 +105,12 @@ PrivateData = @{
 
         # ReleaseNotes of this module
         ReleaseNotes = '# Release Notes
+
+## v0.6.0
+
+Now supports `-Filter` parameter.
+
+Updated to use the final release of `Terminal.Gui` v0.90 (which is feature complete for 1.0).
 
 ## v0.5.0
 
