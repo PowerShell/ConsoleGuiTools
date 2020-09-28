@@ -50,7 +50,7 @@ namespace OutGridView.Cmdlet
         /// gets or sets the initial value for the filter in the GUI
         /// </summary>
         [Parameter()]
-        public string Filter { set; get; } = "";
+        public string Filter { set; get; }
 
         #endregion Input Parameters
 
