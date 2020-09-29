@@ -46,6 +46,12 @@ namespace OutGridView.Cmdlet
         [Parameter()]
         public OutputModeOption OutputMode { set; get; } = OutputModeOption.Multiple;
 
+        /// <summary>
+        /// gets or sets the initial value for the filter in the GUI
+        /// </summary>
+        [Parameter()]
+        public string Filter { set; get; }
+
         #endregion Input Parameters
 
         // This method gets called once for each cmdlet in the pipeline when the pipeline starts executing
@@ -126,6 +132,7 @@ namespace OutGridView.Cmdlet
             {
                 Title = Title ?? "Out-ConsoleGridView",
                 OutputMode = OutputMode,
+                Filter = Filter,
                 DataTable = dataTable
             };
 
