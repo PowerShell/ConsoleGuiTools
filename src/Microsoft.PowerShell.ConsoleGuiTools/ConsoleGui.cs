@@ -171,7 +171,7 @@ namespace OutGridView.Cmdlet
 
             // if the total width is wider than the usable width, remove 1 from widest column until it fits
             // the gui loses 3 chars on the left and 2 chars on the right
-            _gridViewDetails.UsableWidth = Application.Top.Frame.Width - 3 - listViewColumnWidths.Length - _gridViewDetails.ListViewOffset - 2;
+            _gridViewDetails.UsableWidth = Application.Top.Frame.Width - 3 - listViewColumnWidths.Length - _gridViewDetails.ListViewOffset;
             int columnWidthsSum = listViewColumnWidths.Sum();
             while (columnWidthsSum >= _gridViewDetails.UsableWidth)
             {
