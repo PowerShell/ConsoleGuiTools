@@ -15,7 +15,9 @@ namespace OutGridView.Cmdlet
     {
         private const string FILTER_LABEL = "Filter";
         // This adjusts the left margin of all controls
-        private const int FILTER_LABEL_X = 2;
+        private const int MARGIN_LEFT = 2;
+        // Width of Terminal.Gui ListView selection/check UI elements (old == 4, new == 2)
+        private const int CHECK_WIDTH = 4;
         private bool _cancelled;
         private GridViewDataSource _itemSource;
         private Label _filterLabel;
@@ -32,7 +34,7 @@ namespace OutGridView.Cmdlet
             {
                 // If OutputMode is Single or Multiple, then we make items selectable. If we make them selectable,
                 // 2 columns are required for the check/selection indicator and space.
-                ListViewOffset = _applicationData.OutputMode != OutputModeOption.None ? FILTER_LABEL_X + 2 : FILTER_LABEL_X
+                ListViewOffset = _applicationData.OutputMode != OutputModeOption.None ? MARGIN_LEFT + CHECK_WIDTH : MARGIN_LEFT
             };
 
             Window win = AddTopLevelWindow();
@@ -193,7 +195,7 @@ namespace OutGridView.Cmdlet
         {
             _filterLabel = new Label(FILTER_LABEL)
             {
-                X = FILTER_LABEL_X
+                X = MARGIN_LEFT
             };
 
             _filterField = new TextField(string.Empty)
