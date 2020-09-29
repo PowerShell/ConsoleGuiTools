@@ -14,8 +14,11 @@ namespace OutGridView.Cmdlet
     internal class ConsoleGui : IDisposable
     {
         private const string FILTER_LABEL = "Filter";
+        // This adjusts the left margin of all controls
+        private const int FILTER_LABEL_X = 2;
         private bool _cancelled;
         private GridViewDataSource _itemSource;
+        private Label _filterLabel;
         private TextField _filterField;
         private ListView _listView;
         private ApplicationData _applicationData;
@@ -28,9 +31,8 @@ namespace OutGridView.Cmdlet
             _gridViewDetails = new GridViewDetails
             {
                 // If OutputMode is Single or Multiple, then we make items selectable. If we make them selectable,
-                // they have a 8 character addition of a checkbox (".....[ ]" or ".....( )")
-                // that we have to factor in.
-                ListViewOffset = _applicationData.OutputMode != OutputModeOption.None ? 8 : 4
+                // 2 columns are required for the check/selection indicator and space.
+                ListViewOffset = _applicationData.OutputMode != OutputModeOption.None ? FILTER_LABEL_X + 2 : FILTER_LABEL_X
             };
 
             Window win = AddTopLevelWindow();
@@ -189,25 +191,25 @@ namespace OutGridView.Cmdlet
 
         private void AddFilter(Window win)
         {
-            var filterLabel = new Label(FILTER_LABEL)
+            _filterLabel = new Label(FILTER_LABEL)
             {
-                X = 2
+                X = FILTER_LABEL_X
             };
 
             _filterField = new TextField(string.Empty)
             {
-                X = Pos.Right(filterLabel) + 1,
-                Y = Pos.Top(filterLabel),
+                X = Pos.Right(_filterLabel) + 1,
+                Y = Pos.Top(_filterLabel),
                 CanFocus = true,
-                Width = Dim.Fill() - filterLabel.Text.Length
+                Width = Dim.Fill() - _filterLabel.Text.Length
             };
 
             var filterErrorLabel = new Label(string.Empty)
             {
-                X = Pos.Right(filterLabel) + 1,
-                Y = Pos.Top(filterLabel) + 1,
+                X = Pos.Right(_filterLabel) + 1,
+                Y = Pos.Top(_filterLabel) + 1,
                 ColorScheme = Colors.Base,
-                Width = Dim.Fill() - filterLabel.Text.Length
+                Width = Dim.Fill() - _filterLabel.Text.Length
             };
 
             _filterField.TextChanged += (str) =>
@@ -232,14 +234,14 @@ namespace OutGridView.Cmdlet
                 }
             };
 
-            win.Add(filterLabel, _filterField, filterErrorLabel);
+            win.Add(_filterLabel, _filterField, filterErrorLabel);
         }
 
         private void AddHeaders(Window win, List<string> gridHeaders)
         {
             var header = new Label(GridViewHelpers.GetPaddedString(
                 gridHeaders,
-                _gridViewDetails.ListViewOffset + _gridViewDetails.ListViewOffset - 1,
+                _gridViewDetails.ListViewOffset,
                 _gridViewDetails.ListViewColumnWidths))
             {
                 X = 0,
@@ -286,7 +288,7 @@ namespace OutGridView.Cmdlet
                     valueList.Add(dataValue);
                 }
 
-                string displayString = GridViewHelpers.GetPaddedString(valueList, _gridViewDetails.ListViewOffset, _gridViewDetails.ListViewColumnWidths);
+                string displayString = GridViewHelpers.GetPaddedString(valueList, 0, _gridViewDetails.ListViewColumnWidths);
 
                 items.Add(new GridViewRow
                 {
@@ -304,8 +306,8 @@ namespace OutGridView.Cmdlet
         {
             _listView = new ListView(_itemSource)
             {
-                X = 3,
-                Y = 4,
+                X = Pos.Left(_filterLabel),
+                Y = Pos.Bottom(_filterLabel) + 3, // 1 for space, 1 for header, 1 for header underline
                 Width = Dim.Fill(2),
                 Height = Dim.Fill(2),
                 AllowsMarking = _applicationData.OutputMode != OutputModeOption.None,
