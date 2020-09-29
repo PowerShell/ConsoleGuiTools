@@ -170,8 +170,7 @@ namespace OutGridView.Cmdlet
             }
 
             // if the total width is wider than the usable width, remove 1 from widest column until it fits
-            // the gui loses 3 chars on the left and 2 chars on the right
-            _gridViewDetails.UsableWidth = Application.Top.Frame.Width - 3 - listViewColumnWidths.Length - _gridViewDetails.ListViewOffset;
+            _gridViewDetails.UsableWidth = Application.Top.Frame.Width - MARGIN_LEFT - listViewColumnWidths.Length - _gridViewDetails.ListViewOffset;
             int columnWidthsSum = listViewColumnWidths.Sum();
             while (columnWidthsSum >= _gridViewDetails.UsableWidth)
             {
@@ -311,7 +310,7 @@ namespace OutGridView.Cmdlet
                 X = Pos.Left(_filterLabel),
                 Y = Pos.Bottom(_filterLabel) + 3, // 1 for space, 1 for header, 1 for header underline
                 Width = Dim.Fill(2),
-                Height = Dim.Fill(2),
+                Height = Dim.Fill(),
                 AllowsMarking = _applicationData.OutputMode != OutputModeOption.None,
                 AllowsMultipleSelection = _applicationData.OutputMode == OutputModeOption.Multiple,
             };
