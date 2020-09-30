@@ -44,7 +44,10 @@ namespace OutGridView.Cmdlet
             List<string> gridHeaders = _applicationData.DataTable.DataColumns.Select((c) => c.Label).ToList();
             CalculateColumnWidths(gridHeaders);
 
-            AddFilter(win);
+            if (!_applicationData.MinUI)
+            {
+                AddFilter(win);
+            }
             AddHeaders(win, gridHeaders);
 
             // GridView row logic
@@ -91,11 +94,11 @@ namespace OutGridView.Cmdlet
             // Creates the top-level window to show
             var win = new Window(_applicationData.Title)
             {
-                X = 0,
-                Y = 0,
+                X = _applicationData.MinUI ? -1 : 0,
+                Y = _applicationData.MinUI ? -1 : 0,
                 // By using Dim.Fill(), it will automatically resize without manual intervention
-                Width = Dim.Fill(),
-                Height = Dim.Fill(1)
+                Width = Dim.Fill(_applicationData.MinUI ? -1 : 0),
+                Height = Dim.Fill(_applicationData.MinUI ? -1 : 1)
             };
 
             Application.Top.Add(win);
@@ -137,6 +140,11 @@ namespace OutGridView.Cmdlet
                         new StatusItem(Key.Esc, "~ESC~ Close",  () => Close())
                     }
             );
+
+            if (_applicationData.MinUI)
+            {
+                statusBar.Visible = false;
+            }
 
             Application.Top.Add(statusBar);
         }

@@ -12,6 +12,7 @@ namespace OutGridView.Models
         public OutputModeOption OutputMode { get; set; }
         public bool PassThru { get; set; }
         public string Filter { get; set; }
+        public bool MinUI { get; set; }
         public DataTable DataTable { get; set; }
     }
 }
