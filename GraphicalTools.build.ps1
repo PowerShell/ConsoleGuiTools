@@ -3,7 +3,9 @@ param(
     [ValidateSet("Debug", "Release")]
     [string]$Configuration = "Debug",
 
-    [string[]]$ModuleName = @( "Microsoft.PowerShell.GraphicalTools", "Microsoft.PowerShell.ConsoleGuiTools" ) 
+    [string[]]$ModuleName = @( 
+        "Microsoft.PowerShell.GraphicalTools", 
+        "Microsoft.PowerShell.ConsoleGuiTools" ) 
 )
 
 $script:IsUnix = $PSVersionTable.PSEdition -and $PSVersionTable.PSEdition -eq "Core" -and !$IsWindows
