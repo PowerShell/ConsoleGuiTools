@@ -19,10 +19,10 @@ namespace OutGridView.Cmdlet
         // Width of Terminal.Gui ListView selection/check UI elements (old == 4, new == 2)
         private const int CHECK_WIDTH = 4;
         private bool _cancelled;
-        private GridViewDataSource _itemSource;
         private Label _filterLabel;
         private TextField _filterField;
         private ListView _listView;
+        private GridViewDataSource _itemSource;
         private ApplicationData _applicationData;
         private GridViewDetails _gridViewDetails;
 
@@ -37,25 +37,36 @@ namespace OutGridView.Cmdlet
                 ListViewOffset = _applicationData.OutputMode != OutputModeOption.None ? MARGIN_LEFT + CHECK_WIDTH : MARGIN_LEFT
             };
 
-            Window win = AddTopLevelWindow();
-            AddStatusBar();
+            Window win = CreateTopLevelWindow();
 
-            // GridView header logic
+            // Create the headers and calculate column widths based on the DataTable
             List<string> gridHeaders = _applicationData.DataTable.DataColumns.Select((c) => c.Label).ToList();
             CalculateColumnWidths(gridHeaders);
 
+            // Copy DataTable into the ListView's DataSource
+            _itemSource = LoadData();
+
+            // Add Filter UI
             if (!_applicationData.MinUI)
             {
                 AddFilter(win);
             }
-            AddHeaders(win, gridHeaders);
 
-            // GridView row logic
-            LoadData();
-            AddRows(win);
+            // Add Header UI
+            if (!_applicationData.MinUI)
+            {
+                AddHeaders(win, gridHeaders);
+            }
 
-            _filterField.Text = _applicationData.Filter ?? string.Empty;
-            _filterField.CursorPosition = _filterField.Text.Length;
+            // Add ListView
+            AddListView(win);
+
+            // Status bar is where our key-bindings are handled
+            AddStatusBar(!_applicationData.MinUI);
+
+            // If -Filter parameter is set, apply it. 
+            ApplyFilter();
+
             // Run the GUI.
             Application.Run();
             Application.Shutdown();
@@ -78,6 +89,40 @@ namespace OutGridView.Cmdlet
             return selectedIndexes;
         }
 
+        private GridViewDataSource LoadData()
+        {
+            var items = new List<GridViewRow>();
+            int newIndex = 0;
+            for (int i = 0; i < _applicationData.DataTable.Data.Count; i++)
+            {
+                var dataTableRow = _applicationData.DataTable.Data[i];
+                var valueList = new List<string>();
+                foreach (var dataTableColumn in _applicationData.DataTable.DataColumns)
+                {
+                    string dataValue = dataTableRow.Values[dataTableColumn.ToString()].DisplayValue;
+                    valueList.Add(dataValue);
+                }
+
+                string displayString = GridViewHelpers.GetPaddedString(valueList, 0, _gridViewDetails.ListViewColumnWidths);
+
+                items.Add(new GridViewRow
+                {
+                    DisplayString = displayString,
+                    OriginalIndex = i
+                });
+
+                newIndex++;
+            }
+
+            return new GridViewDataSource(items);
+        }
+
+        private void ApplyFilter(){
+            List<GridViewRow> itemList = GridViewHelpers.FilterData(_itemSource.GridViewRowList, _applicationData.Filter ?? string.Empty);
+            // Set the ListView to show only the subset defined by the filter
+            _listView.Source = new GridViewDataSource(itemList);
+        }
+
         private void Accept()
         {
             Application.RequestStop();
@@ -89,7 +134,7 @@ namespace OutGridView.Cmdlet
             Application.RequestStop();
         }
 
-        private Window AddTopLevelWindow()
+        private Window CreateTopLevelWindow()
         {
             // Creates the top-level window to show
             var win = new Window(_applicationData.Title)
@@ -105,7 +150,7 @@ namespace OutGridView.Cmdlet
             return win;
         }
 
-        private void AddStatusBar()
+        private void AddStatusBar(bool visible)
         {
             var statusBar = new StatusBar(
                     _applicationData.OutputMode != OutputModeOption.None
@@ -140,12 +185,7 @@ namespace OutGridView.Cmdlet
                         new StatusItem(Key.Esc, "~ESC~ Close",  () => Close())
                     }
             );
-
-            if (_applicationData.MinUI)
-            {
-                statusBar.Visible = false;
-            }
-
+            statusBar.Visible = visible;
             Application.Top.Add(statusBar);
         }
 
@@ -202,10 +242,11 @@ namespace OutGridView.Cmdlet
         {
             _filterLabel = new Label(FILTER_LABEL)
             {
-                X = MARGIN_LEFT
+                X = MARGIN_LEFT,
+                Y = 0
             };
 
-            _filterField = new TextField(string.Empty)
+            _filterField = new TextField(_applicationData.Filter ?? string.Empty)
             {
                 X = Pos.Right(_filterLabel) + 1,
                 Y = Pos.Top(_filterLabel),
@@ -230,9 +271,9 @@ namespace OutGridView.Cmdlet
                     filterErrorLabel.Text = " ";
                     filterErrorLabel.ColorScheme = Colors.Base;
                     filterErrorLabel.Redraw(filterErrorLabel.Bounds);
+                    _applicationData.Filter = filterText;
+                    ApplyFilter();
 
-                    List<GridViewRow> itemList = GridViewHelpers.FilterData(_itemSource.GridViewRowList, filterText);
-                    _listView.Source = new GridViewDataSource(itemList);
                 }
                 catch (Exception ex)
                 {
@@ -251,12 +292,16 @@ namespace OutGridView.Cmdlet
             var header = new Label(GridViewHelpers.GetPaddedString(
                 gridHeaders,
                 _gridViewDetails.ListViewOffset,
-                _gridViewDetails.ListViewColumnWidths))
+                _gridViewDetails.ListViewColumnWidths));
+            header.X = 0;
+            if (_applicationData.MinUI)
             {
-                X = 0,
-                Y = 2
-            };
-
+                header.Y = 0;
+            }
+            else
+            {
+                header.Y = 2;
+            }
             win.Add(header);
 
             // This renders dashes under the header to make it more clear what is header and what is data
@@ -274,54 +319,32 @@ namespace OutGridView.Cmdlet
                 }
             }
 
-            var headerLine = new Label(headerLineText.ToString())
-            {
-                X = 0,
-                Y = 3
-            };
-
-            win.Add(headerLine);
-        }
-
-        private void LoadData()
-        {
-            var items = new List<GridViewRow>();
-            int newIndex = 0;
-            for (int i = 0; i < _applicationData.DataTable.Data.Count; i++)
-            {
-                var dataTableRow = _applicationData.DataTable.Data[i];
-                var valueList = new List<string>();
-                foreach (var dataTableColumn in _applicationData.DataTable.DataColumns)
+            if (!_applicationData.MinUI){
+                var headerLine = new Label(headerLineText.ToString())
                 {
-                    string dataValue = dataTableRow.Values[dataTableColumn.ToString()].DisplayValue;
-                    valueList.Add(dataValue);
-                }
-
-                string displayString = GridViewHelpers.GetPaddedString(valueList, 0, _gridViewDetails.ListViewColumnWidths);
-
-                items.Add(new GridViewRow
-                {
-                    DisplayString = displayString,
-                    OriginalIndex = i
-                });
-
-                newIndex++;
+                    X = 0,
+                    Y = Pos.Bottom(header)
+                };
+                win.Add(headerLine);
             }
-
-            _itemSource = new GridViewDataSource(items);
         }
 
-        private void AddRows(Window win)
+        private void AddListView(Window win)
         {
-            _listView = new ListView(_itemSource)
+            _listView = new ListView(_itemSource);
+            _listView.X = MARGIN_LEFT;
+            if (!_applicationData.MinUI)
             {
-                X = Pos.Left(_filterLabel),
-                Y = Pos.Bottom(_filterLabel) + 3, // 1 for space, 1 for header, 1 for header underline
-                Width = Dim.Fill(2),
-                Height = Dim.Fill(),
-                AllowsMarking = _applicationData.OutputMode != OutputModeOption.None,
-                AllowsMultipleSelection = _applicationData.OutputMode == OutputModeOption.Multiple,
-            };
+                _listView.Y = Pos.Bottom(_filterLabel) + 3; // 1 for space, 1 for header, 1 for header underline
+            } 
+            else
+            {
+                _listView.Y = 1; // 1 for space, 1 for header, 1 for header underline
+            }
+            _listView.Width = Dim.Fill(2);
+            _listView.Height = Dim.Fill();
+            _listView.AllowsMarking = _applicationData.OutputMode != OutputModeOption.None;
+            _listView.AllowsMultipleSelection = _applicationData.OutputMode == OutputModeOption.Multiple;
 
             win.Add(_listView);
         }
