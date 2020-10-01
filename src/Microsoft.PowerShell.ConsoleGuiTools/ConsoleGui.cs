@@ -17,7 +17,7 @@ namespace OutGridView.Cmdlet
         // This adjusts the left margin of all controls
         private const int MARGIN_LEFT = 2;
         // Width of Terminal.Gui ListView selection/check UI elements (old == 4, new == 2)
-        private const int CHECK_WIDTH = 4;
+        private const int CHECK_WIDTH = 2;
         private bool _cancelled;
         private Label _filterLabel;
         private TextField _filterField;
