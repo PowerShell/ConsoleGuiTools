@@ -8,4 +8,4 @@ Invoke-Build Build -ModuleName Microsoft.PowerShell.ConsoleGuiTools
 
 # Run what was built...
 # pwsh -noprofile -command "Import-Module -verbose '$PSScriptRoot/module/Microsoft.PowerShell.GraphicalTools'; Get-Process | Out-GridView -PassThru"
-pwsh -noprofile -command "Import-Module -verbose '$PSScriptRoot/module/Microsoft.PowerShell.ConsoleGuiTools'; Get-PSProfile | Out-ConsoleGridView -OutputMode Single -Title 'PS Profiles' -Filter power"
+pwsh -noprofile -command "Import-Module -verbose '$PSScriptRoot/module/Microsoft.PowerShell.ConsoleGuiTools'; Get-Module | Out-ConsoleGridView -OutputMode Single -Title 'Imported Modules' -Filter power"
