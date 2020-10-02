@@ -127,7 +127,7 @@ The *PassThru* parameter is equivalent to using the Multiple value of the *Outpu
 
 ### Example 8: Use F7 as "Show Command History"
 
-Save See [this gist](https://gist.github.com/tig/cbbeab7f53efd73e329afd6d4b838191) as `F7History.ps111 and run `F7History.ps1` in your `$profile`.
+Save See [this gist](https://gist.github.com/tig/cbbeab7f53efd73e329afd6d4b838191) as `F7History.ps1` and run `F7History.ps1` in your `$profile`.
 
 Press `F7` to see the history for the current PowerShell instance
 
