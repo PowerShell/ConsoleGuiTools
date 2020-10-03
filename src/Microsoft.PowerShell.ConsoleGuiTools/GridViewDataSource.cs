@@ -47,7 +47,7 @@ namespace OutGridView.Cmdlet
             {
                 (var rune, var size) = Utf8.DecodeRune(ustr, index, index - ustr.Length);
                 var count = Rune.ColumnWidth(rune);
-                if (used + count >= width) break;
+                if (used + count > width) break;
                 driver.AddRune(rune);
                 used += count;
                 index += size;
