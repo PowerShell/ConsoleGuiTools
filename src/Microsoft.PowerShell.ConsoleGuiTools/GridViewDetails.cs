@@ -8,7 +8,7 @@ namespace OutGridView.Cmdlet
         // Contains the width of each column in the grid view.
         public int[] ListViewColumnWidths { get; set; }
 
-        // Dictates where the grid should actually start considering
+        // Dictates where the header should actually start considering
         // some offset is needed to factor in the checkboxes
         public int ListViewOffset { get; set; }
 
