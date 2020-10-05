@@ -16,7 +16,12 @@
             "args": [
                 "-c",
                 "Invoke-Build",
-                "Build"
+                // Build both modules
+                //"Build -ModuleName Microsoft.PowerShell.GraphicalTools, Microsoft.PowerShell.ConsoleGuiTools", 
+                // Build only Out-GridView
+                //"Build -ModuleName Microsoft.PowerShell.GraphicalTools", 
+                // Build only Out-ConsoleGridView
+                "Build -ModuleName Microsoft.PowerShell.ConsoleGuiTools", 
             ],
             "problemMatcher": "$msCompile",
             "group": {

@@ -14,8 +14,13 @@ namespace OutGridView.Cmdlet
     internal class ConsoleGui : IDisposable
     {
         private const string FILTER_LABEL = "Filter";
+        // This adjusts the left margin of all controls
+        private const int MARGIN_LEFT = 2;
+        // Width of Terminal.Gui ListView selection/check UI elements (old == 4, new == 2)
+        private const int CHECK_WIDTH = 4;
         private bool _cancelled;
         private GridViewDataSource _itemSource;
+        private Label _filterLabel;
         private TextField _filterField;
         private ListView _listView;
         private ApplicationData _applicationData;
@@ -28,9 +33,8 @@ namespace OutGridView.Cmdlet
             _gridViewDetails = new GridViewDetails
             {
                 // If OutputMode is Single or Multiple, then we make items selectable. If we make them selectable,
-                // they have a 8 character addition of a checkbox (".....[ ]" or ".....( )")
-                // that we have to factor in.
-                ListViewOffset = _applicationData.OutputMode != OutputModeOption.None ? 8 : 4
+                // 2 columns are required for the check/selection indicator and space.
+                ListViewOffset = _applicationData.OutputMode != OutputModeOption.None ? MARGIN_LEFT + CHECK_WIDTH : MARGIN_LEFT
             };
 
             Window win = AddTopLevelWindow();
@@ -91,7 +95,7 @@ namespace OutGridView.Cmdlet
                 Y = 0,
                 // By using Dim.Fill(), it will automatically resize without manual intervention
                 Width = Dim.Fill(),
-                Height = Dim.Fill()
+                Height = Dim.Fill(1)
             };
 
             Application.Top.Add(win);
@@ -166,8 +170,7 @@ namespace OutGridView.Cmdlet
             }
 
             // if the total width is wider than the usable width, remove 1 from widest column until it fits
-            // the gui loses 3 chars on the left and 2 chars on the right
-            _gridViewDetails.UsableWidth = Application.Top.Frame.Width - 3 - listViewColumnWidths.Length - _gridViewDetails.ListViewOffset - 2;
+            _gridViewDetails.UsableWidth = Application.Top.Frame.Width - MARGIN_LEFT - listViewColumnWidths.Length - _gridViewDetails.ListViewOffset;
             int columnWidthsSum = listViewColumnWidths.Sum();
             while (columnWidthsSum >= _gridViewDetails.UsableWidth)
             {
@@ -189,25 +192,25 @@ namespace OutGridView.Cmdlet
 
         private void AddFilter(Window win)
         {
-            var filterLabel = new Label(FILTER_LABEL)
+            _filterLabel = new Label(FILTER_LABEL)
             {
-                X = 2
+                X = MARGIN_LEFT
             };
 
             _filterField = new TextField(string.Empty)
             {
-                X = Pos.Right(filterLabel) + 1,
-                Y = Pos.Top(filterLabel),
+                X = Pos.Right(_filterLabel) + 1,
+                Y = Pos.Top(_filterLabel),
                 CanFocus = true,
-                Width = Dim.Fill() - filterLabel.Text.Length
+                Width = Dim.Fill() - _filterLabel.Text.Length
             };
 
             var filterErrorLabel = new Label(string.Empty)
             {
-                X = Pos.Right(filterLabel) + 1,
-                Y = Pos.Top(filterLabel) + 1,
+                X = Pos.Right(_filterLabel) + 1,
+                Y = Pos.Top(_filterLabel) + 1,
                 ColorScheme = Colors.Base,
-                Width = Dim.Fill() - filterLabel.Text.Length
+                Width = Dim.Fill() - _filterLabel.Text.Length
             };
 
             _filterField.TextChanged += (str) =>
@@ -232,14 +235,14 @@ namespace OutGridView.Cmdlet
                 }
             };
 
-            win.Add(filterLabel, _filterField, filterErrorLabel);
+            win.Add(_filterLabel, _filterField, filterErrorLabel);
         }
 
         private void AddHeaders(Window win, List<string> gridHeaders)
         {
             var header = new Label(GridViewHelpers.GetPaddedString(
                 gridHeaders,
-                _gridViewDetails.ListViewOffset + _gridViewDetails.ListViewOffset - 1,
+                _gridViewDetails.ListViewOffset,
                 _gridViewDetails.ListViewColumnWidths))
             {
                 X = 0,
@@ -286,7 +289,7 @@ namespace OutGridView.Cmdlet
                     valueList.Add(dataValue);
                 }
 
-                string displayString = GridViewHelpers.GetPaddedString(valueList, _gridViewDetails.ListViewOffset, _gridViewDetails.ListViewColumnWidths);
+                string displayString = GridViewHelpers.GetPaddedString(valueList, 0, _gridViewDetails.ListViewColumnWidths);
 
                 items.Add(new GridViewRow
                 {
@@ -304,10 +307,10 @@ namespace OutGridView.Cmdlet
         {
             _listView = new ListView(_itemSource)
             {
-                X = 3,
-                Y = 4,
+                X = Pos.Left(_filterLabel),
+                Y = Pos.Bottom(_filterLabel) + 3, // 1 for space, 1 for header, 1 for header underline
                 Width = Dim.Fill(2),
-                Height = Dim.Fill(2),
+                Height = Dim.Fill(),
                 AllowsMarking = _applicationData.OutputMode != OutputModeOption.None,
                 AllowsMultipleSelection = _applicationData.OutputMode == OutputModeOption.Multiple,
             };
