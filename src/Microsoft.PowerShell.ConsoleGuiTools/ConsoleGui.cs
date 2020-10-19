@@ -320,11 +320,14 @@ namespace OutGridView.Cmdlet
 
         public void Dispose()
         {
-            // By emitting this, we fix an issue where arrow keys don't work in the console
-            // because .NET requires application mode to support Arrow key escape sequences
-            // Esc[?1h - Set cursor key to application mode
-            // See http://ascii-table.com/ansi-escape-sequences-vt-100.php
-            Console.Write("\u001b[?1h");
+            if (Console.IsInputRedirected == false)
+            {
+                // By emitting this, we fix an issue where arrow keys don't work in the console
+                // because .NET requires application mode to support Arrow key escape sequences
+                // Esc[?1h - Set cursor key to application mode
+                // See http://ascii-table.com/ansi-escape-sequences-vt-100.php
+                Console.Write("\u001b[?1h");
+            }
         }
     }
 }
