@@ -6,7 +6,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Management.Automation;
 using System.Management.Automation.Internal;
-using System.Management.Automation.Remoting;
 using OutGridView.Models;
 
 namespace OutGridView.Cmdlet
@@ -58,17 +57,6 @@ namespace OutGridView.Cmdlet
         // This method gets called once for each cmdlet in the pipeline when the pipeline starts executing
         protected override void BeginProcessing()
         {
-            if (GetVariableValue("PSSenderInfo") is PSSenderInfo)
-            {
-                ErrorRecord error = new ErrorRecord(
-                    new PSNotSupportedException("Not supported in remote sessions."),
-                    EnvironmentNotSupportedForGridView,
-                    ErrorCategory.NotImplemented,
-                    null);
-
-                ThrowTerminatingError(error);
-            }
-
             if (Console.IsInputRedirected)
             {
                 ErrorRecord error = new ErrorRecord(
@@ -163,10 +151,7 @@ namespace OutGridView.Cmdlet
 
         public void Dispose()
         {
-            if (GetVariableValue("PSSenderInfo") is null)
-            {
-                _consoleGui.Dispose();
-            }
+            _consoleGui.Dispose();
         }
     }
 }
