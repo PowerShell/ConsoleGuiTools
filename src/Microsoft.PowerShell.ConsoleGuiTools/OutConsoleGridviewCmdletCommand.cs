@@ -151,7 +151,11 @@ namespace OutGridView.Cmdlet
 
         public void Dispose()
         {
-            _consoleGui.Dispose();
+            // Only call Dispose when not in a remote session
+            if (Console.IsInputRedirected == false)
+            {
+                _consoleGui.Dispose();
+            }
         }
     }
 }
