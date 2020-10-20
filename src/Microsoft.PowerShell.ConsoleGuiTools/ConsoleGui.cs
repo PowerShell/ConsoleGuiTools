@@ -320,7 +320,7 @@ namespace OutGridView.Cmdlet
 
         public void Dispose()
         {
-            if (Console.IsInputRedirected == false)
+            if (!Console.IsInputRedirected)
             {
                 // By emitting this, we fix an issue where arrow keys don't work in the console
                 // because .NET requires application mode to support Arrow key escape sequences
