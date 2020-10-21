@@ -14,8 +14,13 @@ namespace OutGridView.Cmdlet
     internal class ConsoleGui : IDisposable
     {
         private const string FILTER_LABEL = "Filter";
+        // This adjusts the left margin of all controls
+        private const int MARGIN_LEFT = 2;
+        // Width of Terminal.Gui ListView selection/check UI elements (old == 4, new == 2)
+        private const int CHECK_WIDTH = 4;
         private bool _cancelled;
         private GridViewDataSource _itemSource;
+        private Label _filterLabel;
         private TextField _filterField;
         private ListView _listView;
         private ApplicationData _applicationData;
@@ -27,9 +32,9 @@ namespace OutGridView.Cmdlet
             _applicationData = applicationData;
             _gridViewDetails = new GridViewDetails
             {
-                // If we have an OutputMode, then we want to make them selectable. If we make them selectable,
-                // they have a 8 character addition of a checkbox ("     [ ]") that we have to factor in.
-                ListViewOffset = _applicationData.OutputMode != OutputModeOption.None ? 8 : 4
+                // If OutputMode is Single or Multiple, then we make items selectable. If we make them selectable,
+                // 2 columns are required for the check/selection indicator and space.
+                ListViewOffset = _applicationData.OutputMode != OutputModeOption.None ? MARGIN_LEFT + CHECK_WIDTH : MARGIN_LEFT
             };
 
             Window win = AddTopLevelWindow();
@@ -46,8 +51,11 @@ namespace OutGridView.Cmdlet
             LoadData();
             AddRows(win);
 
+            _filterField.Text = _applicationData.Filter ?? string.Empty;
+            _filterField.CursorPosition = _filterField.Text.Length;
             // Run the GUI.
             Application.Run();
+            Application.Shutdown();
 
             // Return results of selection if required.
             HashSet<int> selectedIndexes = new HashSet<int>();
@@ -67,11 +75,13 @@ namespace OutGridView.Cmdlet
             return selectedIndexes;
         }
 
-        private void Accept(){
+        private void Accept()
+        {
             Application.RequestStop();
         }
 
-        private void Close(){
+        private void Close()
+        {
             _cancelled = true;
             Application.RequestStop();
         }
@@ -85,7 +95,7 @@ namespace OutGridView.Cmdlet
                 Y = 0,
                 // By using Dim.Fill(), it will automatically resize without manual intervention
                 Width = Dim.Fill(),
-                Height = Dim.Fill()
+                Height = Dim.Fill(1)
             };
 
             Application.Top.Add(win);
@@ -96,22 +106,33 @@ namespace OutGridView.Cmdlet
         {
             var statusBar = new StatusBar(
                     _applicationData.OutputMode != OutputModeOption.None
-                    ? new StatusItem []
+                    ? new StatusItem[]
                     {
                         // Use Key.Unknown for SPACE with no delegate because ListView already
                         // handles SPACE
                         new StatusItem(Key.Unknown, "~SPACE~ Mark Item", null),
-                        new StatusItem(Key.Enter, "~ENTER~ Accept", () => { 
-                            if (Application.Top.MostFocused == _listView){
+                        new StatusItem(Key.Enter, "~ENTER~ Accept", () =>
+                        {
+                            if (Application.Top.MostFocused == _listView)
+                            {
+                                // If nothing was explicitly marked, we return the item that was selected
+                                // when ENTER is pressed in Single mode. If something was previously selected
+                                // (using SPACE) then honor that as the single item to return
+                                if (_applicationData.OutputMode == OutputModeOption.Single &&
+                                    _itemSource.GridViewRowList.Find(i => i.IsMarked) == null)
+                                {
+                                    _listView.MarkUnmarkRow();
+                                }
                                 Accept();
                             }
-                            else if (Application.Top.MostFocused == _filterField){
-                                Application.Top.SetFocus(_listView);
+                            else if (Application.Top.MostFocused == _filterField)
+                            {
+                                _listView.SetFocus();
                             }
                         }),
                         new StatusItem(Key.Esc, "~ESC~ Close", () => Close())
                     }
-                    : new StatusItem []
+                    : new StatusItem[]
                     {
                         new StatusItem(Key.Esc, "~ESC~ Close",  () => Close())
                     }
@@ -149,8 +170,7 @@ namespace OutGridView.Cmdlet
             }
 
             // if the total width is wider than the usable width, remove 1 from widest column until it fits
-            // the gui loses 3 chars on the left and 2 chars on the right
-            _gridViewDetails.UsableWidth = Application.Top.Frame.Width - 3 - listViewColumnWidths.Length - _gridViewDetails.ListViewOffset - 2;
+            _gridViewDetails.UsableWidth = Application.Top.Frame.Width - MARGIN_LEFT - listViewColumnWidths.Length - _gridViewDetails.ListViewOffset;
             int columnWidthsSum = listViewColumnWidths.Sum();
             while (columnWidthsSum >= _gridViewDetails.UsableWidth)
             {
@@ -172,32 +192,31 @@ namespace OutGridView.Cmdlet
 
         private void AddFilter(Window win)
         {
-            var filterLabel = new Label(FILTER_LABEL)
+            _filterLabel = new Label(FILTER_LABEL)
             {
-                X = 2
+                X = MARGIN_LEFT
             };
 
             _filterField = new TextField(string.Empty)
             {
-                X = Pos.Right(filterLabel) + 1,
-                Y = Pos.Top(filterLabel),
+                X = Pos.Right(_filterLabel) + 1,
+                Y = Pos.Top(_filterLabel),
                 CanFocus = true,
-                Width = Dim.Fill() - filterLabel.Text.Length
+                Width = Dim.Fill() - _filterLabel.Text.Length
             };
 
             var filterErrorLabel = new Label(string.Empty)
             {
-                X = Pos.Right(filterLabel) + 1,
-                Y = Pos.Top(filterLabel) + 1,
+                X = Pos.Right(_filterLabel) + 1,
+                Y = Pos.Top(_filterLabel) + 1,
                 ColorScheme = Colors.Base,
-                Width = Dim.Fill() - filterLabel.Text.Length
+                Width = Dim.Fill() - _filterLabel.Text.Length
             };
 
-            _filterField.Changed += (object sender, ustring e) =>
+            _filterField.TextChanged += (str) =>
             {
-                // NOTE: `ustring e` seems to contain the text _before_ the added character...
-                // so we convert the `sender` into a TextField and grab the text from that.
-                string filterText = (sender as TextField)?.Text?.ToString();
+                // str is the OLD value
+                string filterText = _filterField.Text?.ToString();
                 try
                 {
                     filterErrorLabel.Text = " ";
@@ -216,14 +235,14 @@ namespace OutGridView.Cmdlet
                 }
             };
 
-            win.Add(filterLabel, _filterField, filterErrorLabel);
+            win.Add(_filterLabel, _filterField, filterErrorLabel);
         }
 
         private void AddHeaders(Window win, List<string> gridHeaders)
         {
             var header = new Label(GridViewHelpers.GetPaddedString(
                 gridHeaders,
-                _gridViewDetails.ListViewOffset + _gridViewDetails.ListViewOffset - 1,
+                _gridViewDetails.ListViewOffset,
                 _gridViewDetails.ListViewColumnWidths))
             {
                 X = 0,
@@ -270,7 +289,7 @@ namespace OutGridView.Cmdlet
                     valueList.Add(dataValue);
                 }
 
-                string displayString = GridViewHelpers.GetPaddedString(valueList, _gridViewDetails.ListViewOffset, _gridViewDetails.ListViewColumnWidths);
+                string displayString = GridViewHelpers.GetPaddedString(valueList, 0, _gridViewDetails.ListViewColumnWidths);
 
                 items.Add(new GridViewRow
                 {
@@ -288,11 +307,12 @@ namespace OutGridView.Cmdlet
         {
             _listView = new ListView(_itemSource)
             {
-                X = 3,
-                Y = 4,
+                X = Pos.Left(_filterLabel),
+                Y = Pos.Bottom(_filterLabel) + 3, // 1 for space, 1 for header, 1 for header underline
                 Width = Dim.Fill(2),
-                Height = Dim.Fill(2),
+                Height = Dim.Fill(),
                 AllowsMarking = _applicationData.OutputMode != OutputModeOption.None,
+                AllowsMultipleSelection = _applicationData.OutputMode == OutputModeOption.Multiple,
             };
 
             win.Add(_listView);
@@ -300,11 +320,14 @@ namespace OutGridView.Cmdlet
 
         public void Dispose()
         {
-            // By emitting this, we fix an issue where arrow keys don't work in the console
-            // because .NET requires application mode to support Arrow key escape sequences
-            // Esc[?1h - Set cursor key to application mode
-            // See http://ascii-table.com/ansi-escape-sequences-vt-100.php
-            Console.Write("\u001b[?1h");
+            if (!Console.IsInputRedirected)
+            {
+                // By emitting this, we fix an issue where arrow keys don't work in the console
+                // because .NET requires application mode to support Arrow key escape sequences
+                // Esc[?1h - Set cursor key to application mode
+                // See http://ascii-table.com/ansi-escape-sequences-vt-100.php
+                Console.Write("\u001b[?1h");
+            }
         }
     }
 }

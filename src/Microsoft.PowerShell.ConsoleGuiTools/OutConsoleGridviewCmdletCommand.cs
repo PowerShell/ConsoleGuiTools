@@ -7,12 +7,9 @@ using System.Collections.Generic;
 using System.Management.Automation;
 using System.Management.Automation.Internal;
 using OutGridView.Models;
-using System.Runtime.InteropServices;
 
 namespace OutGridView.Cmdlet
 {
-    /// Enum for SelectionMode parameter.
-    /// </summary>
     [Cmdlet(VerbsData.Out, "ConsoleGridView")]
     [Alias("ocgv")]
     public class OutConsoleGridViewCmdletCommand : PSCmdlet, IDisposable
@@ -49,6 +46,12 @@ namespace OutGridView.Cmdlet
         [Parameter()]
         public OutputModeOption OutputMode { set; get; } = OutputModeOption.Multiple;
 
+        /// <summary>
+        /// gets or sets the initial value for the filter in the GUI
+        /// </summary>
+        [Parameter()]
+        public string Filter { set; get; }
+
         #endregion Input Parameters
 
         // This method gets called once for each cmdlet in the pipeline when the pipeline starts executing
@@ -62,7 +65,7 @@ namespace OutGridView.Cmdlet
                     ErrorCategory.NotImplemented,
                     null);
 
-                this.ThrowTerminatingError(error);
+                ThrowTerminatingError(error);
             }
         }
 
@@ -74,8 +77,7 @@ namespace OutGridView.Cmdlet
                 return;
             }
 
-            IDictionary dictionary = InputObject.BaseObject as IDictionary;
-            if (dictionary != null)
+            if (InputObject.BaseObject is IDictionary dictionary)
             {
                 // Dictionaries should be enumerated through because the pipeline does not enumerate through them.
                 foreach (DictionaryEntry entry in dictionary)
@@ -106,7 +108,7 @@ namespace OutGridView.Cmdlet
                     ErrorCategory.InvalidType,
                     null);
 
-                this.ThrowTerminatingError(error);
+                ThrowTerminatingError(error);
             }
 
             _psObjects.Add(input);
@@ -130,12 +132,12 @@ namespace OutGridView.Cmdlet
             {
                 Title = Title ?? "Out-ConsoleGridView",
                 OutputMode = OutputMode,
+                Filter = Filter,
                 DataTable = dataTable
             };
 
 
             var selectedIndexes = _consoleGui.Start(applicationData);
-
             foreach (int idx in selectedIndexes)
             {
                 var selectedObject = _psObjects[idx];
@@ -143,7 +145,7 @@ namespace OutGridView.Cmdlet
                 {
                     continue;
                 }
-                this.WriteObject(selectedObject, false);
+                WriteObject(selectedObject, false);
             }
         }
 

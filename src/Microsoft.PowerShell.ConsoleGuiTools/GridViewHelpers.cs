@@ -58,7 +58,7 @@ namespace OutGridView.Cmdlet
                 // If the string won't fit in the column, append an ellipsis.
                 if (strings[i].Length > listViewColumnWidths[i])
                 {
-                    builder.Append(strings[i].Substring(0, listViewColumnWidths[i] - 4));
+                    builder.Append(strings[i], 0, listViewColumnWidths[i] - 3);
                     builder.Append("...");
                 }
                 else
