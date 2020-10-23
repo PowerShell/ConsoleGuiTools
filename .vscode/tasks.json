@@ -1,33 +1,22 @@
 {
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "build",
-            "osx": {
-                "command": "/usr/local/bin/pwsh"
-            },
-            "windows": {
-                "command": "pwsh.exe"
-            },
-            "linux": {
-                "command": "/usr/local/bin/pwsh"
-            },
-            "type": "process",
+            "label": "build ConsoleGuiTools",
+            "command": "Invoke-Build",
+            "type": "shell",
             "args": [
-                "-c",
-                "Invoke-Build",
-                // Build both modules
-                //"Build -ModuleName Microsoft.PowerShell.GraphicalTools, Microsoft.PowerShell.ConsoleGuiTools", 
-                // Build only Out-GridView
-                //"Build -ModuleName Microsoft.PowerShell.GraphicalTools", 
-                // Build only Out-ConsoleGridView
-                "Build -ModuleName Microsoft.PowerShell.ConsoleGuiTools", 
+                "Build",
+                "-Module",
+                "Microsoft.PowerShell.ConsoleGuiTools"
             ],
-            "problemMatcher": "$msCompile",
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            }
+            "group": "build",
+            "presentation": {
+                "reveal": "silent"
+            },
+            "problemMatcher": "$msCompile"
         }
     ]
 }

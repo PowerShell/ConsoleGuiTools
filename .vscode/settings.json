@@ -1,5 +1,8 @@
 {
     "files.associations": {
         "**/.vsts-ci/**/*.yml":"azure-pipelines"
-    }
+    },
+    "terminal.integrated.shell.osx": "pwsh",
+    "terminal.integrated.shell.linux": "pwsh",
+    "terminal.integrated.shell.windows": "pwsh"
 }
