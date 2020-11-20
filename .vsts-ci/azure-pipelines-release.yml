@@ -57,6 +57,8 @@ stages:
     pool:
       name: 'Package ES CodeHub Lab E'
       demands: DotNetFramework
+    variables:
+    - group: ESRP
     steps:
     - powershell: |
         Get-ChildItem -Path env:
