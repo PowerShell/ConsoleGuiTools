@@ -41,7 +41,7 @@ resources:
     endpoint: ComplianceGHRepo
     name: PowerShell/compliance
 
-
+stages:
 - stage: Build
   displayName: Build
   jobs:
