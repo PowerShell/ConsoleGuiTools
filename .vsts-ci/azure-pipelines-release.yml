@@ -75,15 +75,6 @@ stages:
         inlineScript: |
           Expand-Archive -Path "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\GraphicalTools\Microsoft.PowerShell.ConsoleGuiTools-Windows_NT.zip" -DestinationPath "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\Microsoft.PowerShell.ConsoleGuiTools"
 
-    - task: PkgESCodeSign@10
-      displayName: 'CodeSign tools/releaseBuild/signing.xml'
-      env:
-        SYSTEM_ACCESSTOKEN: $(System.AccessToken)
-      inputs:
-        signConfigXml: tools/releaseBuild/signing.xml
-        inPathRoot: '$(Build.ArtifactStagingDirectory)'
-        outPathRoot: '$(Build.ArtifactStagingDirectory)\Signed'
-    
     - template: EsrpSign.yml@ComplianceRepo
       parameters:
         # the folder which contains the binaries to sign
