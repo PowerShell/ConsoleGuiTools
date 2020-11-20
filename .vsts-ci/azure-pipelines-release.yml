@@ -1,3 +1,6 @@
+# NOTE:
+# We stop signing GraphicalTools now since we aren't doing anymore work on it until MAUI
+
 name: PR-$(System.PullRequest.PullRequestNumber)-$(Date:yyyyMMdd)$(Rev:.rr)
 
 variables:
@@ -31,155 +34,136 @@ trigger:
       - /LICENSE.txt
       - /CODE_OF_CONDUCT.md
 
-jobs:
-- job: 'ReleaseBuild'
-  displayName: Release Build
-  pool:
-    vmImage: 'vs2017-win2016'
-  steps:
-  - template: templates/ci-general.yml
+resources:
+  repositories:
+  - repository: ComplianceRepo
+    type: github
+    endpoint: ComplianceGHRepo
+    name: PowerShell/compliance
 
-- job: 'SignBuild'
-  displayName: Signing Build
-  dependsOn: 'ReleaseBuild'
-  pool:
-    name: 'Package ES CodeHub Lab E'
-    demands: DotNetFramework
-  steps:
-  - powershell: |
-      Get-ChildItem -Path env:
-    displayName: Capture environment
-    condition: succeededOrFailed()
 
-  - task: PkgESSetupBuild@10
-    displayName: 'Package ES - Setup Build'
-    inputs:
-      productName: GraphicalTools
+- stage: Build
+  displayName: Build
+  jobs:
+  - job: 'ReleaseBuild'
+    displayName: Release Build
+    pool:
+      vmImage: 'vs2017-win2016'
+    steps:
+    - template: templates/ci-general.yml
+  - job: 'SignBuild'
+    displayName: Signing Build
+    dependsOn: 'ReleaseBuild'
+    pool:
+      name: 'Package ES CodeHub Lab E'
+      demands: DotNetFramework
+    steps:
+    - powershell: |
+        Get-ChildItem -Path env:
+      displayName: Capture environment
+      condition: succeededOrFailed()
 
-  - task: DownloadBuildArtifacts@0
-    displayName: 'Download Build Artifacts'
-    inputs:
-      downloadType: specific
+    - task: DownloadBuildArtifacts@0
+      displayName: 'Download Build Artifacts'
+      inputs:
+        downloadType: specific
 
-  - task: PowerShell@1
-    displayName: 'Extract build zip'
-    inputs:
-      scriptType: inlineScript
-      inlineScript: |
-        Expand-Archive -Path "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\GraphicalTools\Microsoft.PowerShell.GraphicalTools-Windows_NT.zip" -DestinationPath "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\Microsoft.PowerShell.GraphicalTools"
-        Expand-Archive -Path "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\GraphicalTools\Microsoft.PowerShell.ConsoleGuiTools-Windows_NT.zip" -DestinationPath "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\Microsoft.PowerShell.ConsoleGuiTools"
+    - task: PowerShell@1
+      displayName: 'Extract build zip'
+      inputs:
+        scriptType: inlineScript
+        inlineScript: |
+          Expand-Archive -Path "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\GraphicalTools\Microsoft.PowerShell.ConsoleGuiTools-Windows_NT.zip" -DestinationPath "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\Microsoft.PowerShell.ConsoleGuiTools"
 
-  - task: PkgESCodeSign@10
-    displayName: 'CodeSign tools/releaseBuild/signing.xml'
-    env:
-      SYSTEM_ACCESSTOKEN: $(System.AccessToken)
-    inputs:
-      signConfigXml: tools/releaseBuild/signing.xml
-      inPathRoot: '$(Build.ArtifactStagingDirectory)'
-      outPathRoot: '$(Build.ArtifactStagingDirectory)\Signed'
+    - task: PkgESCodeSign@10
+      displayName: 'CodeSign tools/releaseBuild/signing.xml'
+      env:
+        SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+      inputs:
+        signConfigXml: tools/releaseBuild/signing.xml
+        inPathRoot: '$(Build.ArtifactStagingDirectory)'
+        outPathRoot: '$(Build.ArtifactStagingDirectory)\Signed'
+    
+    - template: EsrpSign.yml@ComplianceRepo
+      parameters:
+        # the folder which contains the binaries to sign
+        buildOutputPath: $(Build.ArtifactStagingDirectory)
+        # the location to put the signed output
+        signOutputPath: $(Build.ArtifactStagingDirectory)\Signed
+        # the certificate ID to use
+        certificateId: "CP-230012"
+        # The file pattern to use
+        # If not using minimatch: comma separated, with * supported
+        # If using minimatch: newline separated, with !, **, and * supported.
+        # See link in the useMinimatch comments.
+        pattern: 'Microsoft.PowerShell.*.dll,Microsoft.PowerShell.*.psd1,Microsoft.PowerShell.*.psm1'
+        # decides if the task should use minimatch for the pattern matching.
+        # https://github.com/isaacs/minimatch#features
+        useMinimatch: false
 
-  - task: PowerShell@1
-    displayName: 'Copy signed files to unsigned folder'
-    inputs:
-      scriptType: inlineScript
-      inlineScript: |
-        $signed="$env:BUILD_ARTIFACTSTAGINGDIRECTORY\Signed\*"
-        $notSigned="$env:BUILD_ARTIFACTSTAGINGDIRECTORY"
-        Copy-Item $signed $notSigned -Recurse -Force
+    - template: EsrpSign.yml@ComplianceRepo
+      parameters:
+        # the folder which contains the binaries to sign
+        buildOutputPath: $(Build.ArtifactStagingDirectory)
+        # the location to put the signed output
+        signOutputPath: $(Build.ArtifactStagingDirectory)\Signed
+        # the certificate ID to use
+        certificateId: "CP-231522"
+        # The file pattern to use
+        # If not using minimatch: comma separated, with * supported
+        # If using minimatch: newline separated, with !, **, and * supported.
+        # See link in the useMinimatch comments.
+        pattern: 'NStack.dll,Terminal.Gui.dll'
+        # decides if the task should use minimatch for the pattern matching.
+        # https://github.com/isaacs/minimatch#features
+        useMinimatch: false
 
-  - task: PowerShell@1
-    displayName: 'Create catalog file'
-    inputs:
-      scriptType: inlineScript
-      inlineScript: |
-        $signedDir = "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\Microsoft.PowerShell.GraphicalTools\Microsoft.PowerShell.GraphicalTools"
-        New-FileCatalog -CatalogFilePath "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\Microsoft.PowerShell.GraphicalTools\Microsoft.PowerShell.GraphicalTools.cat" -Path "$signedDir"
-        $signedDir = "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\Microsoft.PowerShell.ConsoleGuiTools\Microsoft.PowerShell.ConsoleGuiTools"
-        New-FileCatalog -CatalogFilePath "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\Microsoft.PowerShell.ConsoleGuiTools\Microsoft.PowerShell.ConsoleGuiTools.cat" -Path "$signedDir"
+    - task: PowerShell@1
+      displayName: 'Copy signed files to unsigned folder'
+      inputs:
+        scriptType: inlineScript
+        inlineScript: |
+          $signed="$env:BUILD_ARTIFACTSTAGINGDIRECTORY\Signed\*"
+          $notSigned="$env:BUILD_ARTIFACTSTAGINGDIRECTORY"
+          Copy-Item $signed $notSigned -Recurse -Force
 
-  - task: PkgESCodeSign@10
-    displayName: 'CodeSign tools/releaseBuild/FileCatalogSigning.xml'
-    env:
-      SYSTEM_ACCESSTOKEN: $(System.AccessToken)
-    inputs:
-      signConfigXml: tools/releaseBuild/FileCatalogSigning.xml
-      inPathRoot: '$(Build.ArtifactStagingDirectory)'
-      outPathRoot: '$(Build.ArtifactStagingDirectory)'
+    - task: PowerShell@1
+      displayName: 'Upload Artifacts'
+      condition: succeededOrFailed()
+      inputs:
+        scriptType: inlineScript
+        inlineScript: 'Write-Host "##vso[artifact.upload containerfolder=Microsoft.PowerShell.ConsoleGuiTools-Signed;artifactname=Microsoft.PowerShell.ConsoleGuiTools-Signed]$(Build.ArtifactStagingDirectory)\Microsoft.PowerShell.ConsoleGuiTools\Microsoft.PowerShell.ConsoleGuiTools"'
 
-  - task: ms.vss-governance-buildtask.governance-build-task-component-detection.ComponentGovernanceComponentDetection@0
-    displayName: 'Component Detection'
+- stage: compliance
+  displayName: Compliance
+  dependsOn: Build
+  jobs:
+  - job: Compliance_Job
+    pool:
+      name: Package ES Standard Build
+    steps:
+    - checkout: self
+    - checkout: ComplianceRepo
+    - download: current
+      artifact: Microsoft.PowerShell.ConsoleGuiTools-Signed
 
-  - task: AntiMalware@3
-    inputs:
-      InputType: 'Basic'
-      ScanType: 'CustomScan'
-      FileDirPath: '$(Build.ArtifactStagingDirectory)'
-      EnableServices: false
-      SupportLogOnError: false
-      TreatSignatureUpdateFailureAs: 'Warning'
-      SignatureFreshness: 'UpToDate'
-      TreatStaleSignatureAs: 'Error'
+    - pwsh: |
+        Get-ChildItem -Path "$(Pipeline.Workspace)\Microsoft.PowerShell.ConsoleGuiTools-Signed" -Recurse
+      displayName: Capture downloaded artifacts
 
-  - task: PoliCheck@1
-    condition: succeededOrFailed()
-    inputs:
-      targetType: F
-      optionsFC: 0
-      optionsXS: 0
-      optionsPE: '1|2|3|4'
-      optionsHMENABLE: 0
-      optionsFTPATH: '$(Build.SourcesDirectory)\tools\terms\FileTypeSet.xml'
-      # toolVersion: 5.8.2.1
-
-  - task: CredScan@2
-    condition: succeededOrFailed()
-
-  - task: BinSkim@3
-    condition: succeededOrFailed()
-    inputs:
-      InputType: 'Basic'
-      Function: 'analyze'
-      AnalyzeRecurse: true
-      AnalyzeTarget: '$(Build.ArtifactStagingDirectory)\Microsoft.PowerShell.*Tools.dll;$(Build.ArtifactStagingDirectory)\OutGridView*.dll'
-
-  # Publish results as artifacts
-  - task: PublishSecurityAnalysisLogs@3
-    condition: succeededOrFailed()
-    inputs:
-      ArtifactName: 'CodeAnalysisLogs'
-      ArtifactType: 'Container'
-
-  # Publish to TSA server
-  - task: TSAUpload@1
-    condition: succeededOrFailed()
-    continueOnError: true
-    inputs:
-      tsaVersion: 'TsaV2'
-      codebase: 'Existing'
-      tsaEnvironment: 'PROD'
-      codeBaseName: 'PowerShell_GraphicalTools_20190809'
-      uploadAPIScan: false
-      uploadBinSkim: true
-      uploadCredScan: true
-      uploadFortifySCA: false
-      uploadFxCop: false
-      uploadModernCop: false
-      uploadPoliCheck: true
-      uploadPREfast: false
-      uploadRoslyn: false
-      uploadTSLint: false
-      uploadAsync: true
-
-  - task: PowerShell@1
-    displayName: 'Upload Artifacts'
-    condition: succeededOrFailed()
-    inputs:
-      scriptType: inlineScript
-      inlineScript: 'Write-Host "##vso[artifact.upload containerfolder=Microsoft.PowerShell.GraphicalTools-Signed;artifactname=Microsoft.PowerShell.GraphicalTools-Signed]$(Build.ArtifactStagingDirectory)\Microsoft.PowerShell.GraphicalTools\Microsoft.PowerShell.GraphicalTools"'
-
-  - task: PowerShell@1
-    displayName: 'Upload Artifacts'
-    condition: succeededOrFailed()
-    inputs:
-      scriptType: inlineScript
-      inlineScript: 'Write-Host "##vso[artifact.upload containerfolder=Microsoft.PowerShell.ConsoleGuiTools-Signed;artifactname=Microsoft.PowerShell.ConsoleGuiTools-Signed]$(Build.ArtifactStagingDirectory)\Microsoft.PowerShell.ConsoleGuiTools\Microsoft.PowerShell.ConsoleGuiTools"'
+    - template: assembly-module-compliance.yml@ComplianceRepo
+      parameters:
+        # binskim
+        AnalyzeTarget: '$(Pipeline.Workspace)\*.dll'
+        AnalyzeSymPath: 'SRV*'
+        # component-governance
+        sourceScanPath: '$(Build.SourcesDirectory)'
+        # credscan
+        suppressionsFile: ''
+        # TermCheck
+        optionsRulesDBPath: ''
+        optionsFTPath: ''
+        # tsa-upload
+        codeBaseName: 'PowerShell_GraphicalTools_20190809'
+        # selections
+        APIScan: false # set to false when not using Windows APIs.
