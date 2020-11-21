@@ -77,13 +77,6 @@ stages:
         inlineScript: |
           Expand-Archive -Path "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\GraphicalTools\Microsoft.PowerShell.ConsoleGuiTools-Windows_NT.zip" -DestinationPath "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\Microsoft.PowerShell.ConsoleGuiTools"
 
-    - task: PowerShell@1
-      displayName: 'Copy PowerShell'
-      inputs:
-        scriptType: inlineScript
-        inlineScript: |
-          Expand-Archive -Path "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\GraphicalTools\Microsoft.PowerShell.ConsoleGuiTools-Windows_NT.zip" -DestinationPath "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\Microsoft.PowerShell.ConsoleGuiTools"
-
     - template: EsrpSign.yml@ComplianceRepo
       parameters:
         # the folder which contains the binaries to sign
