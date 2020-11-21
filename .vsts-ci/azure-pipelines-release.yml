@@ -82,7 +82,7 @@ stages:
         # the folder which contains the binaries to sign
         buildOutputPath: $(Build.ArtifactStagingDirectory)\Microsoft.PowerShell.ConsoleGuiTools
         # the location to put the signed output
-        signOutputPath: $(Build.ArtifactStagingDirectory)\Signed
+        signOutputPath: $(Build.ArtifactStagingDirectory)\Microsoft.PowerShell.ConsoleGuiTools-Signed
         # the certificate ID to use
         certificateId: "CP-230012"
         # The file pattern to use
