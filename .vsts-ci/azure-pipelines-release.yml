@@ -115,13 +115,13 @@ stages:
         useMinimatch: false
 
     - pwsh: |
-        $signed="$env:BUILD_ARTIFACTSTAGINGDIRECTORY\Microsoft.PowerShell.ConsoleGuiTools-Signed\*"
-        $notSigned="$env:BUILD_ARTIFACTSTAGINGDIRECTORY\Microsoft.PowerShell.ConsoleGuiTools"
+        $signed="$(Build.ArtifactStagingDirectory)\Microsoft.PowerShell.ConsoleGuiTools-Signed\*"
+        $notSigned="$(Build.ArtifactStagingDirectory)\Microsoft.PowerShell.ConsoleGuiTools"
         Copy-Item $signed $notSigned -Recurse -Force
       displayName: 'Copy signed files to unsigned folder'
 
     - pwsh: |
-        'Write-Host "##vso[artifact.upload containerfolder=Microsoft.PowerShell.ConsoleGuiTools-Signed;artifactname=Microsoft.PowerShell.ConsoleGuiTools-Signed]$env:BUILD_ARTIFACTSTAGINGDIRECTORY\Microsoft.PowerShell.ConsoleGuiTools"'
+        'Write-Host "##vso[artifact.upload containerfolder=Microsoft.PowerShell.ConsoleGuiTools-Signed;artifactname=Microsoft.PowerShell.ConsoleGuiTools-Signed]$(Build.ArtifactStagingDirectory)\Microsoft.PowerShell.ConsoleGuiTools\"'
       displayName: 'Upload Artifacts'
       condition: succeededOrFailed()
 
