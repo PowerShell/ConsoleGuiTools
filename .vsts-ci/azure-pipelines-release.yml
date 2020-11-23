@@ -121,7 +121,7 @@ stages:
       displayName: 'Copy signed files to unsigned folder'
 
     - pwsh: |
-        'Write-Host "##vso[artifact.upload containerfolder=Microsoft.PowerShell.ConsoleGuiTools-Signed;artifactname=Microsoft.PowerShell.ConsoleGuiTools-Signed]$(Build.ArtifactStagingDirectory)\Microsoft.PowerShell.ConsoleGuiTools\Microsoft.PowerShell.ConsoleGuiTools"'
+        'Write-Host "##vso[artifact.upload containerfolder=Microsoft.PowerShell.ConsoleGuiTools-Signed;artifactname=Microsoft.PowerShell.ConsoleGuiTools-Signed]$env:BUILD_ARTIFACTSTAGINGDIRECTORY\Microsoft.PowerShell.ConsoleGuiTools"'
       displayName: 'Upload Artifacts'
       condition: succeededOrFailed()
 
