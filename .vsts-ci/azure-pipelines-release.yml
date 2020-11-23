@@ -166,6 +166,6 @@ stages:
         optionsRulesDBPath: ''
         optionsFTPath: ''
         # tsa-upload
-        codeBaseName: 'PowerShell_GraphicalTools_20190809'
+        codeBaseName: 'PSGraphicalTools_20201123'
         # selections
         APIScan: false # set to false when not using Windows APIs.
