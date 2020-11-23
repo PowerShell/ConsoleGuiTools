@@ -94,7 +94,7 @@ stages:
     - pwsh: |
         $signed="$env:BUILD_ARTIFACTSTAGINGDIRECTORY\Microsoft.PowerShell.ConsoleGuiTools-Signed\*"
         $notSigned="$env:BUILD_ARTIFACTSTAGINGDIRECTORY\Microsoft.PowerShell.ConsoleGuiTools"
-        Copy-Item $signed $notSigned -Recurse -Force
+        Copy-Item $signed $notSigned -Recurse -Force -Verbose
       displayName: 'Copy signed files to unsigned folder'
 
     - template: EsrpSign.yml@ComplianceRepo
@@ -117,7 +117,7 @@ stages:
     - pwsh: |
         $signed="$(Build.ArtifactStagingDirectory)\Microsoft.PowerShell.ConsoleGuiTools-Signed\*"
         $notSigned="$(Build.ArtifactStagingDirectory)\Microsoft.PowerShell.ConsoleGuiTools"
-        Copy-Item $signed $notSigned -Recurse -Force
+        Copy-Item $signed $notSigned -Recurse -Force -Verbose
       displayName: 'Copy signed files to unsigned folder'
 
     - pwsh: |
