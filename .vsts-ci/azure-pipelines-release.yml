@@ -70,12 +70,9 @@ stages:
       inputs:
         downloadType: specific
 
-    - task: PowerShell@2
+    - pwsh: |
+        Expand-Archive -Path "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\GraphicalTools\Microsoft.PowerShell.ConsoleGuiTools-Windows_NT.zip" -DestinationPath "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\Microsoft.PowerShell.ConsoleGuiTools"
       displayName: 'Extract build zip'
-      inputs:
-        targetType: inline
-        script: |
-          Expand-Archive -Path "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\GraphicalTools\Microsoft.PowerShell.ConsoleGuiTools-Windows_NT.zip" -DestinationPath "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\Microsoft.PowerShell.ConsoleGuiTools"
 
     - template: EsrpSign.yml@ComplianceRepo
       parameters:
@@ -94,14 +91,11 @@ stages:
         # https://github.com/isaacs/minimatch#features
         useMinimatch: false
 
-    - task: PowerShell@2
+    - pwsh: |
+        $signed="$env:BUILD_ARTIFACTSTAGINGDIRECTORY\Microsoft.PowerShell.ConsoleGuiTools-Signed\*"
+        $notSigned="$env:BUILD_ARTIFACTSTAGINGDIRECTORY\Microsoft.PowerShell.ConsoleGuiTools"
+        Copy-Item $signed $notSigned -Recurse -Force
       displayName: 'Copy signed files to unsigned folder'
-      inputs:
-        targetType: inline
-        script: |
-          $signed="$env:BUILD_ARTIFACTSTAGINGDIRECTORY\Microsoft.PowerShell.ConsoleGuiTools-Signed\*"
-          $notSigned="$env:BUILD_ARTIFACTSTAGINGDIRECTORY\Microsoft.PowerShell.ConsoleGuiTools"
-          Copy-Item $signed $notSigned -Recurse -Force
 
     - template: EsrpSign.yml@ComplianceRepo
       parameters:
@@ -120,21 +114,16 @@ stages:
         # https://github.com/isaacs/minimatch#features
         useMinimatch: false
 
-    - task: PowerShell@2
+    - pwsh: |
+        $signed="$env:BUILD_ARTIFACTSTAGINGDIRECTORY\Microsoft.PowerShell.ConsoleGuiTools-Signed\*"
+        $notSigned="$env:BUILD_ARTIFACTSTAGINGDIRECTORY\Microsoft.PowerShell.ConsoleGuiTools"
+        Copy-Item $signed $notSigned -Recurse -Force
       displayName: 'Copy signed files to unsigned folder'
-      inputs:
-        targetType: inline
-        script: |
-          $signed="$env:BUILD_ARTIFACTSTAGINGDIRECTORY\Microsoft.PowerShell.ConsoleGuiTools-Signed\*"
-          $notSigned="$env:BUILD_ARTIFACTSTAGINGDIRECTORY\Microsoft.PowerShell.ConsoleGuiTools"
-          Copy-Item $signed $notSigned -Recurse -Force
 
-    - task: PowerShell@2
+    - pwsh: |
+        'Write-Host "##vso[artifact.upload containerfolder=Microsoft.PowerShell.ConsoleGuiTools-Signed;artifactname=Microsoft.PowerShell.ConsoleGuiTools-Signed]$(Build.ArtifactStagingDirectory)\Microsoft.PowerShell.ConsoleGuiTools\Microsoft.PowerShell.ConsoleGuiTools"'
       displayName: 'Upload Artifacts'
       condition: succeededOrFailed()
-      inputs:
-        targetType: inline
-        script: 'Write-Host "##vso[artifact.upload containerfolder=Microsoft.PowerShell.ConsoleGuiTools-Signed;artifactname=Microsoft.PowerShell.ConsoleGuiTools-Signed]$(Build.ArtifactStagingDirectory)\Microsoft.PowerShell.ConsoleGuiTools\Microsoft.PowerShell.ConsoleGuiTools"'
 
 - stage: compliance
   displayName: Compliance
