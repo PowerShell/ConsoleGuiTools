@@ -48,14 +48,14 @@ stages:
   - job: 'ReleaseBuild'
     displayName: Release Build
     pool:
-      vmImage: 'vs2017-win2016'
+      vmImage: 'windows-latest'
     steps:
     - template: templates/ci-general.yml
   - job: 'SignBuild'
     displayName: Signing Build
     dependsOn: 'ReleaseBuild'
     pool:
-      name: 'Package ES CodeHub Lab E'
+      name: 'Package ES Standard Build'
       demands: DotNetFramework
     variables:
     - group: ESRP
@@ -131,7 +131,7 @@ stages:
   jobs:
   - job: Compliance_Job
     pool:
-      name: Package ES CodeHub Lab E
+      name: Package ES Standard Build
     steps:
     - checkout: self
     - checkout: ComplianceRepo
