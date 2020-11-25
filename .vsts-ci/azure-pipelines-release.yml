@@ -51,6 +51,13 @@ stages:
       vmImage: 'windows-latest'
     steps:
     - template: templates/ci-general.yml
+    - pwsh: |
+        Get-ChildItem -Recurse '$(Build.SourcesDirectory)'
+      displayName: Capture downloaded artifacts
+    - publish: '$(Build.SourcesDirectory)\src\Microsoft.PowerShell.ConsoleGuiTools\obj\project.assets.json'
+      artifact: ConsoleGuiToolsAssetsJson
+      displayName: Publish ConsoleGuiTools project.assets.json
+
   - job: 'SignBuild'
     displayName: Signing Build
     dependsOn: 'ReleaseBuild'
@@ -124,14 +131,6 @@ stages:
       artifact: Microsoft.PowerShell.ConsoleGuiTools-Signed
       displayName: 'Upload Artifacts'
       condition: succeededOrFailed()
-
-    - pwsh: |
-        Get-ChildItem -Recurse '$(Build.SourcesDirectory)'
-      displayName: Capture downloaded artifacts
-
-    - publish: '$(Build.SourcesDirectory)\GraphicalTools\src\Microsoft.PowerShell.ConsoleGuiTools\obj\project.assets.json'
-      artifact: ConsoleGuiToolsAssetsJson
-      displayName: Publish ConsoleGuiTools project.assets.json
 
 - stage: compliance
   displayName: Compliance
