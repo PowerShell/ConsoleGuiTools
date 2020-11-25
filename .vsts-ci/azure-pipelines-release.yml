@@ -125,7 +125,7 @@ stages:
       displayName: 'Upload Artifacts'
       condition: succeededOrFailed()
 
-    - publish: '$(Build.SourcesDirectory)\src\Microsoft.PowerShell.ConsoleGuiTools\obj\project.assets.json'
+    - publish: '$(Build.SourcesDirectory)\GraphicalTools\src\Microsoft.PowerShell.ConsoleGuiTools\obj\project.assets.json'
       artifact: ConsoleGuiToolsAssetsJson
       displayName: Publish ConsoleGuiTools project.assets.json
 
