@@ -125,6 +125,10 @@ stages:
       displayName: 'Upload Artifacts'
       condition: succeededOrFailed()
 
+    - publish: '$(Build.SourcesDirectory)\src\Microsoft.PowerShell.ConsoleGuiTools\obj\project.assets.json'
+      artifact: ConsoleGuiToolsAssetsJson
+      displayName: Publish ConsoleGuiTools project.assets.json
+
 - stage: compliance
   displayName: Compliance
   dependsOn: Build
@@ -137,18 +141,20 @@ stages:
     - checkout: ComplianceRepo
     - download: current
       artifact: Microsoft.PowerShell.ConsoleGuiTools-Signed
+    - download: current
+      artifact: ConsoleGuiToolsAssetsJson
 
     - pwsh: |
-        Get-ChildItem -Path "$(Pipeline.Workspace)\Microsoft.PowerShell.ConsoleGuiTools-Signed" -Recurse
+        Get-ChildItem -Recurse '$(Pipeline.Workspace)'
       displayName: Capture downloaded artifacts
 
     - template: assembly-module-compliance.yml@ComplianceRepo
       parameters:
         # binskim
-        AnalyzeTarget: '$(Pipeline.Workspace)\*.dll'
+        AnalyzeTarget: '$(Pipeline.Workspace)\Microsoft.PowerShell.ConsoleGuiTools-Signed\*.dll'
         AnalyzeSymPath: 'SRV*'
         # component-governance
-        sourceScanPath: '$(Build.SourcesDirectory)'
+        sourceScanPath: '$(Pipeline.Workspace)\ConsoleGuiToolsAssetsJson'
         # credscan
         suppressionsFile: ''
         # TermCheck
