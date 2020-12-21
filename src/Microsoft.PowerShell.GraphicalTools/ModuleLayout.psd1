@@ -7,9 +7,9 @@
             "publish/Microsoft.PowerShell.GraphicalTools.psm1"
         )
 
-        'OutGridView.Models' = @(
-            'publish/OutGridView.Models.dll',
-            'publish/OutGridView.Models.pdb'
+        'Microsoft.PowerShell.OutGridView.Models' = @(
+            'publish/Microsoft.PowerShell.OutGridView.Models.dll',
+            'publish/Microsoft.PowerShell.OutGridView.Models.pdb'
         )
     }
 

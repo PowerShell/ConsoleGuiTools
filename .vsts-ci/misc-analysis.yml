@@ -12,8 +12,19 @@ pr:
     - master
 
 resources:
-- repo: self
-  clean: true
+  repositories:
+  - repository: ComplianceRepo
+    type: github
+    endpoint: ComplianceGHRepo
+    name: PowerShell/compliance
 
 jobs:
-- template: templates/credscan.yml
+- job: Compliance_Job
+  pool:
+    vmImage: windows-latest
+  steps:
+  - checkout: self
+    clean: true
+  - checkout: ComplianceRepo
+    clean: true
+  - template: ci-compliance.yml@ComplianceRepo
