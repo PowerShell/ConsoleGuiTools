@@ -327,6 +327,10 @@ namespace OutGridView.Cmdlet
                 // Esc[?1h - Set cursor key to application mode
                 // See http://ascii-table.com/ansi-escape-sequences-vt-100.php
                 Console.Write("\u001b[?1h");
+
+                // Similar to the fix above this, this turns of Mouse Tracking as described here:
+                // https://www.xfree86.org/current/ctlseqs.html#Mouse%20Tracking
+                Console.Write("\u001b[?1003l");
             }
         }
     }
