@@ -11,7 +11,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include ="../OutGridView.Models/OutGridView.Models.csproj" />
+        <ProjectReference Include ="../Microsoft.PowerShell.OutGridView.Models/Microsoft.PowerShell.OutGridView.Models.csproj" />
     </ItemGroup>
 
     <ItemGroup>
