@@ -108,6 +108,10 @@ PrivateData = @{
 
 ## v0.6.2
 
+Update Terminal.Gui to 1.0.
+
+Disable mouse mode to fix bug with mouse movement being printed to console.
+
 Gracefully fail when running in remote sessions.
 
 ## v0.6.1
