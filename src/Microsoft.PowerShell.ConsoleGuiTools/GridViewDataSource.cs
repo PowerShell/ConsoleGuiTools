@@ -20,13 +20,15 @@ namespace OutGridView.Cmdlet
             GridViewRowList = itemList;
         }
 
-        public bool IsMarked(int item) => GridViewRowList[item].IsMarked;
+        public int Length { get; }
 
-        public void Render(ListView container, ConsoleDriver driver, bool selected, int item, int col, int line, int width)
+        public void Render(ListView container, ConsoleDriver driver, bool selected, int item, int col, int line, int width, int start)
         {
             container.Move(col, line);
             RenderUstr(driver, GridViewRowList[item].DisplayString, col, line, width);
         }
+
+        public bool IsMarked(int item) => GridViewRowList[item].IsMarked;
 
         public void SetMark(int item, bool value)
         {
