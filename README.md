@@ -1,19 +1,15 @@
 # GraphicalTools
 
-The GraphicalTools repo contains several different graphical-related PowerShell modules including:
+The GraphicalTools repo contains `Microsoft.PowerShell.ConsoleGuiTools`: a
+module that provides console-based GUI experiences based on
+[Terminal.Gui (gui.cs)](https://github.com/migueldeicaza/gui.cs).
 
-* `Microsoft.PowerShell.GraphicalTools` - A module that provides GUI experiences based on Avalonia.
-* `Microsoft.PowerShell.ConsoleGuiTools` - A module that provides console-based GUI experiences based on [Terminal.Gui (gui.cs)](https://github.com/migueldeicaza/gui.cs).
+Note that a module named `Microsoft.PowerShell.GraphicalTools` used to be built
+and published out of this repo, but per [#101](https://github.com/PowerShell/GraphicalTools/issues/101)
+it is deprecated and unmaintained until such time that it can be rewritten on
+top of [.NET MAUI](https://devblogs.microsoft.com/dotnet/introducing-net-multi-platform-app-ui/).
 
 ## Installation
-
-### Microsoft.PowerShell.GraphicalTools
-
-```powershell
-Install-Module Microsoft.PowerShell.GraphicalTools
-```
-
-### Microsoft.PowerShell.ConsoleGuiTools
 
 ```powershell
 Install-Module Microsoft.PowerShell.ConsoleGuiTools
@@ -21,43 +17,25 @@ Install-Module Microsoft.PowerShell.ConsoleGuiTools
 
 ## Features
 
-### Microsoft.PowerShell.GraphicalTools
-
-[Out-GridView documentation](docs/Microsoft.PowerShell.ConsoleGuiTools/Out-GridView.md)
-
-#### Cross-Platform
-|Linux   |Windows   |Mac   |
-|---|---|---|
-| ![linux-gif](https://powershell.github.io/PowerShell-Blog/Images/2019-08-13-OutGridView-Returns/OutGridViewLinux.gif) |  ![window-gif](https://powershell.github.io/PowerShell-Blog/Images/2019-08-13-OutGridView-Returns/OutGridViewWindows.gif) | ![macos-gif](https://powershell.github.io/PowerShell-Blog/Images/2019-08-13-OutGridView-Returns/OutGridViewMac.gif)|
-
-- Out-Gridview
-    - View and filter objects
-    - Generate reusable filter code
-
-### Microsoft.PowerShell.ConsoleGuiTools
-
-[Out-ConsoleGridView documentation](docs/Microsoft.PowerShell.ConsoleGuiTools/Out-ConsoleGridView.md)
+Cross-platform! Use the cmdlet
+[`Out-ConsoleGridview`](docs/Microsoft.PowerShell.ConsoleGuiTools/Out-ConsoleGridView.md)
+to view and filter objects graphically.
 
 ![screenshot of Out-ConsoleGridView](docs/Microsoft.PowerShell.ConsoleGuiTools/ocgv.gif)
 
-#### Cross-Platform
-
-- Out-ConsoleGridview
-    - View and filter objects
-
 ## Development
 
-### 1. Install PowerShell 6.2+
+### 1. Install PowerShell 7.1+
 
-Install PowerShell 6.2+ with [these instructions](https://github.com/PowerShell/PowerShell#get-powershell).
+Install PowerShell 7.1+ with [these instructions](https://github.com/PowerShell/PowerShell#get-powershell).
 
-### 3. Clone the GitHub repository:
+### 2. Clone the GitHub repository
 
 ```powershell
 git clone https://github.com/PowerShell/GraphicalTools.git
 ```
 
-### 4. Install [Invoke-Build](https://github.com/nightroman/Invoke-Build)
+### 3. Install [Invoke-Build](https://github.com/nightroman/Invoke-Build)
 
 ```powershell
 Install-Module InvokeBuild -Scope CurrentUser
@@ -65,22 +43,16 @@ Install-Module InvokeBuild -Scope CurrentUser
 
 Now you're ready to build the code.  You can do so in one of two ways:
 
-### Building the code from PowerShell
+### 4. Building the code from PowerShell
 
 ```powershell
-PS C:\path\to\GraphicalTools> Invoke-Build Build
+PS ./GraphicalTools> Invoke-Build Build -ModuleName Microsoft.PowerShell.ConsoleGuiTools
 ```
-
-> Note: You can build a single module using the -ModuleName parameter:
->
-> ```powershell
-> Invoke-Build Build -ModuleName Microsoft.PowerShell.ConsoleGuiTools
-> ```
 
 From there you can import the module that you just built for example:
 
 ```powershell
-Import-Module .\module\Microsoft.PowerShell.ConsoleGuiTools
+Import-Module ./module/Microsoft.PowerShell.ConsoleGuiTools
 ```
 
 And then run the cmdlet you want to test, for example:
@@ -90,44 +62,53 @@ Get-Process | Out-ConsoleGridView
 ```
 
 > NOTE: If you change the code and rebuild the project, you'll need to launch a
-> _new_ PowerShell process since the dll is already loaded and can't be unloaded.
+> _new_ PowerShell process since the DLL is already loaded and can't be unloaded.
 
-### Debugging in Visual Studio Code
-
+### 5. Debugging in Visual Studio Code
 
 ```powershell
-PS C:\path\to\GraphicalTools> code .
+PS ./GraphicalTools> code .
 ```
 
-Build by hitting `Ctrl-Shift-b` in VS Code.
+Build by hitting `Ctrl-Shift-B` in VS Code.
 
 To debug:
 
-In a Powershell session in the `c:\path\to\GraphicalTools` directory, run `pwsh` (thus nesting powershell).
+In a PowerShell session in the `./GraphicalTools` directory, run `pwsh` (thus
+nesting PowerShell).
 
 Then do the folowing:
 
 ```powershell
-Import-Module .\module\Microsoft.PowerShell.ConsoleGuiTools
+Import-Module ./module/Microsoft.PowerShell.ConsoleGuiTools
 $pid
 ```
 
-This will import the latest built DLL and output the process ID you'll need for debugging. Copy this ID to the clipboard.
+This will import the latest built DLL and output the process ID you'll need
+for debugging. Copy this ID to the clipboard.
 
-In VScode, set your breakpoints, etc... Then hit `F5`. In the VScode search box, paste the value printed by `$pid`. You'll see something like `pwsh.exe 18328`. Click that and the debug session will start.
+In VScode, set your breakpoints, etc. Then hit `F5`. In the VScode search
+box, paste the value printed by `$pid`. You'll see something like `pwsh.exe
+18328`. Click that and the debug session will start.
 
-In the Powershell session run your commands; breakpoints will be hit, etc...
+In the PowerShell session run your commands; breakpoints will be hit, etc.
 
-When done, run `exit` to exit the nested PowerShell and run `pwsh` again. This unloads the DLL. Repeat.
+When done, run `exit` to exit the nested PowerShell and run `pwsh` again.
+This unloads the DLL.  Repeat.
 
-## Contributions Welcome!
+## Contributions Welcome
 
-We would love to incorporate community contributions into this project.  If you would like to
-contribute code, documentation, tests, or bug reports, please read the [development section above](https://github.com/PowerShell/GraphicalTools#development) to learn more.
+We would love to incorporate community contributions into this project.  If
+you would like to contribute code, documentation, tests, or bug reports,
+please read the [development section above](https://github.com/PowerShell/GraphicalTools#development)
+to learn more.
 
-## Microsoft.PowerShell.GraphicalTools Architecture
+## (Deprecated) Microsoft.PowerShell.GraphicalTools Architecture
 
-Due to the quirks of the PowerShell threading implementation, the design of GUIs in this application are non-standard. The cmdlet invokes an Avalonia application as a separate process to guarantee the GUI is running on the main thread. Graphical tools therefore consists of 3 .NET Projects. 
+Due to the quirks of the PowerShell threading implementation, the design of
+GUIs in this application are non-standard. The cmdlet invokes an Avalonia
+application as a separate process to guarantee the GUI is running on the main
+thread. Graphical tools therefore consists of 3 .NET Projects.
 
 - Microsoft.PowerShell.GraphicalTools - Cmdlet implementations
 - OutGridView.Gui - Implementation of the Out-GridView window
@@ -135,7 +116,9 @@ Due to the quirks of the PowerShell threading implementation, the design of GUIs
 
 ## Maintainers
 
-- [Tyler Leonhardt](https://github.com/tylerleonhardt) - [@TylerLeonhardt](http://twitter.com/tylerleonhardt)
+- [Andrew Schwartzmeyer](https://andschwa.com) - [@andschwa](https://github.com/andschwa)
+
+Originally authored by [Tyler Leonhardt](http://twitter.com/tylerleonhardt).
 
 ## License
 
