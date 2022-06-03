@@ -49,9 +49,10 @@ Now you're ready to build the code.  You can do so in one of two ways:
 PS ./GraphicalTools> Invoke-Build Build -ModuleName Microsoft.PowerShell.ConsoleGuiTools
 ```
 
-From there you can import the module that you just built for example:
+From there you can import the module that you just built for example (start a fresh `pwsh` instance first so you can unload the module with an `exit`; otherwise building again may fail because the `.dll` will be held open):
 
 ```powershell
+pwsh
 Import-Module ./module/Microsoft.PowerShell.ConsoleGuiTools
 ```
 
@@ -59,6 +60,7 @@ And then run the cmdlet you want to test, for example:
 
 ```powershell
 Get-Process | Out-ConsoleGridView
+exit
 ```
 
 > NOTE: If you change the code and rebuild the project, you'll need to launch a
