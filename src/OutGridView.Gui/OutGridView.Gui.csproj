@@ -2,7 +2,7 @@
   <Import Project="..\..\GraphicalTools.Common.props" />
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>net60</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="Models\" />

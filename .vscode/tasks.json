@@ -7,7 +7,7 @@
                 "command": "/usr/local/bin/pwsh"
             },
             "windows": {
-                "command": "pwsh.exe"
+                "command": "C:/Program Files/PowerShell/7-preview/pwsh.exe"
             },
             "linux": {
                 "command": "/usr/local/bin/pwsh"

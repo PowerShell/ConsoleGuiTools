@@ -1,13 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <Import Project="..\..\GraphicalTools.Common.props" />
     <PropertyGroup>
-        <TargetFramework>netcoreapp3.0</TargetFramework>
+        <TargetFramework>net60</TargetFramework>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Nstack.Core" Version="0.17" />
         <PackageReference Include="Terminal.Gui" Version="1.6" />
-        <PackageReference Include="Microsoft.PowerShell.SDK" Version="6.2.1" />
+        <!-- <PackageReference Include="Microsoft.PowerShell.SDK" Version="7.2.0" /> -->
+        <PackageReference Include="System.Management.Automation" Version="7.2.0" />
     </ItemGroup>
 
     <ItemGroup>

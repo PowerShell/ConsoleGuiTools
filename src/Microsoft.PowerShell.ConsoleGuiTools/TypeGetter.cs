@@ -1,13 +1,14 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using System;
+using System; 
 using System.Management.Automation;
 using System.Linq;
 using System.Globalization;
 using System.Collections.Generic;
 using Microsoft.PowerShell.Commands;
 using OutGridView.Models;
+using System.Text.RegularExpressions;
 
 namespace OutGridView.Cmdlet
 {
@@ -62,6 +63,8 @@ namespace OutGridView.Cmdlet
                 }
                 else
                 {
+                    // Strip ANSI
+                    stringValue = new Regex(@"\x1B\[[^@-~]*[@-~]").Replace(stringValue, "");
                     valuePairs[dataColumn.ToString()] = new StringValue { DisplayValue = stringValue };
                 }
             }
