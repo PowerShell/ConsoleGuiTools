@@ -63,6 +63,8 @@ namespace OutGridView.Cmdlet
                 }
                 else
                 {
+                    // Strip ANSI since PS 7.1 started adding it
+                    stringValue = new Regex(@"\x1B\[[^@-~]*[@-~]").Replace(stringValue, "");
                     valuePairs[dataColumn.ToString()] = new StringValue { DisplayValue = stringValue };
                 }
             }
