@@ -205,23 +205,23 @@ namespace OutGridView.Cmdlet
                 Width = Dim.Fill() - _filterLabel.Text.Length
             };
 
-            var filterErrorLabel = new Label(string.Empty)
+            // Note: See Issue #1769 in Terminal.Gui for why the constructor to Label can't take string.Empty
+            var filterErrorLabel = new Label(" ")
             {
                 X = Pos.Right(_filterLabel) + 1,
                 Y = Pos.Top(_filterLabel) + 1,
-                ColorScheme = Colors.Base,
+                ColorScheme = Colors.Error,
                 Width = Dim.Fill() - _filterLabel.Text.Length
             };
 
             _filterField.TextChanged += (str) =>
             {
                 // str is the OLD value
-                string filterText = _filterField.Text?.ToString();
                 try
                 {
-                    filterErrorLabel.Text = " ";
-                    filterErrorLabel.ColorScheme = Colors.Base;
-                    filterErrorLabel.Redraw(filterErrorLabel.Bounds);
+                    string filterText = _filterField.Text?.ToString();
+                    filterErrorLabel.Text = "";
+                    filterErrorLabel.Visible = false;
 
                     List<GridViewRow> itemList = GridViewHelpers.FilterData(_itemSource.GridViewRowList, filterText);
                     _listView.Source = new GridViewDataSource(itemList);
@@ -229,8 +229,7 @@ namespace OutGridView.Cmdlet
                 catch (Exception ex)
                 {
                     filterErrorLabel.Text = ex.Message;
-                    filterErrorLabel.ColorScheme = Colors.Error;
-                    filterErrorLabel.Redraw(filterErrorLabel.Bounds);
+                    filterErrorLabel.Visible = true;
                     _listView.Source = _itemSource;
                 }
             };
