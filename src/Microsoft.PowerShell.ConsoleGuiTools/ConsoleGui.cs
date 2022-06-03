@@ -322,11 +322,15 @@ namespace OutGridView.Cmdlet
         {
             if (!Console.IsInputRedirected)
             {
-                // By emitting this, we fix an issue where arrow keys don't work in the console
-                // because .NET requires application mode to support Arrow key escape sequences
-                // Esc[?1h - Set cursor key to application mode
-                // See http://ascii-table.com/ansi-escape-sequences-vt-100.php
-                Console.Write("\u001b[?1h");
+                // By emitting this, we fix two issues:
+                // 1. An issue where arrow keys don't work in the console because .NET
+                //    requires application mode to support Arrow key escape sequences.
+                //    Esc[?1h sets the cursor key to application mode
+                //    See http://ascii-table.com/ansi-escape-sequences-vt-100.php
+                // 2. An issue where moving the mouse causes characters to show up because
+                //    mouse tracking is still on. Esc[?1003l turns it off.
+                //    See https://www.xfree86.org/current/ctlseqs.html#Mouse%20Tracking
+                Console.Write("\u001b[?1h\u001b[?1003l");
             }
         }
     }

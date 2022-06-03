@@ -9,7 +9,7 @@
 RootModule = 'Microsoft.PowerShell.ConsoleGuiTools.dll'
 
 # Version number of this module.
-ModuleVersion = '0.6.2'
+ModuleVersion = '0.6.3'
 
 # Supported PSEditions
 CompatiblePSEditions = @( 'Core' )
@@ -106,7 +106,15 @@ PrivateData = @{
         # ReleaseNotes of this module
         ReleaseNotes = '# Release Notes
 
+## v0.6.3
+
+Unreleased!
+
 ## v0.6.2
+
+Update Terminal.Gui to 1.0.
+
+Disable mouse mode to fix bug with mouse movement being printed to console.
 
 Gracefully fail when running in remote sessions.
 
