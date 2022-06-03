@@ -63,8 +63,6 @@ namespace OutGridView.Cmdlet
                 }
                 else
                 {
-                    // Strip ANSI
-                    stringValue = new Regex(@"\x1B\[[^@-~]*[@-~]").Replace(stringValue, "");
                     valuePairs[dataColumn.ToString()] = new StringValue { DisplayValue = stringValue };
                 }
             }
