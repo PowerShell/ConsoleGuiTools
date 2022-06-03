@@ -8,7 +8,6 @@ using System.Globalization;
 using System.Collections.Generic;
 using Microsoft.PowerShell.Commands;
 using OutGridView.Models;
-using System.Text.RegularExpressions;
 
 namespace OutGridView.Cmdlet
 {
