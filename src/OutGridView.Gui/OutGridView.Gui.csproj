@@ -2,7 +2,7 @@
   <Import Project="..\..\GraphicalTools.Common.props" />
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net60</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="Models\" />
@@ -20,7 +20,7 @@
     <PackageReference Include="Avalonia.Controls.DataGrid" Version="0.8.1" />
     <PackageReference Include="Avalonia.ReactiveUI" Version="0.8.1" />
     <PackageReference Include="DynamicData.ReactiveUI" Version="6.10.0.2604" />
-    <PackageReference Include="ReactiveUI.Fody" Version="9.16.6" />
+    <PackageReference Include="ReactiveUI.Fody" Version="18.0.10" />
     <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" Version="3.0.0-preview7-27912-14" />
   </ItemGroup>
   <ItemGroup>

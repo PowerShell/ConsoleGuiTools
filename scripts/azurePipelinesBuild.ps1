@@ -8,5 +8,5 @@ if (!(Get-Module -ListAvailable PlatyPS)) {
     Install-Module PlatyPS -Force -Scope CurrentUser
 }
 
-Invoke-Build -Configuration Release
+Invoke-Build Invoke-Build -ModuleName Microsoft.PowerShell.ConsoleGuiTools -Configuration Release
 Pop-Location

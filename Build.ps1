@@ -4,7 +4,7 @@
 # To build only one, specify it using the -ModuleName paramater (e.g. Invoke-Build Build -ModuleName Microsoft.PowerShell.ConsoleGuiTools).
 
 # Build...
-Invoke-Build Build -ModuleName Microsoft.PowerShell.ConsoleGuiTools
+Invoke-Build -ModuleName Microsoft.PowerShell.ConsoleGuiTools
 
 # Run what was built...
 # pwsh -noprofile -command "Import-Module -verbose '$PSScriptRoot/module/Microsoft.PowerShell.GraphicalTools'; Get-Module -all | Out-GridView -OutputMode Single -Title 'Imported Modules' 
