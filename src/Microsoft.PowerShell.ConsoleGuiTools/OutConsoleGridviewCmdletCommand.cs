@@ -111,6 +111,16 @@ namespace OutGridView.Cmdlet
                 ThrowTerminatingError(error);
             }
 
+            // Remove any potential ANSI escape codes from strings
+            foeach (var property in input.Properties)
+            {
+                if (property.Value is string)
+                {
+                    var stringDecorated = new StringDecorated(property.Value as string);
+                    property.Value = stringDecorated.ToString(OutputRendering.PlainText);
+                }
+            }
+
             _psObjects.Add(input);
         }
 
