@@ -30,7 +30,7 @@ Copyright = '(c) Microsoft Corporation.'
 Description = 'Cross-platform Console Gui Tools for PowerShell'
 
 # Minimum version of the PowerShell engine required by this module
-PowerShellVersion = '6.2'
+PowerShellVersion = '7.2'
 
 # Name of the PowerShell host required by this module
 # PowerShellHostName = ''
