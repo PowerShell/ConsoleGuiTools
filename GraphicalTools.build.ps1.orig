@@ -10,7 +10,11 @@ param(
 
 $script:IsUnix = $PSVersionTable.PSEdition -and $PSVersionTable.PSEdition -eq "Core" -and !$IsWindows
 
+<<<<<<< HEAD
+$script:TargetFramework = "net60"
+=======
 $script:TargetFramework = "net6.0"
+>>>>>>> master
 $script:RequiredSdkVersion = (Get-Content (Join-Path $PSScriptRoot 'global.json') | ConvertFrom-Json).sdk.version
 
 $script:ModuleLayouts = @{}

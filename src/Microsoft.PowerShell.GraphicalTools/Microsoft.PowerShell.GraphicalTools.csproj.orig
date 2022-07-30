@@ -1,12 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <Import Project="..\..\GraphicalTools.Common.props" />
     <PropertyGroup>
+<<<<<<< HEAD
+        <TargetFramework>net60</TargetFramework>
+=======
         <TargetFramework>net6.0</TargetFramework>
+>>>>>>> master
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Nstack.Core" Version="0.17.*" />
-        <PackageReference Include="Terminal.Gui" Version="1.6.*" />
         <PackageReference Include="Microsoft.PowerShell.SDK" Version="7.2.*" />
     </ItemGroup>
 
@@ -15,6 +17,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <None Update="Microsoft.PowerShell.ConsoleGuiTools.psd1" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Microsoft.PowerShell.GraphicalTools.psd1" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Microsoft.PowerShell.GraphicalTools.psm1" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
 </Project>

@@ -3,6 +3,7 @@
 
 using System; 
 using System.Management.Automation;
+using System.Management.Automation.Internal;
 using System.Linq;
 using System.Globalization;
 using System.Collections.Generic;
@@ -26,7 +27,7 @@ namespace OutGridView.Cmdlet
             var types = _cmdlet.InvokeCommand.InvokeScript(@"Microsoft.PowerShell.Utility\Get-FormatData " + typeName).ToList();
 
             //No custom type definitions found - try the PowerShell specific format data
-            if (types == null || types.Count == 0) 
+            if (types == null || types.Count == 0)
             {
                 types = _cmdlet.InvokeCommand
                     .InvokeScript(@"Microsoft.PowerShell.Utility\Get-FormatData -PowerShellVersion $PSVersionTable.PSVersion " + typeName).ToList();
@@ -62,7 +63,8 @@ namespace OutGridView.Cmdlet
                 }
                 else
                 {
-                    valuePairs[dataColumn.ToString()] = new StringValue { DisplayValue = stringValue };
+                    var stringDecorated = new StringDecorated(stringValue);
+                    valuePairs[dataColumn.ToString()] = new StringValue { DisplayValue = stringDecorated.ToString(OutputRendering.PlainText) };
                 }
             }
 

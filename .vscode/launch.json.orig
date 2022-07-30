@@ -9,7 +9,11 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
+<<<<<<< HEAD
+            "program": "${workspaceFolder}/Cmdlet/bin/Debug/net60/win10-x64/OutGridViewCmdlet.dll",
+=======
             "program": "${workspaceFolder}/Cmdlet/bin/Debug/net6.0/win10-x64/OutGridViewCmdlet.dll",
+>>>>>>> master
             "args": [],
             "cwd": "${workspaceFolder}/Cmdlet",
             "console": "internalConsole",
@@ -20,7 +24,11 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
+<<<<<<< HEAD
+            "program": "${workspaceFolder}/Application/bin/Debug/net60/win10-x64/OutGridViewApplication.dll",
+=======
             "program": "${workspaceFolder}/Application/bin/Debug/net6.0/win10-x64/OutGridViewApplication.dll",
+>>>>>>> master
             "args": [],
             "cwd": "${workspaceFolder}/Application",
             "console": "internalConsole",

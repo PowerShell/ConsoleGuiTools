@@ -2,7 +2,11 @@
   <Import Project="..\..\GraphicalTools.Common.props" />
   <PropertyGroup>
     <OutputType>Exe</OutputType>
+<<<<<<< HEAD
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+=======
     <TargetFramework>net6.0</TargetFramework>
+>>>>>>> master
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="Models\" />
