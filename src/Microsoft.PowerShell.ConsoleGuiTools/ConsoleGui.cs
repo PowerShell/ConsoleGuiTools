@@ -141,11 +141,16 @@ namespace OutGridView.Cmdlet
             {
                 X = _applicationData.MinUI ? -1 : 0,
                 Y = _applicationData.MinUI ? -1 : 0,
+
                 // By using Dim.Fill(), it will automatically resize without manual intervention
                 Width = Dim.Fill(_applicationData.MinUI ? -1 : 0),
                 Height = Dim.Fill(_applicationData.MinUI ? -1 : 1)
             };
-
+            
+            if (_applicationData.MinUI) {
+                win.Border.BorderStyle = BorderStyle.None;
+            } 
+            
             Application.Top.Add(win);
             return win;
         }
