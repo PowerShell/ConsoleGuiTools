@@ -62,7 +62,7 @@ namespace OutGridView.Cmdlet
             AddListView(win);
 
             // Status bar is where our key-bindings are handled
-            AddStatusBar();
+            AddStatusBar(!_applicationData.MinUI);
 
             // If -Filter parameter is set, apply it. 
             ApplyFilter();
@@ -169,7 +169,7 @@ namespace OutGridView.Cmdlet
 
             if (_applicationData.OutputMode == OutputModeOption.Multiple)
             {
-                statusItems.Add(new StatusItem(Key.A | Key.CtrlMask, "~^A~ Select All", () =>
+                statusItems.Add(new StatusItem(Key.A | Key.CtrlMask, "~CTRL-A~ Select All", () =>
                 {
                     // This selects only the items that match the Filter
                     var gvds = _listView.Source as GridViewDataSource;
@@ -177,8 +177,8 @@ namespace OutGridView.Cmdlet
                     _listView.SetNeedsDisplay();
                 }));
 
-                // Use Ctrl-N until Terminal.Gui supports ctrl-shift chords
-                statusItems.Add(new StatusItem(Key.N | Key.CtrlMask, "~^N~ Select None", () =>
+                // Ctrl-D is commonly used in GUIs for select-none 
+                statusItems.Add(new StatusItem(Key.D | Key.CtrlMask, "~CTRL-D~ Select None", () =>
                 {
                     // This un-selects only the items that match the Filter
                     var gvds = _listView.Source as GridViewDataSource;
@@ -240,7 +240,6 @@ namespace OutGridView.Cmdlet
                     {
                         listViewColumnWidths[index] = len;
                     }
-
                     index++;
                 }
             }
@@ -281,6 +280,13 @@ namespace OutGridView.Cmdlet
                 CanFocus = true,
                 Width = Dim.Fill() - _filterLabel.Text.Length
             };
+
+            // TextField captures Ctrl-A (select all text) and Ctrl-D (delete backwards)
+            // In OCGV these are used for select-all/none of items. Selecting items is more
+            // common than editing the filter field so we turn them off in the filter textview. 
+            // BACKSPACE still works for delete backwards
+            _filterField.ClearKeybinding(Key.A | Key.CtrlMask);
+            _filterField.ClearKeybinding(Key.D | Key.CtrlMask);
 
             var filterErrorLabel = new Label(string.Empty)
             {
