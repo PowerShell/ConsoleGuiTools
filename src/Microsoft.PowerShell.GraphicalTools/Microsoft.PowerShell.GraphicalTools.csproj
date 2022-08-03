@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <Import Project="..\..\GraphicalTools.Common.props" />
     <PropertyGroup>
-        <TargetFramework>netcoreapp3.0</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
     </PropertyGroup>
 
     <ItemGroup>
@@ -9,7 +9,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include ="../OutGridView.Models/OutGridView.Models.csproj" />
+        <ProjectReference Include ="../Microsoft.PowerShell.OutGridView.Models/Microsoft.PowerShell.OutGridView.Models.csproj" />
     </ItemGroup>
 
     <ItemGroup>
