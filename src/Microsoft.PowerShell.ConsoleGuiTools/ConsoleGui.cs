@@ -53,6 +53,9 @@ namespace OutGridView.Cmdlet
 
             _filterField.Text = _applicationData.Filter ?? string.Empty;
             _filterField.CursorPosition = _filterField.Text.Length;
+
+            _listView.SetFocus();
+
             // Run the GUI.
             Application.Run();
             Application.Shutdown();
