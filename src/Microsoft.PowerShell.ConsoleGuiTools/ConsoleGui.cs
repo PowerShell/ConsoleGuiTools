@@ -64,7 +64,10 @@ namespace OutGridView.Cmdlet
                 return selectedIndexes;
             }
 
-            foreach (GridViewRow gvr in _itemSource.GridViewRowList)
+            // Ensure that only items that are marked AND not filtered out
+            // get returned (See Issue #121)
+            List<GridViewRow> itemList = GridViewHelpers.FilterData(_itemSource.GridViewRowList, _filterField.Text.ToString());
+            foreach (GridViewRow gvr in itemList)
             {
                 if (gvr.IsMarked)
                 {
