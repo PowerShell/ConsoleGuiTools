@@ -25,9 +25,9 @@ to view and filter objects graphically.
 
 ## Development
 
-### 1. Install PowerShell 7.1+
+### 1. Install PowerShell 7.2+
 
-Install PowerShell 7.1+ with [these instructions](https://github.com/PowerShell/PowerShell#get-powershell).
+Install PowerShell 7.2+ with [these instructions](https://github.com/PowerShell/PowerShell#get-powershell).
 
 ### 2. Clone the GitHub repository
 
@@ -72,29 +72,15 @@ PS ./GraphicalTools> code .
 
 Build by hitting `Ctrl-Shift-B` in VS Code.
 
-To debug:
+Set a breakpoint and hit `F5` to start the debugger.
 
-In a PowerShell session in the `./GraphicalTools` directory, run `pwsh` (thus
-nesting PowerShell).
-
-Then do the folowing:
+Click on the VS Code "TERMINAL" tab and type your command that starts `Out-ConsoleGridView`, e.g.
 
 ```powershell
-Import-Module ./module/Microsoft.PowerShell.ConsoleGuiTools
-$pid
+ls | ocgv
 ```
 
-This will import the latest built DLL and output the process ID you'll need
-for debugging. Copy this ID to the clipboard.
-
-In VScode, set your breakpoints, etc. Then hit `F5`. In the VScode search
-box, paste the value printed by `$pid`. You'll see something like `pwsh.exe
-18328`. Click that and the debug session will start.
-
-In the PowerShell session run your commands; breakpoints will be hit, etc.
-
-When done, run `exit` to exit the nested PowerShell and run `pwsh` again.
-This unloads the DLL.  Repeat.
+Your breakpoint should be hit.
 
 ## Contributions Welcome
 
