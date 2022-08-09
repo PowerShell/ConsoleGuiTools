@@ -67,9 +67,14 @@ namespace OutGridView.Cmdlet
             // If -Filter parameter is set, apply it. 
             ApplyFilter();
 
+<<<<<<< HEAD
+=======
+            _filterField.Text = _applicationData.Filter ?? string.Empty;
+            _filterField.CursorPosition = _filterField.Text.Length;
 
             _listView.SetFocus();
 
+>>>>>>> fix_87_inital_focus
             // Run the GUI.
             Application.Run();
             Application.Shutdown();
@@ -325,9 +330,6 @@ namespace OutGridView.Cmdlet
             };
 
             win.Add(_filterLabel, _filterField, filterErrorLabel);
-
-            _filterField.Text = _applicationData.Filter ?? string.Empty;
-            _filterField.CursorPosition = _filterField.Text.Length;            
         }
 
         private void AddHeaders(Window win, List<string> gridHeaders)
