@@ -1,0 +1,36 @@
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    {
+    "version": "2.0.0",
+    "tasks": [
+        {
+<<<<<<< HEAD
+            "label": "build ConsoleGuiTools",
+            "command": "Invoke-Build",
+            "type": "shell",
+=======
+            "label": "build",
+            "osx": {
+                "command": "/usr/local/bin/pwsh"
+            },
+            "windows": {
+                "command": "C:/Program Files/PowerShell/7-preview/pwsh.exe"
+            },
+            "linux": {
+                "command": "/usr/local/bin/pwsh"
+            },
+            "type": "process",
+>>>>>>> Fixes_131
+            "args": [
+                "Build",
+                "-Module",
+                "Microsoft.PowerShell.ConsoleGuiTools"
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "silent"
+            },
+            "problemMatcher": "$msCompile"
+        }
+    ]
+}
