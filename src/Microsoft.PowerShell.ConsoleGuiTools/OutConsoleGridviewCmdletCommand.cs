@@ -52,6 +52,12 @@ namespace OutGridView.Cmdlet
         [Parameter()]
         public string Filter { set; get; }
 
+        /// <summary>
+        /// gets or sets the whether "minimum UI" mode will be enabled
+        /// </summary>
+        [Parameter()]
+        public SwitchParameter MinUI { set; get; }
+
         #endregion Input Parameters
 
         // This method gets called once for each cmdlet in the pipeline when the pipeline starts executing
@@ -133,6 +139,7 @@ namespace OutGridView.Cmdlet
                 Title = Title ?? "Out-ConsoleGridView",
                 OutputMode = OutputMode,
                 Filter = Filter,
+                MinUI = MinUI,
                 DataTable = dataTable
             };
 

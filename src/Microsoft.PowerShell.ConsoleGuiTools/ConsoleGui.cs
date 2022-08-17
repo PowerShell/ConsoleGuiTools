@@ -19,10 +19,10 @@ namespace OutGridView.Cmdlet
         // Width of Terminal.Gui ListView selection/check UI elements (old == 4, new == 2)
         private const int CHECK_WIDTH = 4;
         private bool _cancelled;
-        private GridViewDataSource _itemSource;
         private Label _filterLabel;
         private TextField _filterField;
         private ListView _listView;
+        private GridViewDataSource _itemSource;
         private ApplicationData _applicationData;
         private GridViewDetails _gridViewDetails;
 
@@ -37,22 +37,41 @@ namespace OutGridView.Cmdlet
                 ListViewOffset = _applicationData.OutputMode != OutputModeOption.None ? MARGIN_LEFT + CHECK_WIDTH : MARGIN_LEFT
             };
 
-            Window win = AddTopLevelWindow();
-            AddStatusBar();
+            Window win = CreateTopLevelWindow();
 
-            // GridView header logic
+            // Create the headers and calculate column widths based on the DataTable
             List<string> gridHeaders = _applicationData.DataTable.DataColumns.Select((c) => c.Label).ToList();
             CalculateColumnWidths(gridHeaders);
 
-            AddFilter(win);
-            AddHeaders(win, gridHeaders);
+            // Copy DataTable into the ListView's DataSource
+            _itemSource = LoadData();
 
-            // GridView row logic
-            LoadData();
-            AddRows(win);
+            // Add Filter UI
+            if (!_applicationData.MinUI)
+            {
+                AddFilter(win);
+            }
+
+            // Add Header UI
+            if (!_applicationData.MinUI)
+            {
+                AddHeaders(win, gridHeaders);
+            }
+
+            // Add ListView
+            AddListView(win);
+
+            // Status bar is where our key-bindings are handled
+            AddStatusBar(!_applicationData.MinUI);
+
+            // If -Filter parameter is set, apply it. 
+            ApplyFilter();
 
             _filterField.Text = _applicationData.Filter ?? string.Empty;
             _filterField.CursorPosition = _filterField.Text.Length;
+
+            _listView.SetFocus();
+
             // Run the GUI.
             Application.Run();
             Application.Shutdown();
@@ -64,7 +83,10 @@ namespace OutGridView.Cmdlet
                 return selectedIndexes;
             }
 
-            foreach (GridViewRow gvr in _itemSource.GridViewRowList)
+            // Ensure that only items that are marked AND not filtered out
+            // get returned (See Issue #121)
+            List<GridViewRow> itemList = GridViewHelpers.FilterData(_itemSource.GridViewRowList, _filterField.Text.ToString());
+            foreach (GridViewRow gvr in itemList)
             {
                 if (gvr.IsMarked)
                 {
@@ -73,6 +95,41 @@ namespace OutGridView.Cmdlet
             }
 
             return selectedIndexes;
+        }
+
+        private GridViewDataSource LoadData()
+        {
+            var items = new List<GridViewRow>();
+            int newIndex = 0;
+            for (int i = 0; i < _applicationData.DataTable.Data.Count; i++)
+            {
+                var dataTableRow = _applicationData.DataTable.Data[i];
+                var valueList = new List<string>();
+                foreach (var dataTableColumn in _applicationData.DataTable.DataColumns)
+                {
+                    string dataValue = dataTableRow.Values[dataTableColumn.ToString()].DisplayValue;
+                    valueList.Add(dataValue);
+                }
+
+                string displayString = GridViewHelpers.GetPaddedString(valueList, 0, _gridViewDetails.ListViewColumnWidths);
+
+                items.Add(new GridViewRow
+                {
+                    DisplayString = displayString,
+                    OriginalIndex = i
+                });
+
+                newIndex++;
+            }
+
+            return new GridViewDataSource(items);
+        }
+
+        private void ApplyFilter()
+        {
+            List<GridViewRow> itemList = GridViewHelpers.FilterData(_itemSource.GridViewRowList, _applicationData.Filter ?? string.Empty);
+            // Set the ListView to show only the subset defined by the filter
+            _listView.Source = new GridViewDataSource(itemList);
         }
 
         private void Accept()
@@ -86,58 +143,85 @@ namespace OutGridView.Cmdlet
             Application.RequestStop();
         }
 
-        private Window AddTopLevelWindow()
+        private Window CreateTopLevelWindow()
         {
             // Creates the top-level window to show
             var win = new Window(_applicationData.Title)
             {
-                X = 0,
-                Y = 0,
+                X = _applicationData.MinUI ? -1 : 0,
+                Y = _applicationData.MinUI ? -1 : 0,
+
                 // By using Dim.Fill(), it will automatically resize without manual intervention
-                Width = Dim.Fill(),
-                Height = Dim.Fill(1)
+                Width = Dim.Fill(_applicationData.MinUI ? -1 : 0),
+                Height = Dim.Fill(_applicationData.MinUI ? -1 : 1)
             };
+
+            if (_applicationData.MinUI)
+            {
+                win.Border.BorderStyle = BorderStyle.None;
+            }
 
             Application.Top.Add(win);
             return win;
         }
 
-        private void AddStatusBar()
+        private void AddStatusBar(bool visible)
         {
-            var statusBar = new StatusBar(
-                    _applicationData.OutputMode != OutputModeOption.None
-                    ? new StatusItem[]
-                    {
-                        // Use Key.Unknown for SPACE with no delegate because ListView already
-                        // handles SPACE
-                        new StatusItem(Key.Unknown, "~SPACE~ Mark Item", null),
-                        new StatusItem(Key.Enter, "~ENTER~ Accept", () =>
-                        {
-                            if (Application.Top.MostFocused == _listView)
-                            {
-                                // If nothing was explicitly marked, we return the item that was selected
-                                // when ENTER is pressed in Single mode. If something was previously selected
-                                // (using SPACE) then honor that as the single item to return
-                                if (_applicationData.OutputMode == OutputModeOption.Single &&
-                                    _itemSource.GridViewRowList.Find(i => i.IsMarked) == null)
-                                {
-                                    _listView.MarkUnmarkRow();
-                                }
-                                Accept();
-                            }
-                            else if (Application.Top.MostFocused == _filterField)
-                            {
-                                _listView.SetFocus();
-                            }
-                        }),
-                        new StatusItem(Key.Esc, "~ESC~ Close", () => Close())
-                    }
-                    : new StatusItem[]
-                    {
-                        new StatusItem(Key.Esc, "~ESC~ Close",  () => Close())
-                    }
-            );
+            var statusItems = new List<StatusItem>();
+            if (_applicationData.OutputMode != OutputModeOption.None)
+            {
+                // Use Key.Unknown for SPACE with no delegate because ListView already
+                // handles SPACE
+                statusItems.Add(new StatusItem(Key.Unknown, "~SPACE~ Select Item", null));
+            }
 
+            if (_applicationData.OutputMode == OutputModeOption.Multiple)
+            {
+                statusItems.Add(new StatusItem(Key.A | Key.CtrlMask, "~CTRL-A~ Select All", () =>
+                {
+                    // This selects only the items that match the Filter
+                    var gvds = _listView.Source as GridViewDataSource;
+                    gvds.GridViewRowList.ForEach(i => i.IsMarked = true);
+                    _listView.SetNeedsDisplay();
+                }));
+
+                // Ctrl-D is commonly used in GUIs for select-none 
+                statusItems.Add(new StatusItem(Key.D | Key.CtrlMask, "~CTRL-D~ Select None", () =>
+                {
+                    // This un-selects only the items that match the Filter
+                    var gvds = _listView.Source as GridViewDataSource;
+                    gvds.GridViewRowList.ForEach(i => i.IsMarked = false);
+                    _listView.SetNeedsDisplay();
+                }));
+            }
+
+            if (_applicationData.OutputMode != OutputModeOption.None)
+            {
+                statusItems.Add(new StatusItem(Key.Enter, "~ENTER~ Accept", () =>
+                {
+                    if (Application.Top.MostFocused == _listView)
+                    {
+                        // If nothing was explicitly marked, we return the item that was selected
+                        // when ENTER is pressed in Single mode. If something was previously selected
+                        // (using SPACE) then honor that as the single item to return
+                        if (_applicationData.OutputMode == OutputModeOption.Single &&
+                            _itemSource.GridViewRowList.Find(i => i.IsMarked) == null)
+                        {
+                            _listView.MarkUnmarkRow();
+                        }
+                        Accept();
+                    }
+                    else if (Application.Top.MostFocused == _filterField)
+                    {
+                        _listView.SetFocus();
+                    }
+                }));
+            }
+
+            statusItems.Add(new StatusItem(Key.Esc, "~ESC~ Close", () => Close()));
+
+            var statusBar = new StatusBar(statusItems.ToArray());
+            statusBar.Visible = visible;
             Application.Top.Add(statusBar);
         }
 
@@ -164,7 +248,6 @@ namespace OutGridView.Cmdlet
                     {
                         listViewColumnWidths[index] = len;
                     }
-
                     index++;
                 }
             }
@@ -194,16 +277,24 @@ namespace OutGridView.Cmdlet
         {
             _filterLabel = new Label(FILTER_LABEL)
             {
-                X = MARGIN_LEFT
+                X = MARGIN_LEFT,
+                Y = 0
             };
 
-            _filterField = new TextField(string.Empty)
+            _filterField = new TextField(_applicationData.Filter ?? string.Empty)
             {
                 X = Pos.Right(_filterLabel) + 1,
                 Y = Pos.Top(_filterLabel),
                 CanFocus = true,
                 Width = Dim.Fill() - _filterLabel.Text.Length
             };
+
+            // TextField captures Ctrl-A (select all text) and Ctrl-D (delete backwards)
+            // In OCGV these are used for select-all/none of items. Selecting items is more
+            // common than editing the filter field so we turn them off in the filter textview. 
+            // BACKSPACE still works for delete backwards
+            _filterField.ClearKeybinding(Key.A | Key.CtrlMask);
+            _filterField.ClearKeybinding(Key.D | Key.CtrlMask);
 
             var filterErrorLabel = new Label(string.Empty)
             {
@@ -222,9 +313,9 @@ namespace OutGridView.Cmdlet
                     filterErrorLabel.Text = " ";
                     filterErrorLabel.ColorScheme = Colors.Base;
                     filterErrorLabel.Redraw(filterErrorLabel.Bounds);
+                    _applicationData.Filter = filterText;
+                    ApplyFilter();
 
-                    List<GridViewRow> itemList = GridViewHelpers.FilterData(_itemSource.GridViewRowList, filterText);
-                    _listView.Source = new GridViewDataSource(itemList);
                 }
                 catch (Exception ex)
                 {
@@ -243,12 +334,16 @@ namespace OutGridView.Cmdlet
             var header = new Label(GridViewHelpers.GetPaddedString(
                 gridHeaders,
                 _gridViewDetails.ListViewOffset,
-                _gridViewDetails.ListViewColumnWidths))
+                _gridViewDetails.ListViewColumnWidths));
+            header.X = 0;
+            if (_applicationData.MinUI)
             {
-                X = 0,
-                Y = 2
-            };
-
+                header.Y = 0;
+            }
+            else
+            {
+                header.Y = 2;
+            }
             win.Add(header);
 
             // This renders dashes under the header to make it more clear what is header and what is data
@@ -266,54 +361,33 @@ namespace OutGridView.Cmdlet
                 }
             }
 
-            var headerLine = new Label(headerLineText.ToString())
+            if (!_applicationData.MinUI)
             {
-                X = 0,
-                Y = 3
-            };
-
-            win.Add(headerLine);
-        }
-
-        private void LoadData()
-        {
-            var items = new List<GridViewRow>();
-            int newIndex = 0;
-            for (int i = 0; i < _applicationData.DataTable.Data.Count; i++)
-            {
-                var dataTableRow = _applicationData.DataTable.Data[i];
-                var valueList = new List<string>();
-                foreach (var dataTableColumn in _applicationData.DataTable.DataColumns)
+                var headerLine = new Label(headerLineText.ToString())
                 {
-                    string dataValue = dataTableRow.Values[dataTableColumn.ToString()].DisplayValue;
-                    valueList.Add(dataValue);
-                }
-
-                string displayString = GridViewHelpers.GetPaddedString(valueList, 0, _gridViewDetails.ListViewColumnWidths);
-
-                items.Add(new GridViewRow
-                {
-                    DisplayString = displayString,
-                    OriginalIndex = i
-                });
-
-                newIndex++;
+                    X = 0,
+                    Y = Pos.Bottom(header)
+                };
+                win.Add(headerLine);
             }
-
-            _itemSource = new GridViewDataSource(items);
         }
 
-        private void AddRows(Window win)
+        private void AddListView(Window win)
         {
-            _listView = new ListView(_itemSource)
+            _listView = new ListView(_itemSource);
+            _listView.X = MARGIN_LEFT;
+            if (!_applicationData.MinUI)
             {
-                X = Pos.Left(_filterLabel),
-                Y = Pos.Bottom(_filterLabel) + 3, // 1 for space, 1 for header, 1 for header underline
-                Width = Dim.Fill(2),
-                Height = Dim.Fill(),
-                AllowsMarking = _applicationData.OutputMode != OutputModeOption.None,
-                AllowsMultipleSelection = _applicationData.OutputMode == OutputModeOption.Multiple,
-            };
+                _listView.Y = Pos.Bottom(_filterLabel) + 3; // 1 for space, 1 for header, 1 for header underline
+            }
+            else
+            {
+                _listView.Y = 1; // 1 for space, 1 for header, 1 for header underline
+            }
+            _listView.Width = Dim.Fill(2);
+            _listView.Height = Dim.Fill();
+            _listView.AllowsMarking = _applicationData.OutputMode != OutputModeOption.None;
+            _listView.AllowsMultipleSelection = _applicationData.OutputMode == OutputModeOption.Multiple;
 
             win.Add(_listView);
         }
