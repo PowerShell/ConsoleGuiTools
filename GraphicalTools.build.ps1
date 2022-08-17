@@ -3,14 +3,14 @@ param(
     [ValidateSet("Debug", "Release")]
     [string]$Configuration = "Debug",
 
-    [string[]]$ModuleName = @( 
-        "Microsoft.PowerShell.GraphicalTools", 
-        "Microsoft.PowerShell.ConsoleGuiTools" ) 
+    [string[]]$ModuleName = @(
+        #"Microsoft.PowerShell.GraphicalTools",
+        "Microsoft.PowerShell.ConsoleGuiTools" )
 )
 
 $script:IsUnix = $PSVersionTable.PSEdition -and $PSVersionTable.PSEdition -eq "Core" -and !$IsWindows
 
-$script:TargetFramework = "netcoreapp3.0"
+$script:TargetFramework = "net6.0"
 $script:RequiredSdkVersion = (Get-Content (Join-Path $PSScriptRoot 'global.json') | ConvertFrom-Json).sdk.version
 
 $script:ModuleLayouts = @{}
@@ -152,12 +152,12 @@ task LayoutModule -After Build {
         foreach ($projectName in $moduleLayout.NativeBuildAssets.Keys) {
             foreach ($targetPlatform in $moduleLayout.NativeBuildAssets[$projectName]) {
                 $destDir = Join-Path $moduleBinPath $projectName $targetPlatform
-    
+
                 $null = New-Item -Force $destDir -Type Directory
-    
+
                 # Get the project build dir path
                 $publishPath = [System.IO.Path]::Combine($PSScriptRoot, 'src', $projectName, 'bin', $Configuration, $script:TargetFramework, $targetPlatform, "publish\*" )
-    
+
                 Write-Host $publishPath
                 # Binplace the asset
                 Copy-Item -Recurse -Force  $publishPath $destDir
