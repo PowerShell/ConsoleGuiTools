@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using System;
+using System; 
 using System.Management.Automation;
 using System.Management.Automation.Internal;
 using System.Linq;
@@ -9,6 +9,7 @@ using System.Globalization;
 using System.Collections.Generic;
 using Microsoft.PowerShell.Commands;
 using OutGridView.Models;
+using System.Text.RegularExpressions;
 
 namespace OutGridView.Cmdlet
 {

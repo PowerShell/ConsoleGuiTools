@@ -67,9 +67,6 @@ namespace OutGridView.Cmdlet
             // If -Filter parameter is set, apply it. 
             ApplyFilter();
 
-            _filterField.Text = _applicationData.Filter ?? string.Empty;
-            _filterField.CursorPosition = _filterField.Text.Length;
-
             _listView.SetFocus();
 
             // Run the GUI.
@@ -85,7 +82,7 @@ namespace OutGridView.Cmdlet
 
             // Ensure that only items that are marked AND not filtered out
             // get returned (See Issue #121)
-            List<GridViewRow> itemList = GridViewHelpers.FilterData(_itemSource.GridViewRowList, _filterField.Text.ToString());
+            List<GridViewRow> itemList = GridViewHelpers.FilterData(_itemSource.GridViewRowList, _applicationData.Filter);
             foreach (GridViewRow gvr in itemList)
             {
                 if (gvr.IsMarked)
@@ -327,6 +324,9 @@ namespace OutGridView.Cmdlet
             };
 
             win.Add(_filterLabel, _filterField, filterErrorLabel);
+
+            _filterField.Text = _applicationData.Filter ?? string.Empty;
+            _filterField.CursorPosition = _filterField.Text.Length;            
         }
 
         private void AddHeaders(Window win, List<string> gridHeaders)
