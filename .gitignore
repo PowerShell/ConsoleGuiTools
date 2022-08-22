@@ -42,3 +42,6 @@ module/
 # Ignore package
 Microsoft.PowerShell.GraphicalTools.zip
 Microsoft.PowerShell.ConsoleGuiTools.zip
+
+# git artifacts
+*.orig
