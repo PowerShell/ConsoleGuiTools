@@ -46,15 +46,11 @@ namespace OutGridView.Cmdlet
             // Copy DataTable into the ListView's DataSource
             _itemSource = LoadData();
 
-            // Add Filter UI
             if (!_applicationData.MinUI)
             {
+                // Add Filter UI
                 AddFilter(win);
-            }
-
-            // Add Header UI
-            if (!_applicationData.MinUI)
-            {
+                // Add Header UI
                 AddHeaders(win, gridHeaders);
             }
 

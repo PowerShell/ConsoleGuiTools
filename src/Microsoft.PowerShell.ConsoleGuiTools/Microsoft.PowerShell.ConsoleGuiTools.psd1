@@ -107,9 +107,9 @@ PrivateData = @{
         ReleaseNotes = '# Release Notes
 ## v0.7.0
 
-Upugraded to PS 7.2 and net60
+Upgraded to PowerShell 7.2 and .NET target framework `net60`
 
-Updated Terminal.Gui to 1.6
+Updated Terminal.Gui to 1.7
 
 Fixed #131 - Strip ANSI
 
