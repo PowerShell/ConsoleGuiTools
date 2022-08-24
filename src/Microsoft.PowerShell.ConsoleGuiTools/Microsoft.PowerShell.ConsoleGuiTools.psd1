@@ -9,7 +9,7 @@
 RootModule = 'Microsoft.PowerShell.ConsoleGuiTools.dll'
 
 # Version number of this module.
-ModuleVersion = '0.6.3'
+ModuleVersion = '0.7.2'
 
 # Supported PSEditions
 CompatiblePSEditions = @( 'Core' )
@@ -105,6 +105,13 @@ PrivateData = @{
 
         # ReleaseNotes of this module
         ReleaseNotes = '# Release Notes
+## v0.7.0
+
+Upgraded to PowerShell 7.2 and .NET target framework `net60`
+
+Updated Terminal.Gui to 1.7
+
+Fixed #131 - Strip ANSI
 
 ## v0.6.3
 
