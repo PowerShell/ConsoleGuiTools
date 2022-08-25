@@ -1,30 +1,25 @@
 name: PR-$(System.PullRequest.PullRequestNumber)-$(Date:yyyyMMdd)$(Rev:.rr)
+
 trigger:
-  # Batch merge builds together while a merge build is running
-  batch: true
   branches:
     include:
     - master
 
 pr:
-  branches:
-    include:
-    - master
+- master
 
 resources:
   repositories:
   - repository: ComplianceRepo
     type: github
-    endpoint: ComplianceGHRepo
+    endpoint: GitHub
     name: PowerShell/compliance
 
 jobs:
-- job: Compliance_Job
+- job: Compliance
   pool:
     vmImage: windows-latest
   steps:
   - checkout: self
-    clean: true
   - checkout: ComplianceRepo
-    clean: true
   - template: ci-compliance.yml@ComplianceRepo
