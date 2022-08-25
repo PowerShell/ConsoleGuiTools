@@ -3,7 +3,7 @@ external help file: ConsoleGuiToolsModule.dll-Help.xml
 keywords: powershell,cmdlet
 locale: en-us
 Module Name: Microsoft.PowerShell.ConsoleGuiTools
-ms.date: 08/09/2019
+ms.date: 08/24/2022
 schema: 2.0.0
 title: Out-ConsoleGridView
 ---
@@ -18,7 +18,7 @@ Sends output to an interactive table in the same console window.
 
 ```PowerShell
  Out-ConsoleGridView [-InputObject <psobject>] [-Title <string>] [-OutputMode {None | Single |
-    Multiple}] [-Filter <string>] [<CommonParameters>]
+    Multiple}] [-Filter <string>] [-MinUi] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -27,7 +27,7 @@ The **Out-ConsoleGridView** cmdlet sends the output from a command to a grid vie
 
 You can use the following features of the table to examine your data:
 
-- Quick Filter. Use the Filter box at the top of the window to search the text in the table. You can search for text in a particular column, search for literals, and search for multiple words. You can use the `-Filter` command to pre-populate the Filter box.
+- Quick Filter. Use the Filter box at the top of the window to search the text in the table. You can search for text in a particular column, search for literals, and search for multiple words. You can use the `-Filter` command to pre-populate the Filter box. The filter uses regular expressions.
 
 For instructions for using these features, type `Get-Help Out-ConsoleGridView -Full` and see How to Use the Grid View Window Features in the Notes section.
 
@@ -175,7 +175,7 @@ Accept wildcard characters: False
 
 ### -OutputMode
 Specifies the items that the interactive window sends down the pipeline as input to other commands.
-By default, this cmdlet does not generate any output.
+By default, this cmdlet generates zero, one, or many items.
 
 To send items from the interactive window down the pipeline, click to select the items (either the the mouse in terminals that support mouse or the `SPACE` key) and then press `ENTER`. `ESC` cancels.
 
@@ -215,6 +215,21 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
+### -MinUi
+If specified no window frame, filter box, or status bar will be displayed in the **Out-ConsoleGridView** window.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
 ### CommonParameters
 This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
 
@@ -237,8 +252,6 @@ By default `Out-ConsoleGridView` returns objects representing the selected rows 
 * Deserialized output from remote commands might not be formatted correctly in the grid view window.
 
 ## RELATED LINKS
-
-[Out-GridView](Out-GridView.md)
 
 [Out-File](Out-File.md)
 
