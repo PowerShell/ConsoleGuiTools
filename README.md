@@ -2,7 +2,7 @@
 
 The GraphicalTools repo contains the `Out-ConsoleGridView` 
 PowerShell Cmdlet providing console-based GUI experiences based on
-[Terminal.Gui (gui.cs)](https://github.com/migueldeicaza/gui.cs).
+[Terminal.Gui (gui.cs)](https://github.com/gui-cs/Terminal.Gui).
 
 _Note:_ A module named `Microsoft.PowerShell.GraphicalTools` used to be built and published out of this repo, but per [#101](https://github.com/PowerShell/GraphicalTools/issues/101) it is deprecated and unmaintained until such time that it can be rewritten on top of [.NET MAUI](https://devblogs.microsoft.com/dotnet/introducing-net-multi-platform-app-ui/).
 
@@ -43,7 +43,7 @@ The first command uses the Get-Process cmdlet to get the processes on the comput
 
 The second command uses a pipeline operator to send the $P variable to **Out-ConsoleGridView**.
 
-By specifying `-OutputMode Single` the grid view window will be restricted to a single selection, ensuring now more than a single object is returned.
+By specifying `-OutputMode Single` the grid view window will be restricted to a single selection, ensuring no more than a single object is returned.
 
 ### Example 3: Display a formatted table in a grid view
 
@@ -114,7 +114,7 @@ The *PassThru* parameter is equivalent to using the Multiple value of the *Outpu
 
 ### Example 8: Use F7 as "Show Command History"
 
-Add [gui-cs/F7History](https://github.com/gui-cs/F7History) to your Powershell profile...
+Add [gui-cs/F7History](https://github.com/gui-cs/F7History) to your Powershell profile.
 
 Press `F7` to see the history for the current PowerShell instance
 
@@ -192,14 +192,14 @@ you would like to contribute code, documentation, tests, or bug reports,
 please read the [development section above](https://github.com/PowerShell/GraphicalTools#development)
 to learn more.
 
-## (Deprecated) Microsoft.PowerShell.GraphicalTools Architecture
+## Microsoft.PowerShell.ConsoleGuiTools Architecture
 
-`GraphicalTools` consists of 2 .NET Projects:
+`ConsoleGuiTools` consists of 2 .NET Projects:
 
 - ConsoleGuiTools - Cmdlet implementation for Out-ConsoleGridView
 - OutGridView.Models - Contains data contracts between the GUI & Cmdlet
 
-_Note:_ Previously, GraphicalTools also included the Avalonia-based `Out-GridView` which was implemented in `.\Microsoft.PowerShell.GraphicalTools` and `.\OutGridView.Gui`. These components have been deprecated (see note above).
+_Note:_ Previously, this repo included `Microsoft.PowerShell.GraphicalTools` which included the Avalonia-based `Out-GridView` (implemented in `.\Microsoft.PowerShell.GraphicalTools` and `.\OutGridView.Gui`). These components have been deprecated (see note above).
 
 ## Maintainers
 
