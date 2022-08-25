@@ -29,13 +29,13 @@ namespace OutGridView.Cmdlet
         /// <summary>
         /// This parameter specifies the current pipeline object.
         /// </summary>
-        [Parameter(ValueFromPipeline = true)]
+        [Parameter(ValueFromPipeline = true, HelpMessage = "Specifies the input pipeline object")]
         public PSObject InputObject { get; set; } = AutomationNull.Value;
 
         /// <summary>
         /// Gets/sets the title of the Out-GridView window.
         /// </summary>
-        [Parameter]
+        [Parameter(HelpMessage = "Specifies the text that appears in the title bar of the Out-ConsoleGridView window. y default, the title bar displays the command that invokes Out-ConsoleGridView.")]
         [ValidateNotNullOrEmpty]
         public string Title { get; set; }
 
@@ -43,19 +43,19 @@ namespace OutGridView.Cmdlet
         /// Get or sets a value indicating whether the selected items should be written to the pipeline
         /// and if it should be possible to select multiple or single list items.
         /// </summary>
-        [Parameter()]
+        [Parameter(HelpMessage = "Determines whether a single item (Single), multiple items (Multiple; default), or no items (None) will be written to the pipeline. Also determines selection behavior in the GUI.")]
         public OutputModeOption OutputMode { set; get; } = OutputModeOption.Multiple;
 
         /// <summary>
         /// gets or sets the initial value for the filter in the GUI
         /// </summary>
-        [Parameter()]
+        [Parameter(HelpMessage = "Pre-populates the Filter edit box, allowing filtering to be specified on the command line. The filter uses regular expressions." )]
         public string Filter { set; get; }
 
         /// <summary>
         /// gets or sets the whether "minimum UI" mode will be enabled
         /// </summary>
-        [Parameter()]
+        [Parameter(HelpMessage = "If specified no window frame, filter box, or status bar will be displayed in the GUI.")]
         public SwitchParameter MinUI { set; get; }
 
         #endregion Input Parameters
