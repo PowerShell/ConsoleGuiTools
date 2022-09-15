@@ -2,7 +2,7 @@
 
 The GraphicalTools repo contains the `Out-ConsoleGridView` 
 PowerShell Cmdlet providing console-based GUI experiences based on
-[Terminal.Gui (gui.cs)](https://github.com/migueldeicaza/gui.cs).
+[Terminal.Gui (gui.cs)](https://github.com/gui-cs/Terminal.Gui).
 
 _Note:_ A module named `Microsoft.PowerShell.GraphicalTools` used to be built and published out of this repo, but per [#101](https://github.com/PowerShell/GraphicalTools/issues/101) it is deprecated and unmaintained until such time that it can be rewritten on top of [.NET MAUI](https://devblogs.microsoft.com/dotnet/introducing-net-multi-platform-app-ui/).
 
@@ -20,14 +20,109 @@ to view and filter objects graphically.
 
 ![screenshot of Out-ConsoleGridView](docs/Microsoft.PowerShell.ConsoleGuiTools/ocgv.gif)
 
-### Examples
+## Examples
 
-Get a process ID:
-```powershell
-gps | ocgv -OutputMode Single
+### Example 1: Output processes to a grid view
+
+```PowerShell
+PS C:\> Get-Process | Out-ConsoleGridView
 ```
 
-See the [F7 History](https://github.com/gui-cs/F7History) script to show the PowerShell command history when F7 is pressed.
+This command gets the processes running on the local computer and sends them to a grid view window.
+
+### Example 2: Use a variable to output processes to a grid view
+
+```PowerShell
+PS C:\> $P = Get-Process
+PS C:\> $P | Out-ConsoleGridView -OutputMode Single
+```
+
+This command also gets the processes running on the local computer and sends them to a grid view window.
+
+The first command uses the Get-Process cmdlet to get the processes on the computer and then saves the process objects in the $P variable.
+
+The second command uses a pipeline operator to send the $P variable to **Out-ConsoleGridView**.
+
+By specifying `-OutputMode Single` the grid view window will be restricted to a single selection, ensuring no more than a single object is returned.
+
+### Example 3: Display a formatted table in a grid view
+
+```PowerShell
+PS C:\> Get-Process | Select-Object -Property Name, WorkingSet, PeakWorkingSet | Sort-Object -Property WorkingSet -Descending | Out-ConsoleGridView
+```
+
+This command displays a formatted table in a grid view window.
+
+It uses the Get-Process cmdlet to get the processes on the computer.
+
+Then, it uses a pipeline operator (|) to send the process objects to the Select-Object cmdlet.
+The command uses the **Property** parameter of **Select-Object** to select the Name, WorkingSet, and PeakWorkingSet properties to be displayed in the table.
+
+Another pipeline operator sends the filtered objects to the Sort-Object cmdlet, which sorts them in descending order by the value of the **WorkingSet** property.
+
+The final part of the command uses a pipeline operator (|) to send the formatted table to **Out-ConsoleGridView**.
+
+You can now use the features of the grid view to search, sort, and filter the data.
+
+### Example 4: Save output to a variable, and then output a grid view
+
+```PowerShell
+PS C:\> ($A = Get-ChildItem -Path $pshome -Recurse) | Out-ConsoleGridView
+```
+
+This command saves its output in a variable and sends it to **Out-ConsoleGridView**.
+
+The command uses the Get-ChildItem cmdlet to get the files in the Windows PowerShell installation directory and its subdirectories.
+The path to the installation directory is saved in the $pshome automatic variable.
+
+The command uses the assignment operator (=) to save the output in the $A variable and the pipeline operator (|) to send the output to **Out-ConsoleGridView**.
+
+The parentheses in the command establish the order of operations.
+As a result, the output from the Get-ChildItem command is saved in the $A variable before it is sent to **Out-ConsoleGridView**.
+
+### Example 5: Output processes for a specified computer to a grid view
+
+```PowerShell
+PS C:\> Get-Process -ComputerName "Server01" | ocgv -Title "Processes - Server01"
+```
+
+This command displays the processes that are running on the Server01 computer in a grid view window.
+
+The command uses `ocgv`, which is the built-in alias for the **Out-ConsoleGridView** cmdlet, it uses the *Title* parameter to specify the window title.
+
+### Example 6: Define a function to kill processes using a graphical chooser
+
+```PowerShell
+PS C:\> function killp { Get-Process | Out-ConsoleGridView -OutputMode Single -Filter $args[0] | Stop-Process -Id {$_.Id} }
+PS C:\> killp note
+```
+This example shows defining a function named `killp` that shows a grid view of all running processes and allows the user to select one to kill it.
+
+The example uses the `-Filter` paramter to filter for all proceses with a name that includes `note` (thus highlighting `Notepad` if it were running. Selecting an item in the grid view and pressing `ENTER` will kill that process. 
+
+### Example 7: Pass multiple items through Out-ConsoleGridView
+
+```PowerShell
+PS C:\> Get-Process | Out-ConsoleGridView -PassThru | Export-Csv -Path .\ProcessLog.csv
+```
+
+This command lets you select multiple processes from the **Out-ConsoleGridView** window.
+The processes that you select are passed to the **Export-Csv** command and written to the ProcessLog.csv file.
+
+The command uses the *PassThru* parameter of **Out-ConsoleGridView**, which lets you send multiple items down the pipeline.
+The *PassThru* parameter is equivalent to using the Multiple value of the *OutputMode* parameter.
+
+### Example 8: Use F7 as "Show Command History"
+
+Add [gui-cs/F7History](https://github.com/gui-cs/F7History) to your Powershell profile.
+
+Press `F7` to see the history for the current PowerShell instance
+
+Press `Shift-F7` to see the history for all PowerShell instances.
+
+Whatever you select within `Out-ConsoleGridView` will be inserted on your command line. 
+
+Whatever was typed on the command line prior to hitting `F7` or `Shift-F7` will be used as a filter.
 
 ## Development
 
@@ -97,14 +192,14 @@ you would like to contribute code, documentation, tests, or bug reports,
 please read the [development section above](https://github.com/PowerShell/GraphicalTools#development)
 to learn more.
 
-## (Deprecated) Microsoft.PowerShell.GraphicalTools Architecture
+## Microsoft.PowerShell.ConsoleGuiTools Architecture
 
-`GraphicalTools` consists of 2 .NET Projects:
+`ConsoleGuiTools` consists of 2 .NET Projects:
 
 - ConsoleGuiTools - Cmdlet implementation for Out-ConsoleGridView
 - OutGridView.Models - Contains data contracts between the GUI & Cmdlet
 
-_Note:_ Previously, GraphicalTools also included the Avalonia-based `Out-GridView` which was implemented in `.\Microsoft.PowerShell.GraphicalTools` and `.\OutGridView.Gui`. These components have been deprecated (see note above).
+_Note:_ Previously, this repo included `Microsoft.PowerShell.GraphicalTools` which included the Avalonia-based `Out-GridView` (implemented in `.\Microsoft.PowerShell.GraphicalTools` and `.\OutGridView.Gui`). These components have been deprecated (see note above).
 
 ## Maintainers
 

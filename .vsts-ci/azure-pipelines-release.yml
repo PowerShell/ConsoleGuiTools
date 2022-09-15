@@ -1,7 +1,4 @@
-# NOTE:
-# We stop signing GraphicalTools now since we aren't doing anymore work on it until MAUI
-
-name: PR-$(System.PullRequest.PullRequestNumber)-$(Date:yyyyMMdd)$(Rev:.rr)
+name: Release-$(Build.SourceBranchName)-$(Date:yyyyMMdd)$(Rev:.rr)
 
 variables:
   # Don't download unneeded packages
@@ -12,158 +9,68 @@ variables:
     value: 'true'
 
 trigger:
-  batch: true
   branches:
     include:
-      - master
-  paths:
-    exclude:
-      - /.dependabot/*
-      - /.poshchan/*
-      - /.github/**/*
-      - /.vscode/**/*
-      - /.vsts-ci/misc-analysis.yml
-      - /tools/**/*
-      - .editorconfig
-      - .gitattributes
-      - .gitignore
-      - /docs/**/*
-      - /CHANGELOG.md
-      - /CONTRIBUTING.md
-      - /README.md
-      - /LICENSE.txt
-      - /CODE_OF_CONDUCT.md
+      - release
 
 resources:
   repositories:
   - repository: ComplianceRepo
     type: github
-    endpoint: ComplianceGHRepo
+    endpoint: GitHub
     name: PowerShell/compliance
 
 stages:
 - stage: Build
-  displayName: Build
+  displayName: Build the release
   jobs:
-  - job: 'ReleaseBuild'
-    displayName: Release Build
+  - job: Build
     pool:
-      vmImage: 'windows-latest'
+      name: 1ES
+      demands: ImageOverride -equals PSMMS2019-Secure
     steps:
     - template: templates/ci-general.yml
-    - pwsh: |
-        Get-ChildItem -Recurse '$(Build.SourcesDirectory)'
-      displayName: Capture downloaded artifacts
-    - publish: '$(Build.SourcesDirectory)\src\Microsoft.PowerShell.ConsoleGuiTools\obj\project.assets.json'
-      artifact: ConsoleGuiToolsAssetsJson
-      displayName: Publish ConsoleGuiTools project.assets.json
 
-  - job: 'SignBuild'
-    displayName: Signing Build
-    dependsOn: 'ReleaseBuild'
+- stage: Sign
+  displayName: Sign the release
+  jobs:
+  - job: Sign
     pool:
-      name: 'Package ES Standard Build'
-      demands: DotNetFramework
+      name: 1ES
+      demands: ImageOverride -equals PSMMS2019-Secure
     variables:
     - group: ESRP
     steps:
-    - powershell: |
-        Get-ChildItem -Path env:
-      displayName: Capture environment
-      condition: succeededOrFailed()
+    - template: templates/release-general.yml
 
-    - task: DownloadBuildArtifacts@0
-      displayName: 'Download Build Artifacts'
-      inputs:
-        downloadType: specific
-
-    - pwsh: |
-        Expand-Archive -Path "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\GraphicalTools\Microsoft.PowerShell.ConsoleGuiTools-Windows_NT.zip" -DestinationPath "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\Microsoft.PowerShell.ConsoleGuiTools"
-      displayName: 'Extract build zip'
-
-    - template: EsrpSign.yml@ComplianceRepo
-      parameters:
-        # the folder which contains the binaries to sign
-        buildOutputPath: $(Build.ArtifactStagingDirectory)\Microsoft.PowerShell.ConsoleGuiTools
-        # the location to put the signed output
-        signOutputPath: $(Build.ArtifactStagingDirectory)\Microsoft.PowerShell.ConsoleGuiTools-Signed
-        # the certificate ID to use
-        certificateId: "CP-230012"
-        # The file pattern to use
-        # If not using minimatch: comma separated, with * supported
-        # If using minimatch: newline separated, with !, **, and * supported.
-        # See link in the useMinimatch comments.
-        pattern: 'Microsoft.PowerShell.*.dll,Microsoft.PowerShell.*.psd1,Microsoft.PowerShell.*.psm1'
-        # decides if the task should use minimatch for the pattern matching.
-        # https://github.com/isaacs/minimatch#features
-        useMinimatch: false
-
-    - pwsh: |
-        $signed="$env:BUILD_ARTIFACTSTAGINGDIRECTORY\Microsoft.PowerShell.ConsoleGuiTools-Signed\*"
-        $notSigned="$env:BUILD_ARTIFACTSTAGINGDIRECTORY\Microsoft.PowerShell.ConsoleGuiTools"
-        Copy-Item $signed $notSigned -Recurse -Force -Verbose
-      displayName: 'Copy signed files to unsigned folder'
-
-    - template: EsrpSign.yml@ComplianceRepo
-      parameters:
-        # the folder which contains the binaries to sign
-        buildOutputPath: $(Build.ArtifactStagingDirectory)\Microsoft.PowerShell.ConsoleGuiTools
-        # the location to put the signed output
-        signOutputPath: $(Build.ArtifactStagingDirectory)\Microsoft.PowerShell.ConsoleGuiTools-Signed
-        # the certificate ID to use
-        certificateId: "CP-231522"
-        # The file pattern to use
-        # If not using minimatch: comma separated, with * supported
-        # If using minimatch: newline separated, with !, **, and * supported.
-        # See link in the useMinimatch comments.
-        pattern: 'NStack.dll,Terminal.Gui.dll'
-        # decides if the task should use minimatch for the pattern matching.
-        # https://github.com/isaacs/minimatch#features
-        useMinimatch: false
-
-    - pwsh: |
-        $signed="$(Build.ArtifactStagingDirectory)\Microsoft.PowerShell.ConsoleGuiTools-Signed\*"
-        $notSigned="$(Build.ArtifactStagingDirectory)\Microsoft.PowerShell.ConsoleGuiTools"
-        Copy-Item $signed $notSigned -Recurse -Force -Verbose
-      displayName: 'Copy signed files to unsigned folder'
-
-    - publish: $(Build.ArtifactStagingDirectory)\Microsoft.PowerShell.ConsoleGuiTools
-      artifact: Microsoft.PowerShell.ConsoleGuiTools-Signed
-      displayName: 'Upload Artifacts'
-      condition: succeededOrFailed()
-
-- stage: compliance
-  displayName: Compliance
-  dependsOn: Build
+- stage: PublishGitHub
+  displayName: Publish the draft release
   jobs:
-  - job: Compliance_Job
+  - deployment: Publish
+    environment: GraphicalTools-GitHub
     pool:
-      name: Package ES Standard Build
-    steps:
-    - checkout: self
-    - checkout: ComplianceRepo
-    - download: current
-      artifact: Microsoft.PowerShell.ConsoleGuiTools-Signed
-    - download: current
-      artifact: ConsoleGuiToolsAssetsJson
+      name: 1ES
+      demands: ImageOverride -equals PSMMSUbuntu20.04-Secure
+    variables:
+    - group: Publish
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - template: templates/publish-github.yml
 
-    - pwsh: |
-        Get-ChildItem -Recurse '$(Pipeline.Workspace)'
-      displayName: Capture downloaded artifacts
-
-    - template: assembly-module-compliance.yml@ComplianceRepo
-      parameters:
-        # binskim
-        AnalyzeTarget: '$(Pipeline.Workspace)\Microsoft.PowerShell.ConsoleGuiTools-Signed\*.dll'
-        AnalyzeSymPath: 'SRV*'
-        # component-governance
-        sourceScanPath: '$(Pipeline.Workspace)\ConsoleGuiToolsAssetsJson'
-        # credscan
-        suppressionsFile: ''
-        # TermCheck
-        optionsRulesDBPath: ''
-        optionsFTPath: ''
-        # tsa-upload
-        codeBaseName: 'PSGraphicalTools_20201123'
-        # selections
-        APIScan: false # set to false when not using Windows APIs.
+- stage: PublishMarkets
+  displayName: Publish to marketplace and gallery
+  jobs:
+  - deployment: Publish
+    environment: GraphicalTools-Gallery
+    pool:
+      name: 1ES
+      demands: ImageOverride -equals PSMMSUbuntu20.04-Secure
+    variables:
+    - group: Publish
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - template: templates/publish-markets.yml

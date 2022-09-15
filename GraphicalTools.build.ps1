@@ -3,9 +3,7 @@ param(
     [ValidateSet("Debug", "Release")]
     [string]$Configuration = "Debug",
 
-    [string[]]$ModuleName = @(
-        #"Microsoft.PowerShell.GraphicalTools",
-        "Microsoft.PowerShell.ConsoleGuiTools" )
+    [string[]]$ModuleName = @("Microsoft.PowerShell.ConsoleGuiTools" )
 )
 
 $script:IsUnix = $PSVersionTable.PSEdition -and $PSVersionTable.PSEdition -eq "Core" -and !$IsWindows
@@ -175,17 +173,4 @@ task BuildCmdletHelp {
     }
 }
 
-task PackageModule {
-    foreach ($mn in $ModuleName) {
-        Remove-Item "$PSScriptRoot/$mn.zip" -Force -ErrorAction Ignore
-        Compress-Archive -Path "$PSScriptRoot/module/$mn/" -DestinationPath "$mn.zip" -CompressionLevel Optimal -Force
-    }
-}
-
-task UploadArtifacts -If ($null -ne $env:TF_BUILD) {
-    foreach ($mn in $ModuleName) {
-        Copy-Item -Path "$PSScriptRoot/$mn.zip" -Destination "$env:BUILD_ARTIFACTSTAGINGDIRECTORY/$mn-$($env:AGENT_OS).zip"
-    }
-}
-
-task . Clean, Build, BuildCmdletHelp, PackageModule, UploadArtifacts
+task . Clean, Build, BuildCmdletHelp
