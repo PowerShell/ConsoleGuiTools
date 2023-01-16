@@ -10,6 +10,7 @@ using System.Management.Automation;
 using System.Management.Automation.Internal;
 using System.Linq;
 using System.Diagnostics;
+using System.Collections;
 
 namespace OutGridView.Cmdlet
 {
@@ -116,7 +117,17 @@ namespace OutGridView.Cmdlet
         {
             if(forObject is CachedMemberResult p) 
             {
+                if(p.IsCollection)
+                {
+                    return p.Elements;
+                }
+
                 return GetChildren(p.Value);
+            }
+
+            if(forObject is CachedMemberResultElement e)
+            {
+                return GetChildren(e.Value);
             }
 
             List<object> children = new List<object>();
@@ -153,12 +164,43 @@ namespace OutGridView.Cmdlet
             }
         }
 
+        class CachedMemberResultElement
+        {
+            public int Index;
+            public object Value;
+
+            private string representation;
+
+            public CachedMemberResultElement(object value, int index)
+            {
+                Index = index;
+                Value = value;
+
+                try{
+                    representation = Value?.ToString() ?? "Null";
+                }
+                catch (Exception)
+                {
+                    Value = representation = "Unavailable";
+                }
+            }
+            public override string ToString()
+            {
+                return $"[{Index}]: {representation}]";
+            }
+        }
+
         class CachedMemberResult
         {
             public MemberInfo Member;
             public object Value;
             public object Parent;
-            private string representation;
+            private string representation;            
+            private List<CachedMemberResultElement> valueAsList;
+
+            
+            public bool IsCollection => valueAsList != null;
+            public IReadOnlyCollection<CachedMemberResultElement> Elements => valueAsList?.AsReadOnly();
 
             public CachedMemberResult(object parent, MemberInfo mem)
             {
@@ -178,7 +220,7 @@ namespace OutGridView.Cmdlet
                     else
                         throw new NotSupportedException($"Unknown {nameof(MemberInfo)} Type");
 
-                    representation = Value?.ToString() ?? "Null";
+                    representation = ValueToString();
 
                 }
                 catch (Exception)
@@ -187,9 +229,59 @@ namespace OutGridView.Cmdlet
                 }
             }
 
+            private string ValueToString()
+            {
+                if(Value == null)
+                {
+                    return "Null";
+                }
+                try{
+                    if(IsCollectionOfKnownTypeAndSize(out Type elementType, out int size))
+                    {
+                        return $"{elementType.Name}[{size}]";
+                    }
+                }catch(Exception)
+                {
+                    return Value?.ToString();
+                }
+                
+
+                return Value?.ToString();
+            }
+
+            private bool IsCollectionOfKnownTypeAndSize(out Type elementType, out int size)
+            {
+                elementType = null;
+                size = 0;
+
+                if(Value == null || Value is string)
+                {
+                    
+                    return false;
+                }
+
+                if(Value is IEnumerable ienumerable)
+                {
+                    var list = ienumerable.Cast<object>().ToList();
+
+                    var types = list.Where(v=>v!=null).Select(v=>v.GetType()).Distinct().ToArray();
+
+                    if(types.Length == 1)
+                    {
+                        elementType = types[0];
+                        size = list.Count;
+
+                        valueAsList = list.Select((e,i)=>new CachedMemberResultElement(e,i)).ToList();
+                        return true;
+                    }
+                }
+                
+                return false;
+            }
+
             public override string ToString()
             {
-                return Member.Name + ":" + representation;
+                return Member.Name + ": " + representation;
             }
         }
     }
