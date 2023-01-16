@@ -10,8 +10,8 @@ using OutGridView.Models;
 
 namespace OutGridView.Cmdlet
 {
-    [Cmdlet(VerbsData.Out, "ShowObject")]
-    public class ShowObjectCmdletCommand : PSCmdlet, IDisposable
+    [Cmdlet("Show", "ObjectTree")]
+    public class ShowObjectTreeCmdletCommand : PSCmdlet, IDisposable
     {
         #region Properties
         
