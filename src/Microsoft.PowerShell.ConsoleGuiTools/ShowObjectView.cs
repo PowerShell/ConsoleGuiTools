@@ -9,6 +9,7 @@ using Terminal.Gui.Trees;
 using System.Management.Automation;
 using System.Management.Automation.Internal;
 using System.Linq;
+using System.Diagnostics;
 
 namespace OutGridView.Cmdlet
 {
@@ -17,6 +18,8 @@ namespace OutGridView.Cmdlet
         private readonly TreeView<object> tree;
 
         public bool SupportsCanExpand => true;
+        private StatusItem selectedStatusBarItem;
+        private StatusBar statusBar;
 
         public ShowObjectView(List<object> rootObjects)
         {
@@ -26,9 +29,11 @@ namespace OutGridView.Cmdlet
             tree = new TreeView<object>
             {
                 Width = Dim.Fill(),
-                Height = Dim.Fill(),
+                Height = Dim.Fill(1),
             };
             tree.TreeBuilder = this;
+            tree.AspectGetter = this.AspectGetter;
+            tree.SelectionChanged += this.SelectionChanged;
 
             if (rootObjects.Count > 0)
             {
@@ -38,11 +43,58 @@ namespace OutGridView.Cmdlet
             {
                 tree.AddObject("No Objects");
             }
+            statusBar = new StatusBar();
+            
+            string elementDescription = "objects";
 
+            var types = rootObjects.Select(o=>o.GetType()).Distinct().ToArray();
+            if(types.Length == 1)
+            {
+                elementDescription = types[0].Name;
+            }
+
+            var siCount = new StatusItem(Key.Null, $"{rootObjects.Count} {elementDescription}",null);
+            selectedStatusBarItem = new StatusItem(Key.Null, string.Empty,null);
+            statusBar.AddItemAt(0,siCount);
+            statusBar.AddItemAt(1,selectedStatusBarItem);
+            Add(statusBar);
             Add(tree);
         }
 
-        
+        private void SelectionChanged(object sender, SelectionChangedEventArgs<object> e)
+        {
+            var selectedValue = e.NewValue;
+            
+            if( selectedValue is CachedMemberResult cmr)
+            {
+                selectedValue = cmr.Value;
+            }
+
+            if(selectedValue != null && selectedStatusBarItem != null)
+            {
+                selectedStatusBarItem.Title = selectedValue.GetType().Name;
+            }
+            else
+            {
+                selectedStatusBarItem.Title = string.Empty;
+            }
+            
+            statusBar.SetNeedsDisplay();
+        }
+
+        private string AspectGetter(object toRender)
+        {
+            if(toRender is Process p)
+            {
+                return p.ProcessName;
+            }
+            if(toRender is null)
+            {
+                return "Null";
+            }
+
+            return toRender.ToString();
+        }
 
         public bool CanExpand(object toExpand)
         {
@@ -69,14 +121,16 @@ namespace OutGridView.Cmdlet
 
             List<object> children = new List<object>();
             
-            // Vanilla object
-            foreach (var prop in forObject.GetType().GetProperties())
+            foreach(var member in forObject.GetType().GetMembers().OrderBy(m=>m.Name))
             {
-                children.Add(new CachedMemberResult(forObject, prop));
-            }
-            foreach (var field in forObject.GetType().GetFields())
-            {
-                children.Add(new CachedMemberResult(forObject, field));
+                if(member is PropertyInfo prop)
+                {
+                    children.Add(new CachedMemberResult(forObject, prop));
+                }
+                if(member is FieldInfo field)
+                {
+                    children.Add(new CachedMemberResult(forObject, field));
+                }
             }
 
             return children;
