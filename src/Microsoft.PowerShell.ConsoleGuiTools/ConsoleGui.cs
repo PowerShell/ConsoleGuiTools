@@ -384,6 +384,7 @@ namespace OutGridView.Cmdlet
             _listView.Height = Dim.Fill();
             _listView.AllowsMarking = _applicationData.OutputMode != OutputModeOption.None;
             _listView.AllowsMultipleSelection = _applicationData.OutputMode == OutputModeOption.Multiple;
+            _listView.AddKeyBinding (Key.Space, Command.ToggleChecked, Command.LineDown);
 
             win.Add(_listView);
         }
