@@ -32,7 +32,7 @@ namespace OutGridView.Cmdlet
 
         public void SetMark(int item, bool value)
         {
-            var oldValue =  GridViewRowList[item].IsMarked;
+            var oldValue = GridViewRowList[item].IsMarked;
             GridViewRowList[item].IsMarked = value;
             var args = new RowMarkedEventArgs() { 
                 Row = GridViewRowList[item],
@@ -46,6 +46,7 @@ namespace OutGridView.Cmdlet
             public bool OldValue { get ; set;}
 
         }
+
         public event EventHandler<RowMarkedEventArgs> MarkChanged;
 
         public IList ToList()

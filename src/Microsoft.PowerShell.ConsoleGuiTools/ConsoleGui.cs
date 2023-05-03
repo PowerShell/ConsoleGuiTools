@@ -118,7 +118,7 @@ namespace OutGridView.Cmdlet
                 items.Add(new GridViewRow
                 {
                     DisplayString = displayString,
-                    // We use this to keep _inputSource up to date when a fitler is applied
+                    // We use this to keep _inputSource up to date when a filter is applied
                     OriginalIndex = i
                 });
 
@@ -143,8 +143,9 @@ namespace OutGridView.Cmdlet
             _listView.Source = _listViewSource;
         }
 
-        private void  ListViewSource_MarkChanged (object s, GridViewDataSource.RowMarkedEventArgs a) {
-            _inputSource.GridViewRowList[a.Row.OriginalIndex].IsMarked = a.Row.IsMarked;
+        private void ListViewSource_MarkChanged (object s, GridViewDataSource.RowMarkedEventArgs a)
+        {
+                _inputSource.GridViewRowList[a.Row.OriginalIndex].IsMarked = a.Row.IsMarked;
         }
 
         private void Accept()
