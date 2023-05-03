@@ -24,7 +24,7 @@ namespace OutGridView.Cmdlet
 
             foreach (GridViewRow gvr in list)
             {
-                if(Regex.IsMatch(gvr.DisplayString, filter, RegexOptions.IgnoreCase))
+                if (gvr.IsMarked || Regex.IsMatch(gvr.DisplayString, filter, RegexOptions.IgnoreCase))
                 {
                     items.Add(gvr);
                 }

@@ -22,7 +22,15 @@ namespace OutGridView.Cmdlet
         private Label _filterLabel;
         private TextField _filterField;
         private ListView _listView;
-        private GridViewDataSource _itemSource;
+        // _inputSource contains the full set of Input data and tracks any items the user
+        // marks. When the cmdlet exits, any marked items are returned. When a filter is 
+        // active, the list view shows a copy of _inputSource that includes both the items
+        // matching the filter AND any items previously marked. 
+        private GridViewDataSource _inputSource;
+
+        // _listViewSource is a filtered copy of _inputSource that ListView.Source is set to. 
+        // Changes to IsMarked are propogated back to _inputSource.
+        private GridViewDataSource _listViewSource;
         private ApplicationData _applicationData;
         private GridViewDetails _gridViewDetails;
 
@@ -43,8 +51,9 @@ namespace OutGridView.Cmdlet
             List<string> gridHeaders = _applicationData.DataTable.DataColumns.Select((c) => c.Label).ToList();
             CalculateColumnWidths(gridHeaders);
 
-            // Copy DataTable into the ListView's DataSource
-            _itemSource = LoadData();
+            // Copy the input DataTable into our master ListView source list; upon exit any items
+            // that are IsMarked are returned (if Outputmode is set)
+            _inputSource = LoadData();
 
             if (!_applicationData.MinUI)
             {
@@ -60,7 +69,9 @@ namespace OutGridView.Cmdlet
             // Status bar is where our key-bindings are handled
             AddStatusBar(!_applicationData.MinUI);
 
-            // If -Filter parameter is set, apply it. 
+            // We *always* apply a filter, even if the -Filter parameter is not set or Filtering is not
+            // available. The ListView always shows a fitlered version of _inputSource even if there is no
+            // actual fitler. 
             ApplyFilter();
 
             _listView.SetFocus();
@@ -76,10 +87,8 @@ namespace OutGridView.Cmdlet
                 return selectedIndexes;
             }
 
-            // Ensure that only items that are marked AND not filtered out
-            // get returned (See Issue #121)
-            List<GridViewRow> itemList = GridViewHelpers.FilterData(_itemSource.GridViewRowList, _applicationData.Filter);
-            foreach (GridViewRow gvr in itemList)
+            // Return any items that were selected.
+            foreach (GridViewRow gvr in _inputSource.GridViewRowList)
             {
                 if (gvr.IsMarked)
                 {
@@ -109,6 +118,7 @@ namespace OutGridView.Cmdlet
                 items.Add(new GridViewRow
                 {
                     DisplayString = displayString,
+                    // We use this to keep _inputSource up to date when a filter is applied
                     OriginalIndex = i
                 });
 
@@ -120,9 +130,22 @@ namespace OutGridView.Cmdlet
 
         private void ApplyFilter()
         {
-            List<GridViewRow> itemList = GridViewHelpers.FilterData(_itemSource.GridViewRowList, _applicationData.Filter ?? string.Empty);
-            // Set the ListView to show only the subset defined by the filter
-            _listView.Source = new GridViewDataSource(itemList);
+            // The ListView is always filled with a (filtered) copy of _inputSource.
+            // We listen for `MarkChanged` events on this filtered list and apply those changes up to _inputSource.
+
+            if (_listViewSource != null) {
+                _listViewSource.MarkChanged -= ListViewSource_MarkChanged;
+                _listViewSource = null;
+            }
+
+            _listViewSource = new GridViewDataSource(GridViewHelpers.FilterData(_inputSource.GridViewRowList, _applicationData.Filter ?? string.Empty));
+            _listViewSource.MarkChanged +=  ListViewSource_MarkChanged;
+            _listView.Source = _listViewSource;
+        }
+
+        private void ListViewSource_MarkChanged (object s, GridViewDataSource.RowMarkedEventArgs a)
+        {
+                _inputSource.GridViewRowList[a.Row.OriginalIndex].IsMarked = a.Row.IsMarked;
         }
 
         private void Accept()
@@ -198,7 +221,7 @@ namespace OutGridView.Cmdlet
                         // when ENTER is pressed in Single mode. If something was previously selected
                         // (using SPACE) then honor that as the single item to return
                         if (_applicationData.OutputMode == OutputModeOption.Single &&
-                            _itemSource.GridViewRowList.Find(i => i.IsMarked) == null)
+                            _inputSource.GridViewRowList.Find(i => i.IsMarked) == null)
                         {
                             _listView.MarkUnmarkRow();
                         }
@@ -315,7 +338,7 @@ namespace OutGridView.Cmdlet
                     filterErrorLabel.Text = ex.Message;
                     filterErrorLabel.ColorScheme = Colors.Error;
                     filterErrorLabel.Redraw(filterErrorLabel.Bounds);
-                    _listView.Source = _itemSource;
+                    _listView.Source = _inputSource;
                 }
             };
 
@@ -370,7 +393,7 @@ namespace OutGridView.Cmdlet
 
         private void AddListView(Window win)
         {
-            _listView = new ListView(_itemSource);
+            _listView = new ListView(_inputSource);
             _listView.X = MARGIN_LEFT;
             if (!_applicationData.MinUI)
             {
