@@ -14,23 +14,20 @@ namespace OutGridView.Cmdlet
 {
     internal class GridViewHelpers
     {
-        public static List<GridViewRow> FilterData(List<GridViewRow> list, string filter)
+        // Add all items already selected plus any that match the filter
+        // The selected items should be at the top of the list, in their original order
+        public static List<GridViewRow> FilterData(List<GridViewRow> listToFilter, string filter)
         {
-            var items = new List<GridViewRow>();
+            var filteredList = new List<GridViewRow>();
             if (string.IsNullOrEmpty(filter))
             {
-                filter = ".*";
+                return listToFilter;
             }
 
-            foreach (GridViewRow gvr in list)
-            {
-                if (gvr.IsMarked || Regex.IsMatch(gvr.DisplayString, filter, RegexOptions.IgnoreCase))
-                {
-                    items.Add(gvr);
-                }
-            }
+            filteredList.AddRange(listToFilter.Where(gvr => gvr.IsMarked));
+            filteredList.AddRange(listToFilter.Where(gvr => !gvr.IsMarked && Regex.IsMatch(gvr.DisplayString, filter, RegexOptions.IgnoreCase)));
 
-            return items;
+            return filteredList;
         }
 
         public static string GetPaddedString(List<string> strings, int offset, int[] listViewColumnWidths)
