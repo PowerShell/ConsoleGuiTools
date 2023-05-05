@@ -36,6 +36,8 @@ namespace OutGridView.Cmdlet
             tree.AspectGetter = this.AspectGetter;
             tree.SelectionChanged += this.SelectionChanged;
 
+            tree.ClearKeybinding(Command.ExpandAll);
+
             if (rootObjects.Count > 0)
             {
                 tree.AddObjects(rootObjects);
