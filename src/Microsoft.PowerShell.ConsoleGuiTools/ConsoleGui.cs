@@ -338,7 +338,6 @@ namespace OutGridView.Cmdlet
                     filterErrorLabel.Text = ex.Message;
                     filterErrorLabel.ColorScheme = Colors.Error;
                     filterErrorLabel.Redraw(filterErrorLabel.Bounds);
-                    //_listView.Source = _inputSource;
                 }
             };
 
