@@ -15,7 +15,7 @@ namespace OutGridView.Cmdlet
     {
         private const string FILTER_LABEL = "Filter";
         // This adjusts the left margin of all controls
-        private const int MARGIN_LEFT = 2;
+        private const int MARGIN_LEFT = 1;
         // Width of Terminal.Gui ListView selection/check UI elements (old == 4, new == 2)
         private const int CHECK_WIDTH = 2;
         private bool _cancelled;
@@ -302,7 +302,7 @@ namespace OutGridView.Cmdlet
                 X = Pos.Right(_filterLabel) + 1,
                 Y = Pos.Top(_filterLabel),
                 CanFocus = true,
-                Width = Dim.Fill() - _filterLabel.Text.Length
+                Width = Dim.Fill() - 1
             };
 
             // TextField captures Ctrl-A (select all text) and Ctrl-D (delete backwards)
@@ -338,7 +338,6 @@ namespace OutGridView.Cmdlet
                     filterErrorLabel.Text = ex.Message;
                     filterErrorLabel.ColorScheme = Colors.Error;
                     filterErrorLabel.Redraw(filterErrorLabel.Bounds);
-                    _listView.Source = _inputSource;
                 }
             };
 
@@ -403,7 +402,7 @@ namespace OutGridView.Cmdlet
             {
                 _listView.Y = 1; // 1 for space, 1 for header, 1 for header underline
             }
-            _listView.Width = Dim.Fill(2);
+            _listView.Width = Dim.Fill(1);
             _listView.Height = Dim.Fill();
             _listView.AllowsMarking = _applicationData.OutputMode != OutputModeOption.None;
             _listView.AllowsMultipleSelection = _applicationData.OutputMode == OutputModeOption.Multiple;
