@@ -24,6 +24,7 @@ namespace OutGridView.Cmdlet
 
         public ShowObjectView(List<object> rootObjects)
         {
+            Title = "Show-ObjectTree (Ctrl+Q to quit)";
             Width = Dim.Fill();
             Height = Dim.Fill();
 
@@ -110,7 +111,7 @@ namespace OutGridView.Cmdlet
             return IsBasicType(toExpand);
         }
 
-        private bool IsBasicType(object? value)
+        private bool IsBasicType(object value)
         {
             return value != null && value is not string && !value.GetType().IsValueType;
         }
