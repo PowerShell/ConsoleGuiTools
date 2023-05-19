@@ -17,6 +17,7 @@ namespace OutGridView.Cmdlet
     internal class ShowObjectView : Window, ITreeBuilder<object>
     {
         private readonly TreeView<object> tree;
+        private readonly TreeViewTextFilter<object> filter;
 
         public bool SupportsCanExpand => true;
         private StatusItem selectedStatusBarItem;
@@ -30,6 +31,7 @@ namespace OutGridView.Cmdlet
 
             tree = new TreeView<object>
             {
+                Y = 2,
                 Width = Dim.Fill(),
                 Height = Dim.Fill(1),
             };
@@ -38,6 +40,9 @@ namespace OutGridView.Cmdlet
             tree.SelectionChanged += this.SelectionChanged;
 
             tree.ClearKeybinding(Command.ExpandAll);
+
+            this.filter = new TreeViewTextFilter<object>(tree);
+            tree.Filter = this.filter;
 
             if (rootObjects.Count > 0)
             {
@@ -56,6 +61,22 @@ namespace OutGridView.Cmdlet
             {
                 elementDescription = types[0].Name;
             }
+
+            var lblFilter = new Label(){
+                Text = "Filter:"
+            };
+            var tbFilter = new TextField(){
+                X = Pos.Right(lblFilter),
+                Width = Dim.Fill()
+            };
+            tbFilter.TextChanged += (_)=>{
+                filter.Text = tbFilter.Text.ToString();
+            };
+
+            Add(lblFilter);
+            Add(tbFilter);
+
+            tbFilter.FocusFirst();
 
             var siCount = new StatusItem(Key.Null, $"{rootObjects.Count} {elementDescription}",null);
             selectedStatusBarItem = new StatusItem(Key.Null, string.Empty,null);
