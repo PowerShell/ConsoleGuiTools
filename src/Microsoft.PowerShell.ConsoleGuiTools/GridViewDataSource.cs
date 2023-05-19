@@ -32,8 +32,22 @@ namespace OutGridView.Cmdlet
 
         public void SetMark(int item, bool value)
         {
+            var oldValue = GridViewRowList[item].IsMarked;
             GridViewRowList[item].IsMarked = value;
+            var args = new RowMarkedEventArgs() { 
+                Row = GridViewRowList[item],
+                OldValue = oldValue
+            };
+            MarkChanged?.Invoke(this, args);
         }
+
+        public class RowMarkedEventArgs : EventArgs {
+            public GridViewRow Row { get; set;}
+            public bool OldValue { get ; set;}
+
+        }
+
+        public event EventHandler<RowMarkedEventArgs> MarkChanged;
 
         public IList ToList()
         {
