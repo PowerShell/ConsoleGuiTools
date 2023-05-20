@@ -109,7 +109,7 @@ namespace OutGridView.Cmdlet
                 baseObject is PSObject)
             {
                 ErrorRecord error = new ErrorRecord(
-                    new FormatException("Invalid data type for Out-GridView"),
+                    new FormatException("Invalid data type for Out-ConsoleGridView"),
                     DataNotQualifiedForGridView,
                     ErrorCategory.InvalidType,
                     null);
