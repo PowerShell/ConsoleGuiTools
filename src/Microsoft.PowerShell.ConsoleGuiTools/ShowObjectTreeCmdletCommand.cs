@@ -15,8 +15,8 @@ namespace OutGridView.Cmdlet
     {
         #region Properties
         
-        private const string DataNotQualifiedForGridView = nameof(DataNotQualifiedForGridView);
-        private const string EnvironmentNotSupportedForGridView = nameof(EnvironmentNotSupportedForGridView);
+        private const string DataNotQualifiedForShowObjectTree = nameof(DataNotQualifiedForShowObjectTree);
+        private const string EnvironmentNotSupportedForShowObjectTree = nameof(EnvironmentNotSupportedForShowObjectTree);
 
         private List<PSObject> _psObjects = new List<PSObject>();
 
@@ -39,7 +39,7 @@ namespace OutGridView.Cmdlet
             {
                 ErrorRecord error = new ErrorRecord(
                     new PSNotSupportedException("Not supported in this environment (when input is redirected)."),
-                    EnvironmentNotSupportedForGridView,
+                    EnvironmentNotSupportedForShowObjectTree,
                     ErrorCategory.NotImplemented,
                     null);
 
@@ -81,8 +81,8 @@ namespace OutGridView.Cmdlet
                 baseObject is PSObject)
             {
                 ErrorRecord error = new ErrorRecord(
-                    new FormatException("Invalid data type for Out-GridView"),
-                    DataNotQualifiedForGridView,
+                    new FormatException("Invalid data type for Show-ObjectTree"),
+                    DataNotQualifiedForShowObjectTree,
                     ErrorCategory.InvalidType,
                     null);
 
