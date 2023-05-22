@@ -25,14 +25,16 @@ namespace OutGridView.Cmdlet
 
         public ShowObjectView(List<object> rootObjects)
         {
+            Title = "Show-ObjectTree";
             Width = Dim.Fill();
-            Height = Dim.Fill();
+            Height = Dim.Fill(1);
+            Modal = false;
 
             tree = new TreeView<object>
             {
                 Y = 2,
                 Width = Dim.Fill(),
-                Height = Dim.Fill(1),
+                Height = Dim.Fill(),
             };
             tree.TreeBuilder = this;
             tree.AspectGetter = this.AspectGetter;
@@ -62,11 +64,12 @@ namespace OutGridView.Cmdlet
             }
 
             var lblFilter = new Label(){
-                Text = "Filter:"
+                Text = "Filter:",
+                X = 1,
             };
             var tbFilter = new TextField(){
                 X = Pos.Right(lblFilter),
-                Width = Dim.Fill()
+                Width = Dim.Fill(1)
             };
             tbFilter.TextChanged += (_)=>{
                 filter.Text = tbFilter.Text.ToString();
@@ -83,7 +86,8 @@ namespace OutGridView.Cmdlet
             selectedStatusBarItem = new StatusItem(Key.Null, string.Empty,null);
             statusBar.AddItemAt(1,siCount);
             statusBar.AddItemAt(2,selectedStatusBarItem);
-            Add(statusBar);
+            
+            Application.Top.Add(statusBar);
             Add(tree);
         }
 
@@ -181,7 +185,8 @@ namespace OutGridView.Cmdlet
             try
             {                
                 window = new ShowObjectView(objects.Select(p=>p.BaseObject).ToList());
-                Application.Run(window);
+                Application.Top.Add(window);
+                Application.Run();
             }
             finally{
                 Application.Shutdown();
