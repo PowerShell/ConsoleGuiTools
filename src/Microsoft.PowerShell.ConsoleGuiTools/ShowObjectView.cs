@@ -25,7 +25,6 @@ namespace OutGridView.Cmdlet
 
         public ShowObjectView(List<object> rootObjects)
         {
-            Title = "Show-ObjectTree (Ctrl+Q to quit)";
             Width = Dim.Fill();
             Height = Dim.Fill();
 
@@ -78,10 +77,12 @@ namespace OutGridView.Cmdlet
 
             tbFilter.FocusFirst();
 
+            statusBar.AddItemAt(0, new StatusItem(Key.Esc, "~ESC~ Close", () => Application.RequestStop()));
+
             var siCount = new StatusItem(Key.Null, $"{rootObjects.Count} {elementDescription}",null);
             selectedStatusBarItem = new StatusItem(Key.Null, string.Empty,null);
-            statusBar.AddItemAt(0,siCount);
-            statusBar.AddItemAt(1,selectedStatusBarItem);
+            statusBar.AddItemAt(1,siCount);
+            statusBar.AddItemAt(2,selectedStatusBarItem);
             Add(statusBar);
             Add(tree);
         }
