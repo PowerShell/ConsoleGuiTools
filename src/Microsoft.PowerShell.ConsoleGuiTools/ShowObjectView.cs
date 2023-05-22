@@ -242,8 +242,10 @@ namespace OutGridView.Cmdlet
                         Value = f.GetValue(parent);
                     }
                     else
+                    {
                         throw new NotSupportedException($"Unknown {nameof(MemberInfo)} Type");
-
+                    }
+                    
                     representation = ValueToString();
 
                 }
