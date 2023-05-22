@@ -92,7 +92,7 @@ PrivateData = @{
     PSData = @{
 
         # Tags applied to this module. These help with module discovery in online galleries.
-        Tags = @('Console', 'Gui', 'Out-GridView', 'Out-ConsoleGridView', 'Terminal.Gui', 'gui.cs', 'MacOS', 'Windows', 'Linux', 'PSEdition_Core')
+        Tags = @('Console', 'Gui', 'Out-GridView', 'Out-ConsoleGridView', 'Show-ObjectTree', 'Terminal.Gui', 'gui.cs', 'MacOS', 'Windows', 'Linux', 'PSEdition_Core')
 
         # A URL to the license for this module.
         LicenseUri = 'https://github.com/PowerShell/GraphicalTools/blob/master/LICENSE.txt'
