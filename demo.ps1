@@ -13,5 +13,5 @@ killp
 # Example 3b: 'killp note' fitlers for "note" (e.g. notepad.exe)
 killp note
 # .Silent cls
-# Example 4: Nvigate PowerShell command history (Map this to F7 with https://github.com/gui-cs/F7History)
+# Example 4: Navigate PowerShell command history (Map this to F7 with https://github.com/gui-cs/F7History)
 Get-History | Sort-Object -Descending -Property Id -Unique | Select-Object CommandLine -ExpandProperty CommandLine | Out-ConsoleGridView -OutputMode Single -Filter $line -Title "Command Line History"
