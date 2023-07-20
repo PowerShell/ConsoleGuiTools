@@ -1,0 +1,10 @@
+version: 2
+updates:
+- package-ecosystem: nuget
+  directory: "/src/Microsoft.PowerShell.ConsoleGuiTools/"
+  schedule:
+    interval: weekly
+- package-ecosystem: nuget
+  directory: "/src/Microsoft.PowerShell.OutGridView.Models/"
+  schedule:
+    interval: weekly
