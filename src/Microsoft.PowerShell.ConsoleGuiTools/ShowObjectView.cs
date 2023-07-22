@@ -20,7 +20,7 @@ namespace OutGridView.Cmdlet
     internal class ShowObjectView : Window, ITreeBuilder<object>
     {
         private readonly TreeView<object> tree;
-        private readonly SplitRegexTreeViewTextFilter filter;
+        private readonly RegexTreeViewTextFilter filter;
         private readonly Label filterErrorLabel;
 
         public bool SupportsCanExpand => true;
@@ -54,7 +54,7 @@ namespace OutGridView.Cmdlet
 
             tree.ClearKeybinding(Command.ExpandAll);
 
-            this.filter = new SplitRegexTreeViewTextFilter(this, tree);
+            this.filter = new RegexTreeViewTextFilter(this, tree);
             this.filter.Text = applicationData.Filter ?? string.Empty;
             tree.Filter = this.filter;
 
@@ -383,12 +383,12 @@ namespace OutGridView.Cmdlet
                 return Member.Name + ": " + representation;
             }
         }
-        private class SplitRegexTreeViewTextFilter : ITreeViewFilter<object>
+        private class RegexTreeViewTextFilter : ITreeViewFilter<object>
         {
             private readonly ShowObjectView parent;
             readonly TreeView<object> _forTree;
 
-            public SplitRegexTreeViewTextFilter (ShowObjectView parent, TreeView<object> forTree)
+            public RegexTreeViewTextFilter (ShowObjectView parent, TreeView<object> forTree)
             {
                 this.parent = parent;
                 _forTree = forTree ?? throw new ArgumentNullException (nameof (forTree));
