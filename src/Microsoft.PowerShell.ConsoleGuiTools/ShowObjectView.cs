@@ -161,10 +161,9 @@ namespace OutGridView.Cmdlet
             {
                 return "Null";
             }
-
-            if(toRender is FileSystemInfo fsi)
+            if(toRender is FileSystemInfo fsi && !IsRootObject(fsi))
             {
-                return IsRootObject(fsi) ? fsi.ToString() : fsi.Name;
+                return fsi.Name;
             }
 
             return toRender.ToString();
