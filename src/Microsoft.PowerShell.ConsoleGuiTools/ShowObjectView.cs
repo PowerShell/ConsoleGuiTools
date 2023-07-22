@@ -12,13 +12,15 @@ using System.Linq;
 using System.Diagnostics;
 using System.Collections;
 using OutGridView.Models;
+using System.Text.RegularExpressions;
 
 namespace OutGridView.Cmdlet
 {
     internal class ShowObjectView : Window, ITreeBuilder<object>
     {
         private readonly TreeView<object> tree;
-        private readonly TreeViewTextFilter<object> filter;
+        private readonly SplitRegexTreeViewTextFilter filter;
+        private readonly Label filterErrorLabel;
 
         public bool SupportsCanExpand => true;
         private StatusItem selectedStatusBarItem;
@@ -41,7 +43,7 @@ namespace OutGridView.Cmdlet
             
             tree = new TreeView<object>
             {
-                Y = applicationData.MinUI ? 0 : 1,
+                Y = applicationData.MinUI ? 0 : 2,
                 Width = Dim.Fill(),
                 Height = Dim.Fill(),
             };
@@ -51,7 +53,7 @@ namespace OutGridView.Cmdlet
 
             tree.ClearKeybinding(Command.ExpandAll);
 
-            this.filter = new TreeViewTextFilter<object>(tree);
+            this.filter = new SplitRegexTreeViewTextFilter(this, tree);
             this.filter.Text = applicationData.Filter ?? string.Empty;
             tree.Filter = this.filter;
 
@@ -88,10 +90,20 @@ namespace OutGridView.Cmdlet
                 filter.Text = tbFilter.Text.ToString();
             };
 
+            
+            filterErrorLabel = new Label(string.Empty)
+            {
+                X = Pos.Right(lblFilter) + 1,
+                Y = Pos.Top(lblFilter) + 1,
+                ColorScheme = Colors.Base,
+                Width = Dim.Fill() - lblFilter.Text.Length
+            };
+
             if(!applicationData.MinUI)
             {
                 Add(lblFilter);
                 Add(tbFilter);
+                Add(filterErrorLabel);
             }
 
             statusBar.AddItemAt(0, new StatusItem(Key.Esc, "~ESC~ Close", () => Application.RequestStop()));
@@ -105,6 +117,16 @@ namespace OutGridView.Cmdlet
             Application.Top.Add(statusBar);
 
             Add(tree);
+        }
+        private void SetRegexError(string error)
+        {
+            if(string.Equals(error, filterErrorLabel.Text.ToString()))
+            {
+                return;
+            }
+            filterErrorLabel.Text = error;
+            filterErrorLabel.ColorScheme = Colors.Error;
+            filterErrorLabel.Redraw(filterErrorLabel.Bounds);
         }
 
         private void SelectionChanged(object sender, SelectionChangedEventArgs<object> e)
@@ -330,6 +352,52 @@ namespace OutGridView.Cmdlet
             public override string ToString()
             {
                 return Member.Name + ": " + representation;
+            }
+        }
+        private class SplitRegexTreeViewTextFilter : ITreeViewFilter<object>
+        {
+            private readonly ShowObjectView parent;
+            readonly TreeView<object> _forTree;
+
+            public SplitRegexTreeViewTextFilter (ShowObjectView parent, TreeView<object> forTree)
+            {
+                this.parent = parent;
+                _forTree = forTree ?? throw new ArgumentNullException (nameof (forTree));
+            }
+
+            private string text;
+
+            public string Text {
+                get { return text; }
+                set {
+                    text = value;
+                    RefreshTreeView ();
+                }
+            }
+
+            private void RefreshTreeView ()
+            {
+                _forTree.InvalidateLineMap ();
+                _forTree.SetNeedsDisplay ();
+            }
+
+            public bool IsMatch (object model)
+            {
+                if (string.IsNullOrWhiteSpace (Text)) {
+                    return true;
+                }
+
+                parent.SetRegexError(string.Empty);
+
+                var modelText = _forTree.AspectGetter (model);
+                try{
+                    return Regex.IsMatch(modelText, text, RegexOptions.IgnoreCase);
+                }
+                catch(RegexParseException e)
+                {
+                    parent.SetRegexError(e.Message);
+                    return true;
+                }
             }
         }
     }

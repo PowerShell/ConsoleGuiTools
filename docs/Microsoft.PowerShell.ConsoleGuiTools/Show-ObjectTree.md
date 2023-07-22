@@ -27,7 +27,7 @@ The **Show-ObjectTree** cmdlet sends the output from a command to a tree view wi
 
 You can use the following features of the tree to examine your data:
 
-- Quick Filter. Use the Filter box at the top of the window to search the text in the tree. You can search for text in a particular column, search for literals, and search for multiple words. You can use the `-Filter` command to pre-populate the Filter box. The filter uses regular expressions.
+- Quick Filter. Use the Filter box at the top of the window to search the text in the tree. You can search for literals or multiple words. You can use the `-Filter` command to pre-populate the Filter box. The filter uses regular expressions.
 
 For instructions for using these features, type `Get-Help Show-ObjectTree -Full` and see How to Use the Tree View Window Features in the Notes section.
 
