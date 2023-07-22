@@ -41,41 +41,7 @@ PS C:\> Get-Process | Show-ObjectTree
 
 This command gets the processes running on the local computer and sends them to a tree view window.
 
-### Example 2: Use a variable to output processes to a tree view
-
-```PowerShell
-PS C:\> $P = Get-Process
-PS C:\> $P | Show-ObjectTree -OutputMode Single
-```
-
-This command also gets the processes running on the local computer and sends them to a tree view window.
-
-The first command uses the Get-Process cmdlet to get the processes on the computer and then saves the process objects in the $P variable.
-
-The second command uses a pipeline operator to send the $P variable to **Show-ObjectTree**.
-
-By specifying `-OutputMode Single` the tree view window will be restricted to a single selection, ensuring now more than a single object is returned.
-
-### Example 3: Display a formatted tree in a tree view
-
-```PowerShell
-PS C:\> Get-Process | Select-Object -Property Name, WorkingSet, PeakWorkingSet | Sort-Object -Property WorkingSet -Descending | Show-ObjectTree
-```
-
-This command displays a formatted tree in a tree view window.
-
-It uses the Get-Process cmdlet to get the processes on the computer.
-
-Then, it uses a pipeline operator (|) to send the process objects to the Select-Object cmdlet.
-The command uses the **Property** parameter of **Select-Object** to select the Name, WorkingSet, and PeakWorkingSet properties to be displayed in the tree.
-
-Another pipeline operator sends the filtered objects to the Sort-Object cmdlet, which sorts them in descending order by the value of the **WorkingSet** property.
-
-The final part of the command uses a pipeline operator (|) to send the formatted tree to **Show-ObjectTree**.
-
-You can now use the features of the tree view to search, sort, and filter the data.
-
-### Example 4: Save output to a variable, and then output a tree view
+### Example 2: Save output to a variable, and then output a tree view
 
 ```PowerShell
 PS C:\> ($A = Get-ChildItem -Path $pshome -Recurse) | Show-ObjectTree
@@ -90,50 +56,6 @@ The command uses the assignment operator (=) to save the output in the $A variab
 
 The parentheses in the command establish the order of operations.
 As a result, the output from the Get-ChildItem command is saved in the $A variable before it is sent to **Show-ObjectTree**.
-
-### Example 5: Output processes for a specified computer to a tree view
-
-```PowerShell
-PS C:\> Get-Process -ComputerName "Server01" | ocgv -Title "Processes - Server01"
-```
-
-This command displays the processes that are running on the Server01 computer in a tree view window.
-
-The command uses `ocgv`, which is the built-in alias for the **Show-ObjectTree** cmdlet, it uses the *Title* parameter to specify the window title.
-
-### Example 6: Define a function to kill processes using a graphical chooser
-
-```PowerShell
-PS C:\> function killp { Get-Process | Show-ObjectTree -OutputMode Single -Filter $args[0] | Stop-Process -Id {$_.Id} }
-PS C:\> killp note
-```
-This example shows defining a function named `killp` that shows a tree view of all running processes and allows the user to select one to kill it.
-
-The example uses the `-Filter` paramter to filter for all proceses with a name that includes `note` (thus highlighting `Notepad` if it were running. Selecting an item in the tree view and pressing `ENTER` will kill that process. 
-
-### Example 7: Pass multiple items through Show-ObjectTree
-
-```PowerShell
-PS C:\> Get-Process | Show-ObjectTree -PassThru | Export-Csv -Path .\ProcessLog.csv
-```
-
-This command lets you select multiple processes from the **Show-ObjectTree** window.
-The processes that you select are passed to the **Export-Csv** command and written to the ProcessLog.csv file.
-
-The command uses the *PassThru* parameter of **Show-ObjectTree**, which lets you send multiple items down the pipeline.
-The *PassThru* parameter is equivalent to using the Multiple value of the *OutputMode* parameter.
-
-### Example 8: Use F7 as "Show Command History"
-
-Save See [this gist](https://gist.github.com/tig/cbbeab7f53efd73e329afd6d4b838191) as `F7History.ps1` and run `F7History.ps1` in your `$profile`.
-
-Press `F7` to see the history for the current PowerShell instance
-
-Press `Shift-F7` to see the history for all PowerShell instances.
-
-Whatever you select within `Show-ObjectTree` will be inserted on your command line. 
-
-Whatever was typed on the command line prior to hitting `F7` or `Shift-F7` will be used as a filter.
 
 ## PARAMETERS
 
@@ -168,31 +90,6 @@ Required: False
 Position: Named
 Default value: None
 Accept pipeline input: True (ByValue)
-Accept wildcard characters: False
-```
-
-### -OutputMode
-Specifies the items that the interactive window sends down the pipeline as input to other commands.
-By default, this cmdlet generates zero, one, or many items.
-
-To send items from the interactive window down the pipeline, click to select the items (either the the mouse in terminals that support mouse or the `SPACE` key) and then press `ENTER`. `ESC` cancels.
-
-The values of this parameter determine how many items you can send down the pipeline.
-
-- None. No items. 
-- Single.  Zero items or one item. Use this value when the next command can take only one input object.
-- Multiple.  Zero, one, or many items.  Use this value when the next command can take multiple input objects. This is the default value.
-
-```yaml
-Type: OutputModeOption
-Parameter Sets: OutputMode
-Aliases:
-Accepted values: None, Single, Multiple
-
-Required: False
-Position: Named
-Default value: Multiple
-Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
@@ -239,9 +136,9 @@ You can send any object to this cmdlet.
 
 ## OUTPUTS
 
-### System.Object
+### None
 
-By default `Show-ObjectTree` returns objects representing the selected rows to the pipeline. Use `-OutputMode` to change this behavior.
+`Show-ObjectTree` does not output any objects.
 
 ## NOTES
 
