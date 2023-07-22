@@ -162,7 +162,17 @@ namespace OutGridView.Cmdlet
                 return "Null";
             }
 
+            if(toRender is FileSystemInfo fsi)
+            {
+                return IsRootObject(fsi) ? fsi.ToString() : fsi.Name;
+            }
+
             return toRender.ToString();
+        }
+
+        private bool IsRootObject(object o)
+        {
+            return tree.Objects.Contains(o);
         }
 
         public bool CanExpand(object toExpand)
