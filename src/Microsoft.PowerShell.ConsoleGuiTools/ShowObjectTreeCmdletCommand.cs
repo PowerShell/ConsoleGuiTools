@@ -11,6 +11,7 @@ using OutGridView.Models;
 namespace OutGridView.Cmdlet
 {
     [Cmdlet("Show", "ObjectTree")]
+    [Alias("sot")]
     public class ShowObjectTreeCmdletCommand : PSCmdlet, IDisposable
     {
         #region Properties
