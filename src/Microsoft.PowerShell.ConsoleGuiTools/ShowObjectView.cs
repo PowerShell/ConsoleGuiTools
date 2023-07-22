@@ -13,6 +13,7 @@ using System.Diagnostics;
 using System.Collections;
 using OutGridView.Models;
 using System.Text.RegularExpressions;
+using System.IO;
 
 namespace OutGridView.Cmdlet
 {
@@ -211,7 +212,26 @@ namespace OutGridView.Cmdlet
                 }
             }
 
+            try{
+                children.AddRange(GetExtraChildren(forObject));
+            }
+            catch(Exception)
+            {
+                // Extra children unavailable, possibly security or IO exceptions enumerating children etc
+            }
+
             return children;
+        }
+
+        private IEnumerable<object> GetExtraChildren(object forObject)
+        {
+            if(forObject is DirectoryInfo dir)
+            {
+                foreach(var c in dir.EnumerateFileSystemInfos())
+                {
+                    yield return c;
+                }
+            }
         }
 
         internal static void Run(List<PSObject> objects, ApplicationData applicationData)
