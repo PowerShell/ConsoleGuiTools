@@ -30,6 +30,25 @@ namespace OutGridView.Cmdlet
         [Parameter(ValueFromPipeline = true, HelpMessage = "Specifies the input pipeline object")]
         public PSObject InputObject { get; set; } = AutomationNull.Value;
 
+        /// <summary>
+        /// Gets/sets the title of the Out-GridView window.
+        /// </summary>
+        [Parameter(HelpMessage = "Specifies the text that appears in the title bar of the Out-ConsoleGridView window. y default, the title bar displays the command that invokes Out-ConsoleGridView.")]
+        [ValidateNotNullOrEmpty]
+        public string Title { get; set; }
+
+        /// <summary>
+        /// gets or sets the initial value for the filter in the GUI
+        /// </summary>
+        [Parameter(HelpMessage = "Pre-populates the Filter edit box, allowing filtering to be specified on the command line. The filter uses regular expressions." )]
+        public string Filter { set; get; }
+
+        /// <summary>
+        /// gets or sets the whether "minimum UI" mode will be enabled
+        /// </summary>
+        [Parameter(HelpMessage = "If specified no window frame, filter box, or status bar will be displayed in the GUI.")]
+        public SwitchParameter MinUI { set; get; }
+
         #endregion Input Parameters
 
         // This method gets called once for each cmdlet in the pipeline when the pipeline starts executing
@@ -102,8 +121,15 @@ namespace OutGridView.Cmdlet
             {
                 return;
             }
+
+            var applicationData = new ApplicationData
+            {
+                Title = Title ?? "Show-ObjectTree",
+                Filter = Filter,
+                MinUI = MinUI
+            };
             
-            ShowObjectView.Run(_psObjects);
+            ShowObjectView.Run(_psObjects, applicationData);
         }
 
         public void Dispose()

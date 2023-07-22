@@ -11,6 +11,7 @@ using System.Management.Automation.Internal;
 using System.Linq;
 using System.Diagnostics;
 using System.Collections;
+using OutGridView.Models;
 
 namespace OutGridView.Cmdlet
 {
@@ -23,16 +24,24 @@ namespace OutGridView.Cmdlet
         private StatusItem selectedStatusBarItem;
         private StatusBar statusBar;
 
-        public ShowObjectView(List<object> rootObjects)
+        public ShowObjectView(List<object> rootObjects, ApplicationData applicationData)
         {
-            Title = "Show-ObjectTree";
+            Title = applicationData.Title;
             Width = Dim.Fill();
             Height = Dim.Fill(1);
             Modal = false;
 
+            if(applicationData.MinUI)
+            {
+                Border.BorderStyle = BorderStyle.None;
+                Title = string.Empty;
+                X = -1;
+                Height = Dim.Fill();
+            }
+            
             tree = new TreeView<object>
             {
-                Y = 2,
+                Y = applicationData.MinUI ? 0 : 1,
                 Width = Dim.Fill(),
                 Height = Dim.Fill(),
             };
@@ -43,6 +52,7 @@ namespace OutGridView.Cmdlet
             tree.ClearKeybinding(Command.ExpandAll);
 
             this.filter = new TreeViewTextFilter<object>(tree);
+            this.filter.Text = applicationData.Filter ?? string.Empty;
             tree.Filter = this.filter;
 
             if (rootObjects.Count > 0)
@@ -69,16 +79,20 @@ namespace OutGridView.Cmdlet
             };
             var tbFilter = new TextField(){
                 X = Pos.Right(lblFilter),
-                Width = Dim.Fill(1)
+                Width = Dim.Fill(1),
+                Text = applicationData.Filter ?? string.Empty
             };
+            tbFilter.CursorPosition = tbFilter.Text.Length;
+
             tbFilter.TextChanged += (_)=>{
                 filter.Text = tbFilter.Text.ToString();
             };
 
-            Add(lblFilter);
-            Add(tbFilter);
-
-            tbFilter.FocusFirst();
+            if(!applicationData.MinUI)
+            {
+                Add(lblFilter);
+                Add(tbFilter);
+            }
 
             statusBar.AddItemAt(0, new StatusItem(Key.Esc, "~ESC~ Close", () => Application.RequestStop()));
 
@@ -87,7 +101,9 @@ namespace OutGridView.Cmdlet
             statusBar.AddItemAt(1,siCount);
             statusBar.AddItemAt(2,selectedStatusBarItem);
             
+            statusBar.Visible = !applicationData.MinUI;
             Application.Top.Add(statusBar);
+
             Add(tree);
         }
 
@@ -176,7 +192,7 @@ namespace OutGridView.Cmdlet
             return children;
         }
 
-        internal static void Run(List<PSObject> objects)
+        internal static void Run(List<PSObject> objects, ApplicationData applicationData)
         {
 
             Application.Init();
@@ -184,7 +200,7 @@ namespace OutGridView.Cmdlet
             
             try
             {                
-                window = new ShowObjectView(objects.Select(p=>p.BaseObject).ToList());
+                window = new ShowObjectView(objects.Select(p=>p.BaseObject).ToList(), applicationData);
                 Application.Top.Add(window);
                 Application.Run();
             }
