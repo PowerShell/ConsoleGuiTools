@@ -9,7 +9,7 @@
 RootModule = 'Microsoft.PowerShell.ConsoleGuiTools.dll'
 
 # Version number of this module.
-ModuleVersion = '0.7.3'
+ModuleVersion = '0.7.4'
 
 # Supported PSEditions
 CompatiblePSEditions = @( 'Core' )
@@ -105,6 +105,41 @@ PrivateData = @{
 
         # ReleaseNotes of this module
         ReleaseNotes = '# Release Notes
+## v0.7.4
+
+* Fixes last line not cleared on exit in WT by updating to Terminal.Gui v1.13.5 #205
+
+## v0.7.3
+
+* Build updates and compliant release pipeline #168
+* Updates ConsoleGuiTools to Terminal.Gui v1.10 #184
+* Fixes #175. Column headers misaligned #185
+* Fixes# 148. Move to next row on select #187
+* Fixes #174. Changing Filter does not undo previously marked items #186
+* Marked are now at top; simplified code; fixed margin #188
+* Fixes #189 - Fixed typo in exception text. Added -verbose to launch.json #190
+* Fixes #195 - Incompatible with OpenSUS #196
+* Bump Newtonsoft.Json from 13.0.1 to 13.0.3 #198
+* Bump Newtonsoft.Json from 13.0.1 to 13.0.3 #200
+* Bump Microsoft.PowerShell.SDK from 7.2.6 to 7.2.13 #199
+* Bump Terminal.Gui from 1.13 to 1.13.4 #197
+* Remove PDB files from module #201
+
+## v0.7.2
+
+* Update Terminal.Gui to v1.7.1 #161
+* Filter edit chops off first char of filter string passed on command line #151
+* Color changes and terminal becomes unreadable #150
+If items are selected, then a filter is applied, items now hidden stay selected #121
+* Add UI for select-all/select-none #120
+* Add ability to minimize UI #116
+* Initial focus should be on the results (ListView) #87
+* Import-Module causes warning on PowerShell 7 RC3 #44
+* Runaway process on Ubuntu 20.4 displaying random characters upon exit. #139
+* PSAnsiRenderingFileInfo causes display issues with Out-ConsoleGridView #159
+* Removes building and distribution of Out-GridView and the other Avalonia-based components
+* Remove ANSI escape sequences from property values #158
+        
 ## v0.7.0
 
 Upgraded to PowerShell 7.2 and .NET target framework `net60`
