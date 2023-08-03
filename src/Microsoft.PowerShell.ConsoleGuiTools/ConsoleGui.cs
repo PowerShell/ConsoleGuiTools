@@ -39,7 +39,9 @@ namespace OutGridView.Cmdlet
         public HashSet<int> Start(ApplicationData applicationData)
         {
             _applicationData = applicationData;
-            Application.UseSystemConsole = _applicationData.UseSystemConsole;
+            // Note, in Terminal.Gui v2, this property is renamed to Application.UseNetDriver, hence
+            // using that terminology here.
+            Application.UseSystemConsole = _applicationData.UseNetDriver;
             Application.Init();
             _gridViewDetails = new GridViewDetails
             {

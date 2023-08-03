@@ -62,8 +62,8 @@ namespace OutGridView.Cmdlet
         /// gets or sets the whether the Terminal.Gui System.Net.Console-based ConsoleDriver will be used instead of the 
         /// default platform-specific (Windows or Curses) ConsoleDriver.
         /// </summary>
-        [Parameter(HelpMessage = "If specified the Terminal.Gui System.Net.Console-based ConsoleDriver will be used.")]
-        public SwitchParameter UseSystemConsole { set; get; }
+        [Parameter(HelpMessage = "If specified the Terminal.Gui System.Net.Console-based ConsoleDriver (NetDriver) will be used.")]
+        public SwitchParameter UseNetDriver { set; get; }
 
 
          /// <summary>
@@ -159,7 +159,7 @@ namespace OutGridView.Cmdlet
                 Filter = Filter,
                 MinUI = MinUI,
                 DataTable = dataTable,
-                UseSystemConsole = UseSystemConsole,
+                UseNetDriver = UseNetDriver,
                 Verbose = Verbose,
                 Debug = Debug,
                 ModuleVersion = MyInvocation.MyCommand.Version.ToString()
