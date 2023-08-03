@@ -10,4 +10,4 @@ Invoke-Build Build -ModuleName Microsoft.PowerShell.ConsoleGuiTools
 # - Scale: recursive ls of the project
 # - Filter: proving regex works
 # - SelectMultiple
-pwsh -noprofile -command "Import-Module -verbose '$PSScriptRoot/module/Microsoft.PowerShell.ConsoleGuiTools'; Get-ChildItem -Recurse | Out-ConsoleGridView -OutputMode Multiple -Title 'Imported Modules' -Filter \.xml"
+pwsh -noprofile -command "Import-Module -verbose '$PSScriptRoot/module/Microsoft.PowerShell.ConsoleGuiTools'; Get-ChildItem -Recurse | Out-ConsoleGridView -Debug -OutputMode Multiple -Title 'Imported Modules' -Filter \.xml"

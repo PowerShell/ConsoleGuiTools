@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.002.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.PowerShell.ConsoleGuiTools", "Microsoft.PowerShell.ConsoleGuiTools\Microsoft.PowerShell.ConsoleGuiTools.csproj", "{62446F27-830C-42F5-9BBF-A3A1AAEC74FE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.PowerShell.OutGridView.Models", "Microsoft.PowerShell.OutGridView.Models\Microsoft.PowerShell.OutGridView.Models.csproj", "{EA466581-C734-4D1F-93E7-094B7F15A39D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{62446F27-830C-42F5-9BBF-A3A1AAEC74FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{62446F27-830C-42F5-9BBF-A3A1AAEC74FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{62446F27-830C-42F5-9BBF-A3A1AAEC74FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{62446F27-830C-42F5-9BBF-A3A1AAEC74FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA466581-C734-4D1F-93E7-094B7F15A39D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA466581-C734-4D1F-93E7-094B7F15A39D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA466581-C734-4D1F-93E7-094B7F15A39D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA466581-C734-4D1F-93E7-094B7F15A39D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {060A50A1-A6B4-42B5-9975-E5CE3020630E}
+	EndGlobalSection
+EndGlobal

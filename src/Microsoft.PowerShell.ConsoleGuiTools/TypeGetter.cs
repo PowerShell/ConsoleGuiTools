@@ -169,7 +169,8 @@ namespace OutGridView.Cmdlet
 
             foreach (var dataColumn in dataTableColumns)
             {
-                _cmdlet.WriteVerbose(dataColumn.ToString());
+                // See https://github.com/PowerShell/GraphicalTools/issues/192
+                //_cmdlet.WriteVerbose(dataColumn.ToString());
             }
 
             List<DataTableRow> dataTableRows = new List<DataTableRow>();
