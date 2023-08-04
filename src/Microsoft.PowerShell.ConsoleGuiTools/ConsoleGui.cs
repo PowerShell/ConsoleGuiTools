@@ -243,7 +243,8 @@ namespace OutGridView.Cmdlet
             if (_applicationData.Verbose || _applicationData.Debug)
             {
                 statusItems.Add(new StatusItem(Key.Null, $" v{_applicationData.ModuleVersion}", null));
-                statusItems.Add(new StatusItem(Key.Null, $"Terminal.Gui v{FileVersionInfo.GetVersionInfo(Assembly.GetAssembly(typeof(Application)).Location).FileVersion}", null));
+                statusItems.Add(new StatusItem(Key.Null, 
+                $"Terminal.Gui v{FileVersionInfo.GetVersionInfo(Assembly.GetAssembly(typeof(Application)).Location).ProductVersion}", null));
             }
 
             var statusBar = new StatusBar(statusItems.ToArray());
