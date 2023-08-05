@@ -2,15 +2,53 @@
 # GraphicalTools includes two modules: Microsoft.PowerShell.GraphicalTools and Microsoft.PowerShell.ConsoleGuiTools
 # To build them all leave -ModuleName off the `InvokeBuild` command (e.g. Invoke-Build Build).
 # To build only one, specify it using the -ModuleName paramater (e.g. Invoke-Build Build -ModuleName Microsoft.PowerShell.ConsoleGuiTools).
+$ModuleName = "Microsoft.PowerShell.ConsoleGuiTools"
 
-# Build...
-Invoke-Build Build -ModuleName Microsoft.PowerShell.ConsoleGuiTools
+$ModulePath = "$PSScriptRoot/module/$ModuleName"
+
+# Assume this is the first build
+$build = 0
+
+$psd1Content = Get-Content $($ModulePath + "/$($ModuleName).psd1") -Raw -ErrorAction SilentlyContinue
+if ($psd1Content) {
+    # Extract the ModuleVersion from the .psd1 content using regular expression
+    if ($psd1Content -match "ModuleVersion\s+=\s+'(.*?)'") {
+        $prevVersion = $Matches[1]
+        $prevVersionParts = $prevVersion -split '\.'
+        $build = [int]$prevVersionParts[3] + 1
+        $ModuleVersion = "{0}.{1}.{2}" -f $prevVersionParts[0], $prevVersionParts[1], $prevVersionParts[2]
+    } else {
+       throw "ModuleVersion not found in the old .psd1 file."
+    }
+} else {
+    "No previous version found. Assuming this is the first build."
+    # Get the ModuleVersion using dotnet-gitversion
+    $prevVersion = "1.0.0"
+    $ModuleVersion = "$($prevVersion)"
+}
+
+"New Version: $ModuleVersion"
+
+"Buildihg $ModuleName..."
+Invoke-Build Build -ModuleName $ModuleName
+
+# Publish to a local PSRepository to enable downstream dependenies to use development builds
+# - If `local` doesn't exist, create with `Register-PSRepository -Name local -SourceLocation "~/psrepo" -InstallationPolicy Trusted`
+$localRepository = Get-PSRepository | Where-Object { $_.Name -eq 'local' }
+if ($localRepository) {    
+    $localRepositoryPath = $localRepository | Select-Object -ExpandProperty SourceLocation
+    # Un-publishing $ModuleName from local repository at $localRepositoryPath"
+    Remove-Item "${localRepositoryPath}/${ModuleName}.{$ModuleVersion}.nupkg" -Recurse -Force -ErrorAction SilentlyContinue
+}
+
+"Publishing $ModuleName... to `local` PSRepository"
+Publish-Module -Path $ModulePath  -Repository 'local'
 
 # Run what was built as a bit of test of:
 # - Scale: recursive ls of the project
 # - Filter: proving regex works
 # - SelectMultiple
-pwsh -noprofile -command "Import-Module -verbose '$PSScriptRoot/module/Microsoft.PowerShell.ConsoleGuiTools'; Get-ChildItem -Recurse | Out-ConsoleGridView -Debug -OutputMode Multiple -Title 'Imported Modules' -Filter \.xml"
-
-Publish-Module -Path $PSScriptRoot/module/Microsoft.PowerShell.ConsoleGuiTools  -Repository 'local' -Verbose
-```
+$testCommand = "Get-ChildItem -Recurse | Out-ConsoleGridView -Debug -OutputMode Multiple -Title 'Imported Modules' -Filter \.xml"
+"Running test in new pwsh session: $testCommand"
+pwsh -noprofile -command "Import-Module -verbose '$PSScriptRoot/module/$ModuleName'; $testCommand"
+"Test exited. Build complete."

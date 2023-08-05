@@ -11,7 +11,7 @@
     -->
 
     <PropertyGroup>
-        <RestoreSources>$(RestoreSources);../../../gui-cs/Terminal.Gui/Terminal.Gui/bin/Debug;https://api.nuget.org/v3/index.json</RestoreSources>
+        <RestoreSources>$(RestoreSources);../../../gui-cs/Terminal.Gui/Terminal.Gui/bin/Debug</RestoreSources>
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Nstack.Core" Version="1.0.7" />
