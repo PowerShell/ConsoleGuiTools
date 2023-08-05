@@ -65,8 +65,7 @@ namespace OutGridView.Cmdlet
         [Parameter(HelpMessage = "If specified the Terminal.Gui System.Net.Console-based ConsoleDriver (NetDriver) will be used.")]
         public SwitchParameter UseNetDriver { set; get; }
 
-
-         /// <summary>
+        /// <summary>
         /// For the -Verbose switch
         /// </summary>
         public bool Verbose => MyInvocation.BoundParameters.TryGetValue("Verbose", out var o);
