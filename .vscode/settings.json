@@ -1,5 +1,6 @@
 {
     "files.associations": {
         "**/.vsts-ci/**/*.yml":"azure-pipelines",
-    }
+    },
+    "dotnet.defaultSolution": "src/src.sln"
 }

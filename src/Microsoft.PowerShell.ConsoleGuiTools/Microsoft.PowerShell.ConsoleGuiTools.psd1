@@ -10,7 +10,7 @@ RootModule = 'Microsoft.PowerShell.ConsoleGuiTools.dll'
 
 # Version number of this module.
 # NOTE: This will get updated by build.ps1; the build number will be incremented for each build.
-ModuleVersion = '0.7.5.3'
+ModuleVersion = '0.7.5.4'
 
 # Supported PSEditions
 CompatiblePSEditions = @( 'Core' )
@@ -225,6 +225,7 @@ Initial Release
 # DefaultCommandPrefix = ''
 
 }
+
 
 
 

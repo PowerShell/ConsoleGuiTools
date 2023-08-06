@@ -4,18 +4,18 @@
         <TargetFramework>net7.0</TargetFramework>
     </PropertyGroup>
 
-    <!-- To pull Terminal.Gui from a local nuget source:                        
-    - Build Terminal.Gui locally in ../../gui-cs/Terminal.Gui          
-    - Change Version= to "1.99.*-*"     
-    - Uncomment the RestoreSources property group below
-    -->
-
     <PropertyGroup>
-        <RestoreSources>$(RestoreSources);../../../gui-cs/Terminal.Gui/Terminal.Gui/bin/Debug</RestoreSources>
+        <!-- To pull Terminal.Gui from a local nuget source:                        
+        - Build Terminal.Gui locally in ../../gui-cs/Terminal.Gui          
+        - Change Version= to "1.99.*-*"     
+        - Uncomment the RestoreSources property group below
+        -->
+        <!-- <RestoreSources>$(RestoreSources);../../../gui-cs/Terminal.Gui/Terminal.Gui/bin/Debug;https://api.nuget.org/v3/index.json</RestoreSources> -->
     </PropertyGroup>
+
     <ItemGroup>
         <PackageReference Include="Nstack.Core" Version="1.0.7" />
-        <PackageReference Include="Terminal.Gui" Version="1.99.*-*" />  
+        <PackageReference Include="Terminal.Gui" Version="1.14.0" />  
         <PackageReference Include="Microsoft.PowerShell.SDK" Version="7.2.13" />
     </ItemGroup>
 
