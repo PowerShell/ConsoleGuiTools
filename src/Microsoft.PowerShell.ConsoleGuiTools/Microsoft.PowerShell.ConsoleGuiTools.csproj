@@ -7,11 +7,11 @@
     <PropertyGroup>
         <!-- To pull Terminal.Gui from a local nuget source:                        
         - Build Terminal.Gui locally in ../../gui-cs/Terminal.Gui          
-        - Change Version= to "major.minor.patch-*"     
+        - Change Terminal.Gui Version= to "major.minor.patch-*"     
         - Add ';https://api.nuget.org/v3/index.json' to the end of the RestoreSources property group below
         - Uncomment the RestoreSources property group below
         -->
-        <RestoreSources>$(RestoreSources);../../../gui-cs/Terminal.Gui/Terminal.Gui/bin/Debug</RestoreSources>
+        <!-- <RestoreSources>$(RestoreSources);../../../gui-cs/Terminal.Gui/Terminal.Gui/bin/Debug</RestoreSources> -->
     </PropertyGroup>
 
     <ItemGroup>
