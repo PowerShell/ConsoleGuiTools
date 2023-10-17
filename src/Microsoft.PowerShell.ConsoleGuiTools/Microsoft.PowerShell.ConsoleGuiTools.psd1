@@ -9,7 +9,8 @@
 RootModule = 'Microsoft.PowerShell.ConsoleGuiTools.dll'
 
 # Version number of this module.
-ModuleVersion = '0.7.4'
+# NOTE: This will get updated by build.ps1; the build number will be incremented for each build.
+ModuleVersion = '0.7.5.36'
 
 # Supported PSEditions
 CompatiblePSEditions = @( 'Core' )
@@ -105,6 +106,11 @@ PrivateData = @{
 
         # ReleaseNotes of this module
         ReleaseNotes = '# Release Notes
+## v0.7.5
+
+* Adds support for -Diagnostic switch to Out-ConsoleGridView #208
+* Adds support for -UseNetDriver switch to Out-ConsoleGridView #208
+
 ## v0.7.4
 
 * Fixes last line not cleared on exit in WT by updating to Terminal.Gui v1.13.5 #205
@@ -219,3 +225,4 @@ Initial Release
 # DefaultCommandPrefix = ''
 
 }
+

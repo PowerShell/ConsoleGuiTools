@@ -39,7 +39,9 @@ namespace OutGridView.Cmdlet
         public HashSet<int> Start(ApplicationData applicationData)
         {
             _applicationData = applicationData;
-            Application.UseSystemConsole = _applicationData.UseSystemConsole;
+            // Note, in Terminal.Gui v2, this property is renamed to Application.UseNetDriver, hence
+            // using that terminology here.
+            Application.UseSystemConsole = _applicationData.UseNetDriver;
             Application.Init();
             _gridViewDetails = new GridViewDetails
             {
@@ -241,7 +243,8 @@ namespace OutGridView.Cmdlet
             if (_applicationData.Verbose || _applicationData.Debug)
             {
                 statusItems.Add(new StatusItem(Key.Null, $" v{_applicationData.ModuleVersion}", null));
-                statusItems.Add(new StatusItem(Key.Null, $"Terminal.Gui v{FileVersionInfo.GetVersionInfo(Assembly.GetAssembly(typeof(Application)).Location).FileVersion}", null));
+                statusItems.Add(new StatusItem(Key.Null, 
+                $"{Application.Driver} v{FileVersionInfo.GetVersionInfo(Assembly.GetAssembly(typeof(Application)).Location).ProductVersion}", null));
             }
 
             var statusBar = new StatusBar(statusItems.ToArray());
