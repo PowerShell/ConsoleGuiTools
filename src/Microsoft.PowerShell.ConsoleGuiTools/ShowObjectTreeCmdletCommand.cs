@@ -49,6 +49,17 @@ namespace OutGridView.Cmdlet
         /// </summary>
         [Parameter(HelpMessage = "If specified no window frame, filter box, or status bar will be displayed in the GUI.")]
         public SwitchParameter MinUI { set; get; }
+        /// <summary>
+        /// gets or sets the whether the Terminal.Gui System.Net.Console-based ConsoleDriver will be used instead of the 
+        /// default platform-specific (Windows or Curses) ConsoleDriver.
+        /// </summary>
+        [Parameter(HelpMessage = "If specified the Terminal.Gui System.Net.Console-based ConsoleDriver (NetDriver) will be used.")]
+        public SwitchParameter UseNetDriver { set; get; }
+
+        /// <summary>
+        /// For the -Debug switch
+        /// </summary>
+        public bool Debug => MyInvocation.BoundParameters.TryGetValue("Debug", out var o);
 
         #endregion Input Parameters
 
@@ -127,7 +138,10 @@ namespace OutGridView.Cmdlet
             {
                 Title = Title ?? "Show-ObjectTree",
                 Filter = Filter,
-                MinUI = MinUI
+                MinUI = MinUI,
+                UseNetDriver = UseNetDriver,
+                Debug = Debug,
+                ModuleVersion = MyInvocation.MyCommand.Version.ToString()
             };
             
             ShowObjectView.Run(_psObjects, applicationData);

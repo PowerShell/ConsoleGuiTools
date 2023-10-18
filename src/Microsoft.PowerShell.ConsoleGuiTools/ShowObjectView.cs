@@ -33,6 +33,7 @@ namespace OutGridView.Cmdlet
             Width = Dim.Fill();
             Height = Dim.Fill(1);
             Modal = false;
+            
 
             if(applicationData.MinUI)
             {
@@ -107,13 +108,21 @@ namespace OutGridView.Cmdlet
                 Add(filterErrorLabel);
             }
 
-            statusBar.AddItemAt(0, new StatusItem(Key.Esc, "~ESC~ Close", () => Application.RequestStop()));
+            int pos = 0;
+            statusBar.AddItemAt(pos++, new StatusItem(Key.Esc, "~ESC~ Close", () => Application.RequestStop()));
 
             var siCount = new StatusItem(Key.Null, $"{rootObjects.Count} {elementDescription}",null);
             selectedStatusBarItem = new StatusItem(Key.Null, string.Empty,null);
-            statusBar.AddItemAt(1,siCount);
-            statusBar.AddItemAt(2,selectedStatusBarItem);
-            
+            statusBar.AddItemAt(pos++,siCount);
+            statusBar.AddItemAt(pos++,selectedStatusBarItem);
+
+            if ( applicationData.Debug)
+            {
+                statusBar.AddItemAt(pos++,new StatusItem(Key.Null, $" v{applicationData.ModuleVersion}", null));
+                statusBar.AddItemAt(pos++,new StatusItem(Key.Null, 
+                $"{Application.Driver} v{FileVersionInfo.GetVersionInfo(Assembly.GetAssembly(typeof(Application)).Location).ProductVersion}", null));
+            }
+                        
             statusBar.Visible = !applicationData.MinUI;
             Application.Top.Add(statusBar);
 
@@ -245,7 +254,9 @@ namespace OutGridView.Cmdlet
 
         internal static void Run(List<PSObject> objects, ApplicationData applicationData)
         {
-
+            // Note, in Terminal.Gui v2, this property is renamed to Application.UseNetDriver, hence
+            // using that terminology here.
+            Application.UseSystemConsole = applicationData.UseNetDriver;
             Application.Init();
             Window window = null;
             
