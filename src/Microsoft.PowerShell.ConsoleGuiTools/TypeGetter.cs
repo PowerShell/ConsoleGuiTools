@@ -167,11 +167,6 @@ namespace OutGridView.Cmdlet
 
             var dataTableColumns = GetDataColumnsForObject(psObjects);
 
-            foreach (var dataColumn in dataTableColumns)
-            {
-                _cmdlet.WriteVerbose(dataColumn.ToString());
-            }
-
             List<DataTableRow> dataTableRows = new List<DataTableRow>();
             for (var i = 0; i < objectFormats.Count; i++)
             {

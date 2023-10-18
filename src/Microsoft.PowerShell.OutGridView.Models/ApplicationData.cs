@@ -14,5 +14,11 @@ namespace OutGridView.Models
         public string Filter { get; set; }
         public bool MinUI { get; set; }
         public DataTable DataTable { get; set; }
+
+        public bool UseNetDriver { get; set; }
+        public bool Verbose { get; set; }
+        public bool Debug { get; set; }
+
+        public string ModuleVersion { get; set; }
     }
 }

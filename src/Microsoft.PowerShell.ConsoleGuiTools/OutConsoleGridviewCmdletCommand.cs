@@ -58,6 +58,23 @@ namespace OutGridView.Cmdlet
         [Parameter(HelpMessage = "If specified no window frame, filter box, or status bar will be displayed in the GUI.")]
         public SwitchParameter MinUI { set; get; }
 
+        /// <summary>
+        /// gets or sets the whether the Terminal.Gui System.Net.Console-based ConsoleDriver will be used instead of the 
+        /// default platform-specific (Windows or Curses) ConsoleDriver.
+        /// </summary>
+        [Parameter(HelpMessage = "If specified the Terminal.Gui System.Net.Console-based ConsoleDriver (NetDriver) will be used.")]
+        public SwitchParameter UseNetDriver { set; get; }
+
+        /// <summary>
+        /// For the -Verbose switch
+        /// </summary>
+        public bool Verbose => MyInvocation.BoundParameters.TryGetValue("Verbose", out var o);
+
+        /// <summary>
+        /// For the -Debug switch
+        /// </summary>
+        public bool Debug => MyInvocation.BoundParameters.TryGetValue("Debug", out var o);
+
         #endregion Input Parameters
 
         // This method gets called once for each cmdlet in the pipeline when the pipeline starts executing
@@ -140,7 +157,11 @@ namespace OutGridView.Cmdlet
                 OutputMode = OutputMode,
                 Filter = Filter,
                 MinUI = MinUI,
-                DataTable = dataTable
+                DataTable = dataTable,
+                UseNetDriver = UseNetDriver,
+                Verbose = Verbose,
+                Debug = Debug,
+                ModuleVersion = MyInvocation.MyCommand.Version.ToString()
             };
 
 

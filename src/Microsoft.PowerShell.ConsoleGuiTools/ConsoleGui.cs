@@ -3,7 +3,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using NStack;
 using OutGridView.Models;
@@ -36,8 +38,11 @@ namespace OutGridView.Cmdlet
 
         public HashSet<int> Start(ApplicationData applicationData)
         {
-            Application.Init();
             _applicationData = applicationData;
+            // Note, in Terminal.Gui v2, this property is renamed to Application.UseNetDriver, hence
+            // using that terminology here.
+            Application.UseSystemConsole = _applicationData.UseNetDriver;
+            Application.Init();
             _gridViewDetails = new GridViewDetails
             {
                 // If OutputMode is Single or Multiple, then we make items selectable. If we make them selectable,
@@ -235,6 +240,12 @@ namespace OutGridView.Cmdlet
             }
 
             statusItems.Add(new StatusItem(Key.Esc, "~ESC~ Close", () => Close()));
+            if (_applicationData.Verbose || _applicationData.Debug)
+            {
+                statusItems.Add(new StatusItem(Key.Null, $" v{_applicationData.ModuleVersion}", null));
+                statusItems.Add(new StatusItem(Key.Null, 
+                $"{Application.Driver} v{FileVersionInfo.GetVersionInfo(Assembly.GetAssembly(typeof(Application)).Location).ProductVersion}", null));
+            }
 
             var statusBar = new StatusBar(statusItems.ToArray());
             statusBar.Visible = visible;
