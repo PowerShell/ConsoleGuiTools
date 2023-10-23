@@ -2,22 +2,23 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Management.Automation;
 using System.Reflection;
+using System.Text.RegularExpressions;
+
+using OutGridView.Models;
+
 using Terminal.Gui;
 using Terminal.Gui.Trees;
-using System.Management.Automation;
-using System.Management.Automation.Internal;
-using System.Linq;
-using System.Diagnostics;
-using System.Collections;
-using OutGridView.Models;
-using System.Text.RegularExpressions;
-using System.IO;
 
 namespace OutGridView.Cmdlet
 {
-    internal class ShowObjectView : Window, ITreeBuilder<object>
+    internal sealed class ShowObjectView : Window, ITreeBuilder<object>
     {
         private readonly TreeView<object> tree;
         private readonly RegexTreeViewTextFilter filter;
@@ -133,7 +134,7 @@ namespace OutGridView.Cmdlet
         }
         private void SetRegexError(string error)
         {
-            if (string.Equals(error, filterErrorLabel.Text.ToString()))
+            if (string.Equals(error, filterErrorLabel.Text.ToString(), StringComparison.Ordinal))
             {
                 return;
             }
@@ -197,7 +198,7 @@ namespace OutGridView.Cmdlet
             return IsBasicType(toExpand);
         }
 
-        private bool IsBasicType(object value)
+        private static bool IsBasicType(object value)
         {
             return value != null && value is not string && !value.GetType().IsValueType;
         }
@@ -245,7 +246,7 @@ namespace OutGridView.Cmdlet
             return children;
         }
 
-        private IEnumerable<object> GetExtraChildren(object forObject)
+        private static IEnumerable<object> GetExtraChildren(object forObject)
         {
             if (forObject is DirectoryInfo dir)
             {
@@ -277,7 +278,7 @@ namespace OutGridView.Cmdlet
             }
         }
 
-        class CachedMemberResultElement
+        sealed class CachedMemberResultElement
         {
             public int Index;
             public object Value;
@@ -304,7 +305,7 @@ namespace OutGridView.Cmdlet
             }
         }
 
-        class CachedMemberResult
+        sealed class CachedMemberResult
         {
             public MemberInfo Member;
             public object Value;
@@ -402,7 +403,7 @@ namespace OutGridView.Cmdlet
                 return Member.Name + ": " + representation;
             }
         }
-        private class RegexTreeViewTextFilter : ITreeViewFilter<object>
+        private sealed class RegexTreeViewTextFilter : ITreeViewFilter<object>
         {
             private readonly ShowObjectView parent;
             readonly TreeView<object> _forTree;
