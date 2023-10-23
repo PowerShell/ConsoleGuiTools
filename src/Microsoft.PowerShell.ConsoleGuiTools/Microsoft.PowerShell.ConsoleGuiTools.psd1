@@ -108,6 +108,8 @@ PrivateData = @{
         ReleaseNotes = '# Release Notes
 ## v0.7.5
 
+* Adds Show-ObjectTree cmdlet #179
+* Fix clear last line on Windows Terminal Issue again #207
 * Adds support for -Diagnostic switch to Out-ConsoleGridView #208
 * Adds support for -UseNetDriver switch to Out-ConsoleGridView #208
 
