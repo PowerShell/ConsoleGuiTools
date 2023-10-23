@@ -34,16 +34,18 @@ namespace OutGridView.Cmdlet
         {
             var oldValue = GridViewRowList[item].IsMarked;
             GridViewRowList[item].IsMarked = value;
-            var args = new RowMarkedEventArgs() { 
+            var args = new RowMarkedEventArgs()
+            {
                 Row = GridViewRowList[item],
                 OldValue = oldValue
             };
             MarkChanged?.Invoke(this, args);
         }
 
-        public class RowMarkedEventArgs : EventArgs {
-            public GridViewRow Row { get; set;}
-            public bool OldValue { get ; set;}
+        public class RowMarkedEventArgs : EventArgs
+        {
+            public GridViewRow Row { get; set; }
+            public bool OldValue { get; set; }
 
         }
 
@@ -53,7 +55,7 @@ namespace OutGridView.Cmdlet
         {
             return GridViewRowList;
         }
-        
+
         // A slightly adapted method from gui.cs: https://github.com/migueldeicaza/gui.cs/blob/fc1faba7452ccbdf49028ac49f0c9f0f42bbae91/Terminal.Gui/Views/ListView.cs#L433-L461
         private void RenderUstr(ConsoleDriver driver, ustring ustr, int col, int line, int width)
         {

@@ -15,7 +15,7 @@ namespace OutGridView.Cmdlet
     public class ShowObjectTreeCmdletCommand : PSCmdlet, IDisposable
     {
         #region Properties
-        
+
         private const string DataNotQualifiedForShowObjectTree = nameof(DataNotQualifiedForShowObjectTree);
         private const string EnvironmentNotSupportedForShowObjectTree = nameof(EnvironmentNotSupportedForShowObjectTree);
 
@@ -41,7 +41,7 @@ namespace OutGridView.Cmdlet
         /// <summary>
         /// gets or sets the initial value for the filter in the GUI
         /// </summary>
-        [Parameter(HelpMessage = "Pre-populates the Filter edit box, allowing filtering to be specified on the command line. The filter uses regular expressions." )]
+        [Parameter(HelpMessage = "Pre-populates the Filter edit box, allowing filtering to be specified on the command line. The filter uses regular expressions.")]
         public string Filter { set; get; }
 
         /// <summary>
@@ -143,13 +143,13 @@ namespace OutGridView.Cmdlet
                 Debug = Debug,
                 ModuleVersion = MyInvocation.MyCommand.Version.ToString()
             };
-            
+
             ShowObjectView.Run(_psObjects, applicationData);
         }
 
         public void Dispose()
         {
-            
+
         }
     }
 }
