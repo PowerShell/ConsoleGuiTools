@@ -33,16 +33,16 @@ namespace OutGridView.Cmdlet
             Width = Dim.Fill();
             Height = Dim.Fill(1);
             Modal = false;
-            
 
-            if(applicationData.MinUI)
+
+            if (applicationData.MinUI)
             {
                 Border.BorderStyle = BorderStyle.None;
                 Title = string.Empty;
                 X = -1;
                 Height = Dim.Fill();
             }
-            
+
             tree = new TreeView<object>
             {
                 Y = applicationData.MinUI ? 0 : 2,
@@ -68,31 +68,34 @@ namespace OutGridView.Cmdlet
                 tree.AddObject("No Objects");
             }
             statusBar = new StatusBar();
-            
+
             string elementDescription = "objects";
 
-            var types = rootObjects.Select(o=>o.GetType()).Distinct().ToArray();
-            if(types.Length == 1)
+            var types = rootObjects.Select(o => o.GetType()).Distinct().ToArray();
+            if (types.Length == 1)
             {
                 elementDescription = types[0].Name;
             }
 
-            var lblFilter = new Label(){
+            var lblFilter = new Label()
+            {
                 Text = "Filter:",
                 X = 1,
             };
-            var tbFilter = new TextField(){
+            var tbFilter = new TextField()
+            {
                 X = Pos.Right(lblFilter),
                 Width = Dim.Fill(1),
                 Text = applicationData.Filter ?? string.Empty
             };
             tbFilter.CursorPosition = tbFilter.Text.Length;
 
-            tbFilter.TextChanged += (_)=>{
+            tbFilter.TextChanged += (_) =>
+            {
                 filter.Text = tbFilter.Text.ToString();
             };
 
-            
+
             filterErrorLabel = new Label(string.Empty)
             {
                 X = Pos.Right(lblFilter) + 1,
@@ -101,7 +104,7 @@ namespace OutGridView.Cmdlet
                 Width = Dim.Fill() - lblFilter.Text.Length
             };
 
-            if(!applicationData.MinUI)
+            if (!applicationData.MinUI)
             {
                 Add(lblFilter);
                 Add(tbFilter);
@@ -111,18 +114,18 @@ namespace OutGridView.Cmdlet
             int pos = 0;
             statusBar.AddItemAt(pos++, new StatusItem(Key.Esc, "~ESC~ Close", () => Application.RequestStop()));
 
-            var siCount = new StatusItem(Key.Null, $"{rootObjects.Count} {elementDescription}",null);
-            selectedStatusBarItem = new StatusItem(Key.Null, string.Empty,null);
-            statusBar.AddItemAt(pos++,siCount);
-            statusBar.AddItemAt(pos++,selectedStatusBarItem);
+            var siCount = new StatusItem(Key.Null, $"{rootObjects.Count} {elementDescription}", null);
+            selectedStatusBarItem = new StatusItem(Key.Null, string.Empty, null);
+            statusBar.AddItemAt(pos++, siCount);
+            statusBar.AddItemAt(pos++, selectedStatusBarItem);
 
-            if ( applicationData.Debug)
+            if (applicationData.Debug)
             {
-                statusBar.AddItemAt(pos++,new StatusItem(Key.Null, $" v{applicationData.ModuleVersion}", null));
-                statusBar.AddItemAt(pos++,new StatusItem(Key.Null, 
+                statusBar.AddItemAt(pos++, new StatusItem(Key.Null, $" v{applicationData.ModuleVersion}", null));
+                statusBar.AddItemAt(pos++, new StatusItem(Key.Null,
                 $"{Application.Driver} v{FileVersionInfo.GetVersionInfo(Assembly.GetAssembly(typeof(Application)).Location).ProductVersion}", null));
             }
-                        
+
             statusBar.Visible = !applicationData.MinUI;
             Application.Top.Add(statusBar);
 
@@ -130,7 +133,7 @@ namespace OutGridView.Cmdlet
         }
         private void SetRegexError(string error)
         {
-            if(string.Equals(error, filterErrorLabel.Text.ToString()))
+            if (string.Equals(error, filterErrorLabel.Text.ToString()))
             {
                 return;
             }
@@ -142,13 +145,13 @@ namespace OutGridView.Cmdlet
         private void SelectionChanged(object sender, SelectionChangedEventArgs<object> e)
         {
             var selectedValue = e.NewValue;
-            
-            if( selectedValue is CachedMemberResult cmr)
+
+            if (selectedValue is CachedMemberResult cmr)
             {
                 selectedValue = cmr.Value;
             }
 
-            if(selectedValue != null && selectedStatusBarItem != null)
+            if (selectedValue != null && selectedStatusBarItem != null)
             {
                 selectedStatusBarItem.Title = selectedValue.GetType().Name;
             }
@@ -156,21 +159,21 @@ namespace OutGridView.Cmdlet
             {
                 selectedStatusBarItem.Title = string.Empty;
             }
-            
+
             statusBar.SetNeedsDisplay();
         }
 
         private string AspectGetter(object toRender)
         {
-            if(toRender is Process p)
+            if (toRender is Process p)
             {
                 return p.ProcessName;
             }
-            if(toRender is null)
+            if (toRender is null)
             {
                 return "Null";
             }
-            if(toRender is FileSystemInfo fsi && !IsRootObject(fsi))
+            if (toRender is FileSystemInfo fsi && !IsRootObject(fsi))
             {
                 return fsi.Name;
             }
@@ -201,9 +204,9 @@ namespace OutGridView.Cmdlet
 
         public IEnumerable<object> GetChildren(object forObject)
         {
-            if(forObject is CachedMemberResult p) 
+            if (forObject is CachedMemberResult p)
             {
-                if(p.IsCollection)
+                if (p.IsCollection)
                 {
                     return p.Elements;
                 }
@@ -211,29 +214,30 @@ namespace OutGridView.Cmdlet
                 return GetChildren(p.Value);
             }
 
-            if(forObject is CachedMemberResultElement e)
+            if (forObject is CachedMemberResultElement e)
             {
                 return GetChildren(e.Value);
             }
 
             List<object> children = new List<object>();
-            
-            foreach(var member in forObject.GetType().GetMembers().OrderBy(m=>m.Name))
+
+            foreach (var member in forObject.GetType().GetMembers().OrderBy(m => m.Name))
             {
-                if(member is PropertyInfo prop)
+                if (member is PropertyInfo prop)
                 {
                     children.Add(new CachedMemberResult(forObject, prop));
                 }
-                if(member is FieldInfo field)
+                if (member is FieldInfo field)
                 {
                     children.Add(new CachedMemberResult(forObject, field));
                 }
             }
 
-            try{
+            try
+            {
                 children.AddRange(GetExtraChildren(forObject));
             }
-            catch(Exception)
+            catch (Exception)
             {
                 // Extra children unavailable, possibly security or IO exceptions enumerating children etc
             }
@@ -243,9 +247,9 @@ namespace OutGridView.Cmdlet
 
         private IEnumerable<object> GetExtraChildren(object forObject)
         {
-            if(forObject is DirectoryInfo dir)
+            if (forObject is DirectoryInfo dir)
             {
-                foreach(var c in dir.EnumerateFileSystemInfos())
+                foreach (var c in dir.EnumerateFileSystemInfos())
                 {
                     yield return c;
                 }
@@ -259,14 +263,15 @@ namespace OutGridView.Cmdlet
             Application.UseSystemConsole = applicationData.UseNetDriver;
             Application.Init();
             Window window = null;
-            
+
             try
-            {                
-                window = new ShowObjectView(objects.Select(p=>p.BaseObject).ToList(), applicationData);
+            {
+                window = new ShowObjectView(objects.Select(p => p.BaseObject).ToList(), applicationData);
                 Application.Top.Add(window);
                 Application.Run();
             }
-            finally{
+            finally
+            {
                 Application.Shutdown();
                 window?.Dispose();
             }
@@ -284,7 +289,8 @@ namespace OutGridView.Cmdlet
                 Index = index;
                 Value = value;
 
-                try{
+                try
+                {
                     representation = Value?.ToString() ?? "Null";
                 }
                 catch (Exception)
@@ -303,10 +309,10 @@ namespace OutGridView.Cmdlet
             public MemberInfo Member;
             public object Value;
             public object Parent;
-            private string representation;            
+            private string representation;
             private List<CachedMemberResultElement> valueAsList;
 
-            
+
             public bool IsCollection => valueAsList != null;
             public IReadOnlyCollection<CachedMemberResultElement> Elements => valueAsList?.AsReadOnly();
 
@@ -329,7 +335,7 @@ namespace OutGridView.Cmdlet
                     {
                         throw new NotSupportedException($"Unknown {nameof(MemberInfo)} Type");
                     }
-                    
+
                     representation = ValueToString();
 
                 }
@@ -341,20 +347,22 @@ namespace OutGridView.Cmdlet
 
             private string ValueToString()
             {
-                if(Value == null)
+                if (Value == null)
                 {
                     return "Null";
                 }
-                try{
-                    if(IsCollectionOfKnownTypeAndSize(out Type elementType, out int size))
+                try
+                {
+                    if (IsCollectionOfKnownTypeAndSize(out Type elementType, out int size))
                     {
                         return $"{elementType.Name}[{size}]";
                     }
-                }catch(Exception)
+                }
+                catch (Exception)
                 {
                     return Value?.ToString();
                 }
-                
+
 
                 return Value?.ToString();
             }
@@ -364,28 +372,28 @@ namespace OutGridView.Cmdlet
                 elementType = null;
                 size = 0;
 
-                if(Value == null || Value is string)
+                if (Value == null || Value is string)
                 {
-                    
+
                     return false;
                 }
 
-                if(Value is IEnumerable ienumerable)
+                if (Value is IEnumerable ienumerable)
                 {
                     var list = ienumerable.Cast<object>().ToList();
 
-                    var types = list.Where(v=>v!=null).Select(v=>v.GetType()).Distinct().ToArray();
+                    var types = list.Where(v => v != null).Select(v => v.GetType()).Distinct().ToArray();
 
-                    if(types.Length == 1)
+                    if (types.Length == 1)
                     {
                         elementType = types[0];
                         size = list.Count;
 
-                        valueAsList = list.Select((e,i)=>new CachedMemberResultElement(e,i)).ToList();
+                        valueAsList = list.Select((e, i) => new CachedMemberResultElement(e, i)).ToList();
                         return true;
                     }
                 }
-                
+
                 return false;
             }
 
@@ -399,41 +407,45 @@ namespace OutGridView.Cmdlet
             private readonly ShowObjectView parent;
             readonly TreeView<object> _forTree;
 
-            public RegexTreeViewTextFilter (ShowObjectView parent, TreeView<object> forTree)
+            public RegexTreeViewTextFilter(ShowObjectView parent, TreeView<object> forTree)
             {
                 this.parent = parent;
-                _forTree = forTree ?? throw new ArgumentNullException (nameof (forTree));
+                _forTree = forTree ?? throw new ArgumentNullException(nameof(forTree));
             }
 
             private string text;
 
-            public string Text {
+            public string Text
+            {
                 get { return text; }
-                set {
+                set
+                {
                     text = value;
-                    RefreshTreeView ();
+                    RefreshTreeView();
                 }
             }
 
-            private void RefreshTreeView ()
+            private void RefreshTreeView()
             {
-                _forTree.InvalidateLineMap ();
-                _forTree.SetNeedsDisplay ();
+                _forTree.InvalidateLineMap();
+                _forTree.SetNeedsDisplay();
             }
 
-            public bool IsMatch (object model)
+            public bool IsMatch(object model)
             {
-                if (string.IsNullOrWhiteSpace (Text)) {
+                if (string.IsNullOrWhiteSpace(Text))
+                {
                     return true;
                 }
 
                 parent.SetRegexError(string.Empty);
 
-                var modelText = _forTree.AspectGetter (model);
-                try{
+                var modelText = _forTree.AspectGetter(model);
+                try
+                {
                     return Regex.IsMatch(modelText, text, RegexOptions.IgnoreCase);
                 }
-                catch(RegexParseException e)
+                catch (RegexParseException e)
                 {
                     parent.SetRegexError(e.Message);
                     return true;
