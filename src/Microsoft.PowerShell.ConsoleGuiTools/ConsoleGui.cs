@@ -7,13 +7,14 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using NStack;
+
 using OutGridView.Models;
+
 using Terminal.Gui;
 
 namespace OutGridView.Cmdlet
 {
-    internal class ConsoleGui : IDisposable
+    internal sealed class ConsoleGui : IDisposable
     {
         private const string FILTER_LABEL = "Filter";
         // This adjusts the left margin of all controls
@@ -154,7 +155,7 @@ namespace OutGridView.Cmdlet
             _inputSource.GridViewRowList[a.Row.OriginalIndex].IsMarked = a.Row.IsMarked;
         }
 
-        private void Accept()
+        private static void Accept()
         {
             Application.RequestStop();
         }

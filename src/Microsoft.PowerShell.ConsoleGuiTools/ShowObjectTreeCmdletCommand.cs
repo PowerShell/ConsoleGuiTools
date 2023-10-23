@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Management.Automation;
 using System.Management.Automation.Internal;
+
 using OutGridView.Models;
 
 namespace OutGridView.Cmdlet
@@ -149,7 +150,7 @@ namespace OutGridView.Cmdlet
 
         public void Dispose()
         {
-
+            GC.SuppressFinalize(this);
         }
     }
 }

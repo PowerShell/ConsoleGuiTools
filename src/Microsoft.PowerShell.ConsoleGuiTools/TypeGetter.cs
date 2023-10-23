@@ -2,14 +2,15 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using System.Management.Automation;
 using System.Management.Automation.Internal;
-using System.Linq;
-using System.Globalization;
-using System.Collections.Generic;
+
 using Microsoft.PowerShell.Commands;
+
 using OutGridView.Models;
-using System.Text.RegularExpressions;
 
 namespace OutGridView.Cmdlet
 {
@@ -44,7 +45,7 @@ namespace OutGridView.Cmdlet
             return extendedTypeDefinition.FormatViewDefinition[0];
         }
 
-        public DataTableRow CastObjectToDataTableRow(PSObject ps, List<DataTableColumn> dataColumns, int objectIndex)
+        public static DataTableRow CastObjectToDataTableRow(PSObject ps, List<DataTableColumn> dataColumns, int objectIndex)
         {
             Dictionary<string, IValue> valuePairs = new Dictionary<string, IValue>();
 
@@ -72,7 +73,7 @@ namespace OutGridView.Cmdlet
             return new DataTableRow(valuePairs, objectIndex);
         }
 
-        private void SetTypesOnDataColumns(List<DataTableRow> dataTableRows, List<DataTableColumn> dataTableColumns)
+        private static void SetTypesOnDataColumns(List<DataTableRow> dataTableRows, List<DataTableColumn> dataTableColumns)
         {
             var dataRows = dataTableRows.Select(x => x.Values);
 
@@ -187,7 +188,7 @@ namespace OutGridView.Cmdlet
             "System.Security.SecureString",
             "System.Numerics.BigInteger"
         };
-        private bool PSObjectIsPrimitive(PSObject ps)
+        private static bool PSObjectIsPrimitive(PSObject ps)
         {
             var psBaseType = ps.BaseObject.GetType();
 

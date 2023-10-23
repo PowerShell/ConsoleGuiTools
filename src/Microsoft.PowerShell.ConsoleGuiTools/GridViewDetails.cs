@@ -3,7 +3,7 @@
 
 namespace OutGridView.Cmdlet
 {
-    internal class GridViewDetails
+    internal sealed class GridViewDetails
     {
         // Contains the width of each column in the grid view.
         public int[] ListViewColumnWidths { get; set; }
