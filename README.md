@@ -138,6 +138,8 @@ PS C:\> Get-Process | Show-ObjectTree
 
 This command gets the processes running on the local computer and sends them to a tree view window.
 
+Use right arrow when a row has a `+` symbol to expand the tree. Left arrow will collapse the tree.
+
 ## Development
 
 ### 1. Install PowerShell 7.2+
