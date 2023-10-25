@@ -1,6 +1,6 @@
-# GraphicalTools - `Out-ConsoleGridView`
+# ConsoleGuiTools - `Out-ConsoleGridView` and `Show-ObjectTree`
 
-The GraphicalTools repo contains the `Out-ConsoleGridView` 
+This repo contains the `Out-ConsoleGridView` 
 PowerShell Cmdlet providing console-based GUI experiences based on
 [Terminal.Gui (gui.cs)](https://github.com/gui-cs/Terminal.Gui).
 
