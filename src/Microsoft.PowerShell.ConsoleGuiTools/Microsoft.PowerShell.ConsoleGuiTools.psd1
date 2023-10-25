@@ -70,13 +70,13 @@ NestedModules = @()
 FunctionsToExport = @()
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
-CmdletsToExport = @( 'Out-ConsoleGridView' )
+CmdletsToExport = @( 'Out-ConsoleGridView', 'Show-ObjectTree' )
 
 # Variables to export from this module
 VariablesToExport = '*'
 
 # Aliases to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no aliases to export.
-AliasesToExport = @( 'ocgv' )
+AliasesToExport = @( 'ocgv', 'sot' )
 
 # DSC resources to export from this module
 # DscResourcesToExport = @()
@@ -93,7 +93,7 @@ PrivateData = @{
     PSData = @{
 
         # Tags applied to this module. These help with module discovery in online galleries.
-        Tags = @('Console', 'Gui', 'Out-GridView', 'Out-ConsoleGridView', 'Terminal.Gui', 'gui.cs', 'MacOS', 'Windows', 'Linux', 'PSEdition_Core')
+        Tags = @('Console', 'Gui', 'Out-GridView', 'Out-ConsoleGridView', 'Show-ObjectTree', 'Terminal.Gui', 'gui.cs', 'MacOS', 'Windows', 'Linux', 'PSEdition_Core')
 
         # A URL to the license for this module.
         LicenseUri = 'https://github.com/PowerShell/GraphicalTools/blob/master/LICENSE.txt'
@@ -108,6 +108,8 @@ PrivateData = @{
         ReleaseNotes = '# Release Notes
 ## v0.7.5
 
+* Adds Show-ObjectTree cmdlet #179
+* Fix clear last line on Windows Terminal Issue again #207
 * Adds support for -Diagnostic switch to Out-ConsoleGridView #208
 * Adds support for -UseNetDriver switch to Out-ConsoleGridView #208
 

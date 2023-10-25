@@ -14,7 +14,7 @@ steps:
 
 - pwsh: |
     Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
-    Install-Module -Name PowerShellGet -AllowPrerelease -Scope CurrentUser -Force
-    Import-Module -Name PowerShellGet -MinimumVersion 3.0.0
+    Install-Module -Name Microsoft.PowerShell.PSResourceGet -AllowPrerelease -Scope CurrentUser -Force
+    Import-Module -Name Microsoft.PowerShell.PSResourceGet -MinimumVersion 1.0.0
     Publish-PSResource -Path $(Pipeline.Workspace)/Publish/Microsoft.PowerShell.ConsoleGuiTools -Repository PSGallery -APIKey $(GalleryToken) -Verbose
   displayName: Publishing ConsoleGuiTools to PowerShell Gallery

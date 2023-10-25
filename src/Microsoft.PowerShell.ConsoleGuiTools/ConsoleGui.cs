@@ -7,13 +7,14 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using NStack;
+
 using OutGridView.Models;
+
 using Terminal.Gui;
 
 namespace OutGridView.Cmdlet
 {
-    internal class ConsoleGui : IDisposable
+    internal sealed class ConsoleGui : IDisposable
     {
         private const string FILTER_LABEL = "Filter";
         // This adjusts the left margin of all controls
@@ -138,22 +139,23 @@ namespace OutGridView.Cmdlet
             // The ListView is always filled with a (filtered) copy of _inputSource.
             // We listen for `MarkChanged` events on this filtered list and apply those changes up to _inputSource.
 
-            if (_listViewSource != null) {
+            if (_listViewSource != null)
+            {
                 _listViewSource.MarkChanged -= ListViewSource_MarkChanged;
                 _listViewSource = null;
             }
 
             _listViewSource = new GridViewDataSource(GridViewHelpers.FilterData(_inputSource.GridViewRowList, _applicationData.Filter ?? string.Empty));
-            _listViewSource.MarkChanged +=  ListViewSource_MarkChanged;
+            _listViewSource.MarkChanged += ListViewSource_MarkChanged;
             _listView.Source = _listViewSource;
         }
 
-        private void ListViewSource_MarkChanged (object s, GridViewDataSource.RowMarkedEventArgs a)
+        private void ListViewSource_MarkChanged(object s, GridViewDataSource.RowMarkedEventArgs a)
         {
-                _inputSource.GridViewRowList[a.Row.OriginalIndex].IsMarked = a.Row.IsMarked;
+            _inputSource.GridViewRowList[a.Row.OriginalIndex].IsMarked = a.Row.IsMarked;
         }
 
-        private void Accept()
+        private static void Accept()
         {
             Application.RequestStop();
         }
@@ -243,7 +245,7 @@ namespace OutGridView.Cmdlet
             if (_applicationData.Verbose || _applicationData.Debug)
             {
                 statusItems.Add(new StatusItem(Key.Null, $" v{_applicationData.ModuleVersion}", null));
-                statusItems.Add(new StatusItem(Key.Null, 
+                statusItems.Add(new StatusItem(Key.Null,
                 $"{Application.Driver} v{FileVersionInfo.GetVersionInfo(Assembly.GetAssembly(typeof(Application)).Location).ProductVersion}", null));
             }
 
@@ -355,7 +357,7 @@ namespace OutGridView.Cmdlet
             win.Add(_filterLabel, _filterField, filterErrorLabel);
 
             _filterField.Text = _applicationData.Filter ?? string.Empty;
-            _filterField.CursorPosition = _filterField.Text.Length;            
+            _filterField.CursorPosition = _filterField.Text.Length;
         }
 
         private void AddHeaders(Window win, List<string> gridHeaders)
@@ -417,7 +419,7 @@ namespace OutGridView.Cmdlet
             _listView.Height = Dim.Fill();
             _listView.AllowsMarking = _applicationData.OutputMode != OutputModeOption.None;
             _listView.AllowsMultipleSelection = _applicationData.OutputMode == OutputModeOption.Multiple;
-            _listView.AddKeyBinding (Key.Space, Command.ToggleChecked, Command.LineDown);
+            _listView.AddKeyBinding(Key.Space, Command.ToggleChecked, Command.LineDown);
 
             win.Add(_listView);
         }

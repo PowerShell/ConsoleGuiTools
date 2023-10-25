@@ -11,17 +11,16 @@ using OutGridView.Models;
 
 namespace OutGridView.Cmdlet
 {
-    [Cmdlet(VerbsData.Out, "ConsoleGridView")]
-    [Alias("ocgv")]
-    public class OutConsoleGridViewCmdletCommand : PSCmdlet, IDisposable
+    [Cmdlet("Show", "ObjectTree")]
+    [Alias("sot")]
+    public class ShowObjectTreeCmdletCommand : PSCmdlet, IDisposable
     {
         #region Properties
 
-        private const string DataNotQualifiedForGridView = nameof(DataNotQualifiedForGridView);
-        private const string EnvironmentNotSupportedForGridView = nameof(EnvironmentNotSupportedForGridView);
+        private const string DataNotQualifiedForShowObjectTree = nameof(DataNotQualifiedForShowObjectTree);
+        private const string EnvironmentNotSupportedForShowObjectTree = nameof(EnvironmentNotSupportedForShowObjectTree);
 
         private List<PSObject> _psObjects = new List<PSObject>();
-        private ConsoleGui _consoleGui = new ConsoleGui();
 
         #endregion Properties
 
@@ -41,13 +40,6 @@ namespace OutGridView.Cmdlet
         public string Title { get; set; }
 
         /// <summary>
-        /// Get or sets a value indicating whether the selected items should be written to the pipeline
-        /// and if it should be possible to select multiple or single list items.
-        /// </summary>
-        [Parameter(HelpMessage = "Determines whether a single item (Single), multiple items (Multiple; default), or no items (None) will be written to the pipeline. Also determines selection behavior in the GUI.")]
-        public OutputModeOption OutputMode { set; get; } = OutputModeOption.Multiple;
-
-        /// <summary>
         /// gets or sets the initial value for the filter in the GUI
         /// </summary>
         [Parameter(HelpMessage = "Pre-populates the Filter edit box, allowing filtering to be specified on the command line. The filter uses regular expressions.")]
@@ -58,18 +50,12 @@ namespace OutGridView.Cmdlet
         /// </summary>
         [Parameter(HelpMessage = "If specified no window frame, filter box, or status bar will be displayed in the GUI.")]
         public SwitchParameter MinUI { set; get; }
-
         /// <summary>
         /// gets or sets the whether the Terminal.Gui System.Net.Console-based ConsoleDriver will be used instead of the 
         /// default platform-specific (Windows or Curses) ConsoleDriver.
         /// </summary>
         [Parameter(HelpMessage = "If specified the Terminal.Gui System.Net.Console-based ConsoleDriver (NetDriver) will be used.")]
         public SwitchParameter UseNetDriver { set; get; }
-
-        /// <summary>
-        /// For the -Verbose switch
-        /// </summary>
-        public bool Verbose => MyInvocation.BoundParameters.TryGetValue("Verbose", out var o);
 
         /// <summary>
         /// For the -Debug switch
@@ -85,7 +71,7 @@ namespace OutGridView.Cmdlet
             {
                 ErrorRecord error = new ErrorRecord(
                     new PSNotSupportedException("Not supported in this environment (when input is redirected)."),
-                    EnvironmentNotSupportedForGridView,
+                    EnvironmentNotSupportedForShowObjectTree,
                     ErrorCategory.NotImplemented,
                     null);
 
@@ -127,8 +113,8 @@ namespace OutGridView.Cmdlet
                 baseObject is PSObject)
             {
                 ErrorRecord error = new ErrorRecord(
-                    new FormatException("Invalid data type for Out-ConsoleGridView"),
-                    DataNotQualifiedForGridView,
+                    new FormatException("Invalid data type for Show-ObjectTree"),
+                    DataNotQualifiedForShowObjectTree,
                     ErrorCategory.InvalidType,
                     null);
 
@@ -149,38 +135,21 @@ namespace OutGridView.Cmdlet
                 return;
             }
 
-            var TG = new TypeGetter(this);
-
-            var dataTable = TG.CastObjectsToTableView(_psObjects);
             var applicationData = new ApplicationData
             {
-                Title = Title ?? "Out-ConsoleGridView",
-                OutputMode = OutputMode,
+                Title = Title ?? "Show-ObjectTree",
                 Filter = Filter,
                 MinUI = MinUI,
-                DataTable = dataTable,
                 UseNetDriver = UseNetDriver,
-                Verbose = Verbose,
                 Debug = Debug,
                 ModuleVersion = MyInvocation.MyCommand.Version.ToString()
             };
 
-
-            var selectedIndexes = _consoleGui.Start(applicationData);
-            foreach (int idx in selectedIndexes)
-            {
-                var selectedObject = _psObjects[idx];
-                if (selectedObject == null)
-                {
-                    continue;
-                }
-                WriteObject(selectedObject, false);
-            }
+            ShowObjectView.Run(_psObjects, applicationData);
         }
 
         public void Dispose()
         {
-            _consoleGui.Dispose();
             GC.SuppressFinalize(this);
         }
     }

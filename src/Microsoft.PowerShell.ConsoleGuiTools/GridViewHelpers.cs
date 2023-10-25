@@ -1,18 +1,14 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using NStack;
-using OutGridView.Models;
-using Terminal.Gui;
 
 namespace OutGridView.Cmdlet
 {
-    internal class GridViewHelpers
+    internal sealed class GridViewHelpers
     {
         // Add all items already selected plus any that match the filter
         // The selected items should be at the top of the list, in their original order
