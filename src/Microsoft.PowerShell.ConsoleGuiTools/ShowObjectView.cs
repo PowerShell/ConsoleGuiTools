@@ -205,6 +205,11 @@ namespace OutGridView.Cmdlet
 
         public IEnumerable<object> GetChildren(object forObject)
         {
+            if(!this.CanExpand(forObject))
+            {
+                return Enumerable.Empty<object>();
+            }
+
             if (forObject is CachedMemberResult p)
             {
                 if (p.IsCollection)
