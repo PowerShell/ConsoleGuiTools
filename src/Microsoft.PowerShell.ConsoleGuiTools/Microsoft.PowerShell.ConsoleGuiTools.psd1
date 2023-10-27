@@ -10,7 +10,7 @@ RootModule = 'Microsoft.PowerShell.ConsoleGuiTools.dll'
 
 # Version number of this module.
 # NOTE: This will get updated by build.ps1; the build number will be incremented for each build.
-ModuleVersion = '0.7.5.38'
+ModuleVersion = '0.7.6.0'
 
 # Supported PSEditions
 CompatiblePSEditions = @( 'Core' )
@@ -106,6 +106,10 @@ PrivateData = @{
 
         # ReleaseNotes of this module
         ReleaseNotes = '# Release Notes
+## v0.7.6
+
+* Fix child expand #223
+
 ## v0.7.5
 
 * Adds Show-ObjectTree cmdlet #179
