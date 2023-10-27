@@ -205,6 +205,11 @@ namespace OutGridView.Cmdlet
 
         public IEnumerable<object> GetChildren(object forObject)
         {
+            if (forObject == null || !this.CanExpand(forObject))
+            {
+                return Enumerable.Empty<object>();
+            }
+
             if (forObject is CachedMemberResult p)
             {
                 if (p.IsCollection)
@@ -222,7 +227,7 @@ namespace OutGridView.Cmdlet
 
             List<object> children = new List<object>();
 
-            foreach (var member in forObject.GetType().GetMembers().OrderBy(m => m.Name))
+            foreach (var member in forObject.GetType().GetMembers(BindingFlags.Instance | BindingFlags.Public).OrderBy(m => m.Name))
             {
                 if (member is PropertyInfo prop)
                 {
