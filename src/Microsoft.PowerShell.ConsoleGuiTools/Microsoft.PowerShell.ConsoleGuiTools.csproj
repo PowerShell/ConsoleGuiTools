@@ -16,7 +16,7 @@
 
     <ItemGroup>
         <PackageReference Include="Nstack.Core" Version="1.0.7" />
-        <PackageReference Include="Terminal.Gui" Version="1.14.0" />
+        <PackageReference Include="Terminal.Gui" Version="1.14.1" />
         <PackageReference Include="Microsoft.PowerShell.SDK" Version="7.2.15" />
     </ItemGroup>
 
