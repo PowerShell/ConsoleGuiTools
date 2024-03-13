@@ -6,81 +6,21 @@ param(
     [string[]]$ModuleName = @("Microsoft.PowerShell.ConsoleGuiTools" )
 )
 
-$script:IsUnix = $PSVersionTable.PSEdition -and $PSVersionTable.PSEdition -eq "Core" -and !$IsWindows
-
 $script:TargetFramework = "net6.0"
-$script:RequiredSdkVersion = (Get-Content (Join-Path $PSScriptRoot 'global.json') | ConvertFrom-Json).sdk.version
 
 $script:ModuleLayouts = @{}
 foreach ($mn in $ModuleName) {
     $script:ModuleLayouts.$mn = Import-PowerShellDataFile -Path "$PSScriptRoot/src/$mn/ModuleLayout.psd1"
 }
 
-task SetupDotNet -Before Clean, Build {
+task FindDotNet -Before Clean, Build {
+    Assert (Get-Command dotnet -ErrorAction SilentlyContinue) "dotnet not found, please install it: https://aka.ms/dotnet-cli"
 
-    $dotnetPath = "$PSScriptRoot/.dotnet"
-    $dotnetExePath = if ($script:IsUnix) { "$dotnetPath/dotnet" } else { "$dotnetPath/dotnet.exe" }
-    $originalDotNetExePath = $dotnetExePath
+    # Strip out semantic version metadata so it can be cast to `Version`
+    [Version]$existingVersion, $null = (dotnet --version) -split " " -split "-"
+    Assert ($existingVersion -ge [Version]("6.0")) ".NET SDK 6.0 or higher is required, please update it: https://aka.ms/dotnet-cli"
 
-    if (!(Test-Path $dotnetExePath)) {
-        $installedDotnet = Get-Command dotnet -ErrorAction Ignore
-        if ($installedDotnet) {
-            $dotnetExePath = $installedDotnet.Source
-        }
-        else {
-            $dotnetExePath = $null
-        }
-    }
-
-    # Make sure the dotnet we found is the right version
-    if ($dotnetExePath) {
-        # dotnet --version can write to stderr, which causes builds to abort, therefore use --list-sdks instead.
-        if ((& $dotnetExePath --list-sdks | ForEach-Object { $_.Split()[0] } ) -contains $script:RequiredSdkVersion) {
-            $script:dotnetExe = $dotnetExePath
-        }
-        else {
-            # Clear the path so that we invoke installation
-            $script:dotnetExe = $null
-        }
-    }
-    else {
-        # Clear the path so that we invoke installation
-        $script:dotnetExe = $null
-    }
-
-    if ($script:dotnetExe -eq $null) {
-
-        Write-Host "`n### Installing .NET CLI $script:RequiredSdkVersion...`n" -ForegroundColor Green
-
-        # The install script is platform-specific
-        $installScriptExt = if ($script:IsUnix) { "sh" } else { "ps1" }
-
-        # Download the official installation script and run it
-        $installScriptPath = "$([System.IO.Path]::GetTempPath())dotnet-install.$installScriptExt"
-        Invoke-WebRequest "https://dot.net/v1/dotnet-install.$installScriptExt" -OutFile $installScriptPath
-        $env:DOTNET_INSTALL_DIR = "$PSScriptRoot/.dotnet"
-
-        if (!$script:IsUnix) {
-            & $installScriptPath -Version $script:RequiredSdkVersion -InstallDir "$env:DOTNET_INSTALL_DIR"
-        }
-        else {
-            & /bin/bash $installScriptPath -Version $script:RequiredSdkVersion -InstallDir "$env:DOTNET_INSTALL_DIR"
-            $env:PATH = $dotnetExeDir + [System.IO.Path]::PathSeparator + $env:PATH
-        }
-
-        Write-Host "`n### Installation complete." -ForegroundColor Green
-        $script:dotnetExe = $originalDotnetExePath
-    }
-
-    # This variable is used internally by 'dotnet' to know where it's installed
-    $script:dotnetExe = Resolve-Path $script:dotnetExe
-    if (!$env:DOTNET_INSTALL_DIR) {
-        $dotnetExeDir = [System.IO.Path]::GetDirectoryName($script:dotnetExe)
-        $env:PATH = $dotnetExeDir + [System.IO.Path]::PathSeparator + $env:PATH
-        $env:DOTNET_INSTALL_DIR = $dotnetExeDir
-    }
-
-    Write-Host "`n### Using dotnet v$(& $script:dotnetExe --version) at path $script:dotnetExe`n" -ForegroundColor Green
+    Write-Host "Using dotnet v$(dotnet --version) at path $((Get-Command dotnet).Source)" -ForegroundColor Green
 }
 
 task Build {
@@ -88,7 +28,7 @@ task Build {
 
     foreach ($moduleLayout in $script:ModuleLayouts.Values) {
         foreach ($projName in $moduleLayout.RequiredBuildAssets.Keys) {
-            exec { & $script:dotnetExe publish -c $Configuration "$PSScriptRoot/src/$projName/$projName.csproj" }
+            exec { & dotnet publish -c $Configuration "$PSScriptRoot/src/$projName/$projName.csproj" }
         }
 
         foreach ($nativeProj in $moduleLayout.NativeBuildAssets.Keys) {
@@ -99,28 +39,23 @@ task Build {
                 else {
                     "/property:IsWindows=false"
                 }
-                exec { & $script:dotnetExe publish -c $Configuration "$PSScriptRoot/src/$nativeProj/$nativeProj.csproj" -r $targetPlatform $buildPropertyParams }
+                exec { & dotnet publish -c $Configuration "$PSScriptRoot/src/$nativeProj/$nativeProj.csproj" -r $targetPlatform $buildPropertyParams }
             }
         }
     }
 }
 
 task Clean {
-    #Remove Module Build
-    Remove-Item $PSScriptRoot/module -Recurse -Force -ErrorAction Ignore
+    Remove-BuildItem $PSScriptRoot/module
 
     foreach ($moduleLayout in $script:ModuleLayouts.Values) {
         foreach ($projName in $moduleLayout.RequiredBuildAssets.Keys) {
-            exec { & $script:dotnetExe clean -c $Configuration "$PSScriptRoot/src/$projName/$projName.csproj" }
+            exec { & dotnet clean -c $Configuration "$PSScriptRoot/src/$projName/$projName.csproj" }
         }
 
         foreach ($projName in $moduleLayout.NativeBuildAssets.Keys) {
-            exec { & $script:dotnetExe clean -c $Configuration "$PSScriptRoot/src/$projName/$projName.csproj" }
+            exec { & dotnet clean -c $Configuration "$PSScriptRoot/src/$projName/$projName.csproj" }
         }
-    }
-
-    foreach ($mn in $ModuleName) {
-        Get-ChildItem "$PSScriptRoot\module\$mn\Commands\en-US\*-help.xml" -ErrorAction Ignore | Remove-Item -Force
     }
 }
 
@@ -132,7 +67,7 @@ task LayoutModule -After Build {
         # Create the destination dir
         $null = New-Item -Force $moduleBinPath -Type Directory
 
-        # For each PSES subproject
+        # For each subproject
         foreach ($projectName in $moduleLayout.RequiredBuildAssets.Keys) {
             # Get the project build dir path
             $basePath = [System.IO.Path]::Combine($PSScriptRoot, 'src', $projectName, 'bin', $Configuration, $script:TargetFramework)
