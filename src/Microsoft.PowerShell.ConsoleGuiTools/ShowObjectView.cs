@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -14,10 +13,11 @@ using System.Text.RegularExpressions;
 using OutGridView.Models;
 using Terminal.Gui;
 using Terminal.Gui.Trees;
+using OutGridView.Cmdlet.TreeNodeCaching;
 
 namespace OutGridView.Cmdlet
 {
-    internal sealed class ShowObjectView : Window, ITreeBuilder<object>
+    internal sealed partial class ShowObjectView : Window, ITreeBuilder<object>
     {
         private readonly TreeView<object> tree;
         private readonly RegexTreeViewTextFilter filter;
@@ -146,7 +146,7 @@ namespace OutGridView.Cmdlet
         {
             var selectedValue = e.NewValue;
 
-            if (selectedValue is CachedMemberResult cmr)
+            if (selectedValue is ICachedMemberResult cmr)
             {
                 selectedValue = cmr.Value;
             }
@@ -179,12 +179,7 @@ namespace OutGridView.Cmdlet
             }
             if(toRender is PSObject o)
             {
-                var str = "";
-                foreach(var prop in o.Properties)
-                {
-                    str += $"{prop.Name}:{prop.Value}";
-                }
-                return str;
+                return o.ToString();
             }
             
 
@@ -198,7 +193,7 @@ namespace OutGridView.Cmdlet
 
         public bool CanExpand(object toExpand)
         {
-            if (toExpand is CachedMemberResult p)
+            if (toExpand is ICachedMemberResult p)
             {
                 return IsBasicType(p?.Value);
             }
@@ -219,7 +214,7 @@ namespace OutGridView.Cmdlet
                 return Enumerable.Empty<object>();
             }
 
-            if (forObject is CachedMemberResult p)
+            if (forObject is ICachedMemberResult p)
             {
                 if (p.IsCollection)
                 {
@@ -232,6 +227,11 @@ namespace OutGridView.Cmdlet
             if (forObject is CachedMemberResultElement e)
             {
                 return GetChildren(e.Value);
+            }
+
+            if(forObject is PSObject pso)
+            {
+                return GetPSObjectChildren(pso);
             }
 
             List<object> children = new List<object>();
@@ -258,6 +258,20 @@ namespace OutGridView.Cmdlet
             }
 
             return children;
+        }
+
+        /// <summary>
+        /// We only deal with PSObject when there is no native type (e.g. Process).
+        /// For example when the PSObject.BaseObject is a PSCustomObject.
+        /// </summary>
+        /// <param name="pso"></param>
+        /// <returns></returns>
+        public IEnumerable<object> GetPSObjectChildren(PSObject pso)
+        {
+            foreach(var m in pso.Members.Where(m=>m.IsInstance))
+            {
+                yield return new CachedPSObjectMemberResult(pso, m);
+            }
         }
 
         private static IEnumerable<object> GetExtraChildren(object forObject)
@@ -302,131 +316,6 @@ namespace OutGridView.Cmdlet
             return obj.BaseObject;
         }
 
-        sealed class CachedMemberResultElement
-        {
-            public int Index;
-            public object Value;
-
-            private string representation;
-
-            public CachedMemberResultElement(object value, int index)
-            {
-                Index = index;
-                Value = value;
-
-                try
-                {
-                    representation = Value?.ToString() ?? "Null";
-                }
-                catch (Exception)
-                {
-                    Value = representation = "Unavailable";
-                }
-            }
-            public override string ToString()
-            {
-                return $"[{Index}]: {representation}]";
-            }
-        }
-
-        sealed class CachedMemberResult
-        {
-            public MemberInfo Member;
-            public object Value;
-            public object Parent;
-            private string representation;
-            private List<CachedMemberResultElement> valueAsList;
-
-
-            public bool IsCollection => valueAsList != null;
-            public IReadOnlyCollection<CachedMemberResultElement> Elements => valueAsList?.AsReadOnly();
-
-            public CachedMemberResult(object parent, MemberInfo mem)
-            {
-                Parent = parent;
-                Member = mem;
-
-                try
-                {
-                    if (mem is PropertyInfo p)
-                    {
-                        Value = p.GetValue(parent);
-                    }
-                    else if (mem is FieldInfo f)
-                    {
-                        Value = f.GetValue(parent);
-                    }
-                    else
-                    {
-                        throw new NotSupportedException($"Unknown {nameof(MemberInfo)} Type");
-                    }
-
-                    representation = ValueToString();
-
-                }
-                catch (Exception)
-                {
-                    Value = representation = "Unavailable";
-                }
-            }
-
-            private string ValueToString()
-            {
-                if (Value == null)
-                {
-                    return "Null";
-                }
-                try
-                {
-                    if (IsCollectionOfKnownTypeAndSize(out Type elementType, out int size))
-                    {
-                        return $"{elementType.Name}[{size}]";
-                    }
-                }
-                catch (Exception)
-                {
-                    return Value?.ToString();
-                }
-
-
-                return Value?.ToString();
-            }
-
-            private bool IsCollectionOfKnownTypeAndSize(out Type elementType, out int size)
-            {
-                elementType = null;
-                size = 0;
-
-                if (Value == null || Value is string)
-                {
-
-                    return false;
-                }
-
-                if (Value is IEnumerable ienumerable)
-                {
-                    var list = ienumerable.Cast<object>().ToList();
-
-                    var types = list.Where(v => v != null).Select(v => v.GetType()).Distinct().ToArray();
-
-                    if (types.Length == 1)
-                    {
-                        elementType = types[0];
-                        size = list.Count;
-
-                        valueAsList = list.Select((e, i) => new CachedMemberResultElement(e, i)).ToList();
-                        return true;
-                    }
-                }
-
-                return false;
-            }
-
-            public override string ToString()
-            {
-                return Member.Name + ": " + representation;
-            }
-        }
         private sealed class RegexTreeViewTextFilter : ITreeViewFilter<object>
         {
             private readonly ShowObjectView parent;
