@@ -9,10 +9,9 @@ using System.IO;
 using System.Linq;
 using System.Management.Automation;
 using System.Reflection;
+using System.Text;
 using System.Text.RegularExpressions;
-
 using OutGridView.Models;
-
 using Terminal.Gui;
 using Terminal.Gui.Trees;
 
@@ -178,6 +177,16 @@ namespace OutGridView.Cmdlet
             {
                 return fsi.Name;
             }
+            if(toRender is PSObject o)
+            {
+                var str = "";
+                foreach(var prop in o.Properties)
+                {
+                    str += $"{prop.Name}:{prop.Value}";
+                }
+                return str;
+            }
+            
 
             return toRender.ToString();
         }
@@ -272,7 +281,7 @@ namespace OutGridView.Cmdlet
 
             try
             {
-                window = new ShowObjectView(objects.Select(p => p.BaseObject).ToList(), applicationData);
+                window = new ShowObjectView(objects.Select(SelectObject).ToList(), applicationData);
                 Application.Top.Add(window);
                 Application.Run();
             }
@@ -281,6 +290,16 @@ namespace OutGridView.Cmdlet
                 Application.Shutdown();
                 window?.Dispose();
             }
+        }
+
+        private static object SelectObject(PSObject obj)
+        {
+            if(obj.BaseObject is PSCustomObject)
+            {
+                return obj;
+            }
+            
+            return obj.BaseObject;
         }
 
         sealed class CachedMemberResultElement
