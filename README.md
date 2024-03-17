@@ -1,6 +1,6 @@
-# GraphicalTools - `Out-ConsoleGridView`
+# ConsoleGuiTools - `Out-ConsoleGridView` and `Show-ObjectTree`
 
-The GraphicalTools repo contains the `Out-ConsoleGridView` 
+This repo contains the `Out-ConsoleGridView` 
 PowerShell Cmdlet providing console-based GUI experiences based on
 [Terminal.Gui (gui.cs)](https://github.com/gui-cs/Terminal.Gui).
 
@@ -14,11 +14,17 @@ Install-Module Microsoft.PowerShell.ConsoleGuiTools
 
 ## Features
 
-Cross-platform! Use the cmdlet
-[`Out-ConsoleGridview`](docs/Microsoft.PowerShell.ConsoleGuiTools/Out-ConsoleGridView.md)
-to view and filter objects graphically.
+* [`Out-ConsoleGridview`](docs/Microsoft.PowerShell.ConsoleGuiTools/Out-ConsoleGridView.md) - Send objects to a grid view window for interactive filtering and sorting.
+* [`Show-ObjectTree`](docs/Microsoft.PowerShell.ConsoleGuiTools/Show-ObjectTree.md) - Send objects to a tree view window for interactive filtering and sorting.
 
-![screenshot of Out-ConsoleGridView](docs/Microsoft.PowerShell.ConsoleGuiTools/ocgv.gif)
+* Cross-platform - Works on any platform that supports PowerShell 7.2+.
+* Interactive - Use the mouse and keyboard to interact with the grid or tree view.
+* Filtering - Filter the data using the built-in filter box.
+* Sorting - Sort the data by clicking on the column headers.
+* Multiple Selection - Select multiple items and send them down the pipeline.
+* Customizable - Customize the grid view window with the built-in parameters.
+
+![Demo GIF](docs/Microsoft.PowerShell.ConsoleGuiTools/ocgv.gif)
 
 ## Examples
 
@@ -123,6 +129,16 @@ Press `Shift-F7` to see the history for all PowerShell instances.
 Whatever you select within `Out-ConsoleGridView` will be inserted on your command line. 
 
 Whatever was typed on the command line prior to hitting `F7` or `Shift-F7` will be used as a filter.
+
+### Example 9: Output processes to a tree view
+
+```PowerShell
+PS C:\> Get-Process | Show-ObjectTree
+```
+
+This command gets the processes running on the local computer and sends them to a tree view window.
+
+Use right arrow when a row has a `+` symbol to expand the tree. Left arrow will collapse the tree.
 
 ## Development
 

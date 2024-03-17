@@ -12,7 +12,7 @@ using OutGridView.Models;
 namespace OutGridView.Cmdlet
 {
     [Cmdlet("Show", "ObjectTree")]
-    [Alias("sot")]
+    [Alias("shot")]
     public class ShowObjectTreeCmdletCommand : PSCmdlet, IDisposable
     {
         #region Properties
@@ -51,7 +51,7 @@ namespace OutGridView.Cmdlet
         [Parameter(HelpMessage = "If specified no window frame, filter box, or status bar will be displayed in the GUI.")]
         public SwitchParameter MinUI { set; get; }
         /// <summary>
-        /// gets or sets the whether the Terminal.Gui System.Net.Console-based ConsoleDriver will be used instead of the 
+        /// gets or sets the whether the Terminal.Gui System.Net.Console-based ConsoleDriver will be used instead of the
         /// default platform-specific (Windows or Curses) ConsoleDriver.
         /// </summary>
         [Parameter(HelpMessage = "If specified the Terminal.Gui System.Net.Console-based ConsoleDriver (NetDriver) will be used.")]
