@@ -268,7 +268,7 @@ namespace OutGridView.Cmdlet
         /// <returns></returns>
         public IEnumerable<object> GetPSObjectChildren(PSObject pso)
         {
-            foreach(var m in pso.Members.Where(m=>m.IsInstance))
+            foreach(var m in pso.Members.Where(PsoHelper.IsDisplayableMember))
             {
                 yield return new CachedPSObjectMemberResult(pso, m);
             }
@@ -295,7 +295,7 @@ namespace OutGridView.Cmdlet
 
             try
             {
-                window = new ShowObjectView(objects.Select(SelectObject).ToList(), applicationData);
+                window = new ShowObjectView(objects.Select(PsoHelper.MaybeUnwrap).ToList(), applicationData);
                 Application.Top.Add(window);
                 Application.Run();
             }
@@ -306,15 +306,6 @@ namespace OutGridView.Cmdlet
             }
         }
 
-        private static object SelectObject(PSObject obj)
-        {
-            if(obj.BaseObject is PSCustomObject)
-            {
-                return obj;
-            }
-            
-            return obj.BaseObject;
-        }
 
         private sealed class RegexTreeViewTextFilter : ITreeViewFilter<object>
         {

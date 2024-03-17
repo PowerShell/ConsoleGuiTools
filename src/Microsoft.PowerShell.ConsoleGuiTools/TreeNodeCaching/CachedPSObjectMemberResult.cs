@@ -16,7 +16,17 @@ namespace OutGridView.Cmdlet.TreeNodeCaching
         {
             Parent = parent;
             Member = mem;
-            Value = mem.Value;
+            
+            if(mem.Value is PSObject psoVal)
+            {
+                Value = PsoHelper.MaybeUnwrap(psoVal);
+            }
+            else
+            {
+                Value = mem.Value;
+            }
+            
+
             Representation = ValueToString();
         }
 
