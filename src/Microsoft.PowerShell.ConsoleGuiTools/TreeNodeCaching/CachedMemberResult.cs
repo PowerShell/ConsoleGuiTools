@@ -7,8 +7,10 @@ using System.Reflection;
 namespace OutGridView.Cmdlet.TreeNodeCaching
 {
 
-    sealed class CachedMemberResult : CachedMemberResultBase<MemberInfo>
+    sealed class CachedMemberResult : CachedMemberResultBase
     {
+        MemberInfo Member {get;}
+
         protected override string GetMemberName()
         {
             return Member.Name;

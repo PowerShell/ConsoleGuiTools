@@ -10,8 +10,9 @@ using System.Reflection;
 
 namespace OutGridView.Cmdlet.TreeNodeCaching
 {
-    sealed class CachedPSObjectMemberResult : CachedMemberResultBase<PSMemberInfo>
+    sealed class CachedPSObjectMemberResult : CachedMemberResultBase
     {
+        PSMemberInfo Member {get;}
         public CachedPSObjectMemberResult(object parent, PSMemberInfo mem)
         {
             Parent = parent;

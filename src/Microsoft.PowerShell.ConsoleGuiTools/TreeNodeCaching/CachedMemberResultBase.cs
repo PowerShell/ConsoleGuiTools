@@ -8,9 +8,8 @@ using System.Linq;
 
 namespace OutGridView.Cmdlet.TreeNodeCaching
 {
-    abstract class CachedMemberResultBase<T> : ICachedMemberResult
+    abstract class CachedMemberResultBase : ICachedMemberResult
     {
-        public T Member;
         public object Value {get; protected set;}
         public object Parent;
         protected string Representation;
