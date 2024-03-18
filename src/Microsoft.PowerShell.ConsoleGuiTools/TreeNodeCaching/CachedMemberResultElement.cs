@@ -28,7 +28,7 @@ namespace OutGridView.Cmdlet.TreeNodeCaching
         }
         public override string ToString()
         {
-            return $"[{Index}]: {representation}]";
+            return $"[{Index}]: {representation}";
         }
     }
 }
