@@ -17,7 +17,7 @@ using OutGridView.Cmdlet.TreeNodeCaching;
 
 namespace OutGridView.Cmdlet
 {
-    internal sealed partial class ShowObjectView : Window, ITreeBuilder<object>
+    internal sealed class ShowObjectView : Window, ITreeBuilder<object>
     {
         private readonly TreeView<object> tree;
         private readonly RegexTreeViewTextFilter filter;
@@ -177,11 +177,6 @@ namespace OutGridView.Cmdlet
             {
                 return fsi.Name;
             }
-            if(toRender is PSObject o)
-            {
-                return o.ToString();
-            }
-            
 
             return toRender.ToString();
         }
