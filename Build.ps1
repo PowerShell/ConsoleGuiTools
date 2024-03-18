@@ -26,6 +26,7 @@ if ($psd1Content) {
     }
     "Rewriting $PsdPath with new ModuleVersion: $ModuleVersion"
     $updatedpsd1Content = $psd1Content -replace "ModuleVersion\s+=\s+'([\d\.]+)'", "ModuleVersion = '$ModuleVersion'"
+    $updatedpsd1Content = $updatedpsd1Content.TrimEnd()
     $updatedpsd1Content | Out-File -FilePath $PsdPath -Encoding ascii
 }
 else {

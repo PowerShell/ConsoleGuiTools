@@ -44,7 +44,7 @@ This command gets the processes running on the local computer and sends them to 
 ### Example 2: Save output to a variable, and then output a tree view
 
 ```PowerShell
-PS C:\> ($A = Get-ChildItem -Path $pshome -Recurse) | sot
+PS C:\> ($A = Get-ChildItem -Path $pshome -Recurse) | shot
 ```
 
 This command saves its output in a variable and sends it to **Show-ObjectTree**.

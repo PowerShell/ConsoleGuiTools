@@ -10,7 +10,7 @@ RootModule = 'Microsoft.PowerShell.ConsoleGuiTools.dll'
 
 # Version number of this module.
 # NOTE: This will get updated by build.ps1; the build number will be incremented for each build.
-ModuleVersion = '0.7.5.35'
+ModuleVersion = '0.7.6.1'
 
 # Supported PSEditions
 CompatiblePSEditions = @( 'Core' )
@@ -76,7 +76,7 @@ CmdletsToExport = @( 'Out-ConsoleGridView', 'Show-ObjectTree' )
 VariablesToExport = '*'
 
 # Aliases to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no aliases to export.
-AliasesToExport = @( 'ocgv', 'sot' )
+AliasesToExport = @( 'ocgv', 'shot' )
 
 # DSC resources to export from this module
 # DscResourcesToExport = @()
@@ -106,6 +106,10 @@ PrivateData = @{
 
         # ReleaseNotes of this module
         ReleaseNotes = '# Release Notes
+## v0.7.6
+
+* Fix child expand #223
+
 ## v0.7.5
 
 * Adds Show-ObjectTree cmdlet #179
@@ -147,7 +151,7 @@ If items are selected, then a filter is applied, items now hidden stay selected 
 * PSAnsiRenderingFileInfo causes display issues with Out-ConsoleGridView #159
 * Removes building and distribution of Out-GridView and the other Avalonia-based components
 * Remove ANSI escape sequences from property values #158
-        
+
 ## v0.7.0
 
 Upgraded to PowerShell 7.2 and .NET target framework `net60`

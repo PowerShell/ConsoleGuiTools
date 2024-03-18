@@ -209,7 +209,7 @@ namespace OutGridView.Cmdlet
 
         public IEnumerable<object> GetChildren(object forObject)
         {
-            if(forObject == null || !this.CanExpand(forObject))
+            if (forObject == null || !this.CanExpand(forObject))
             {
                 return Enumerable.Empty<object>();
             }
