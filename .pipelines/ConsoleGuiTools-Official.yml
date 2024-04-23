@@ -110,13 +110,13 @@ extends:
             rootFolderOrFile: $(drop)
             includeRootFolder: false
             archiveType: zip
-            archiveFile: out/GraphicalTools.zip
+            archiveFile: out/ConsoleGuiTools.zip
         - task: GitHubRelease@1
           displayName: Create GitHub release
           inputs:
             gitHubConnection: GitHub
-            repositoryName: PowerShell/GraphicalTools
-            assets: out/GraphicalTools.zip
+            repositoryName: PowerShell/ConsoleGuiTools
+            assets: out/ConsoleGuiTools.zip
             tagSource: userSpecifiedTag
             tag: v$(version)
             isDraft: true

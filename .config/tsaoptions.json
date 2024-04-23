@@ -3,6 +3,6 @@
   "projectName": "One",
   "areaPath": "One\\MGMT\\Compute\\Powershell\\Powershell",
   "notificationAliases": [ "andschwa@microsoft.com", "slee@microsoft.com" ],
-  "codebaseName": "PowerShell_GraphicalTools_20240404",
+  "codebaseName": "PowerShell_ConsoleGuiTools_20240404",
   "tools": [ "CredScan", "PoliCheck", "BinSkim" ]
 }

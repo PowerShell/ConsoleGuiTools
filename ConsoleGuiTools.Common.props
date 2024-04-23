@@ -1,0 +1,10 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <Company>Microsoft</Company>
+        <Copyright>© Microsoft Corporation.</Copyright>
+        <LangVersion>latest</LangVersion>
+        <PackageLicenseUrl>https://github.com/PowerShell/ConsoleGuiTools/blob/main/LICENSE.txt</PackageLicenseUrl>
+        <RepositoryType>git</RepositoryType>
+        <RepositoryUrl>https://github.com/PowerShell/ConsoleGuiTools</RepositoryUrl>
+    </PropertyGroup>
+</Project>

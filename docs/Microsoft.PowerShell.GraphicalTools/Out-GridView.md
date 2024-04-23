@@ -1,8 +1,8 @@
 ---
-external help file: GraphicalToolsModule.dll-Help.xml
+external help file: ConsoleGuiToolsModule.dll-Help.xml
 keywords: powershell,cmdlet
 locale: en-us
-Module Name: GraphicalTools
+Module Name: ConsoleGuiTools
 ms.date: 08/09/2019
 schema: 2.0.0
 title: Out-GridView
