@@ -47,7 +47,7 @@ extends:
         pool:
           type: windows
         variables:
-          ob_outputDirectory: $(Build.SourcesDirectory)/module
+          ob_outputDirectory: $(Build.SourcesDirectory)/out
         steps:
           - pwsh: |
               $data = Import-PowerShellDataFile -Path src/Microsoft.PowerShell.ConsoleGuiTools/Microsoft.PowerShell.ConsoleGuiTools.psd1
@@ -60,7 +60,7 @@ extends:
               system: Custom
               customVersion: $(package.version)
           - task: UseDotNet@2
-            displayName: Use .NET 6.x SDK
+            displayName: Use .NET SDK
             inputs:
               packageType: sdk
               useGlobalJson: true
@@ -118,7 +118,7 @@ extends:
           inputs:
             gitHubConnection: GitHub
             repositoryName: PowerShell/ConsoleGuiTools
-            assets: $(drop)/*.nupkg
+            assets: $(drop)/Microsoft.PowerShell.ConsoleGuiTools.$(version).nupkg
             tagSource: userSpecifiedTag
             tag: v$(version)
             isDraft: true
@@ -137,10 +137,19 @@ extends:
             notifyUsers: $(Build.RequestedForEmail)
             instructions: Please validate the release and then publish it!
             timeoutInMinutes: 1440
+      - job: publish
+        dependsOn: validation
+        displayName: Publish to PowerShell Gallery
+        pool:
+          type: windows
+        variables:
+          ob_outputDirectory: $(Build.SourcesDirectory)/out
+        steps:
+        - download: current
+          displayName: Download artifacts
         - task: NuGetCommand@2
-          dependsOn: validation
           displayName: Publish ConsoleGuiTools to PowerShell Gallery
           inputs:
             command: push
-            packagesToPush: $(drop)/*.nupkg
-            publishFeedCredentials: PSGet-PSGalleryPush
+            packagesToPush: $(drop)/Microsoft.PowerShell.ConsoleGuiTools.$(version).nupkg
+            publishFeedCredentials: PowerShellGallery
