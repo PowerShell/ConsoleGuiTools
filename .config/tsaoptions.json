@@ -1,0 +1,8 @@
+{
+  "instanceUrl": "https://msazure.visualstudio.com",
+  "projectName": "One",
+  "areaPath": "One\\MGMT\\Compute\\Powershell\\Powershell",
+  "notificationAliases": [ "andschwa@microsoft.com", "slee@microsoft.com" ],
+  "codebaseName": "PowerShell_ConsoleGuiTools_20240404",
+  "tools": [ "CredScan", "PoliCheck", "BinSkim" ]
+}

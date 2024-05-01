@@ -4,7 +4,7 @@ This repo contains the `Out-ConsoleGridView`
 PowerShell Cmdlet providing console-based GUI experiences based on
 [Terminal.Gui (gui.cs)](https://github.com/gui-cs/Terminal.Gui).
 
-_Note:_ A module named `Microsoft.PowerShell.GraphicalTools` used to be built and published out of this repo, but per [#101](https://github.com/PowerShell/GraphicalTools/issues/101) it is deprecated and unmaintained until such time that it can be rewritten on top of [.NET MAUI](https://devblogs.microsoft.com/dotnet/introducing-net-multi-platform-app-ui/).
+_Note:_ A module named `Microsoft.PowerShell.GraphicalTools` used to be built and published out of this repo, but per [#101](https://github.com/PowerShell/ConsoleGuiTools/issues/101) it is deprecated and unmaintained until such time that it can be rewritten on top of [.NET MAUI](https://devblogs.microsoft.com/dotnet/introducing-net-multi-platform-app-ui/).
 
 ## Installation
 
@@ -149,7 +149,7 @@ Install PowerShell 7.2+ with [these instructions](https://github.com/PowerShell/
 ### 2. Clone the GitHub repository
 
 ```powershell
-git clone https://github.com/PowerShell/GraphicalTools.git
+git clone https://github.com/PowerShell/ConsoleGuiTools.git
 ```
 
 ### 3. Install [Invoke-Build](https://github.com/nightroman/Invoke-Build)
@@ -163,7 +163,7 @@ Now you're ready to build the code.  You can do so in one of two ways:
 ### 4. Building the code from PowerShell
 
 ```powershell
-pushd ./GraphicalTools
+pushd ./ConsoleGuiTools
 Invoke-Build Build -ModuleName Microsoft.PowerShell.ConsoleGuiTools
 popd
 ```
@@ -188,7 +188,7 @@ exit
 ### 5. Debugging in Visual Studio Code
 
 ```powershell
-code ./GraphicalTools
+code ./ConsoleGuiTools
 ```
 
 Build by hitting `Ctrl-Shift-B` in VS Code.
@@ -207,7 +207,7 @@ Your breakpoint should be hit.
 
 We would love to incorporate community contributions into this project.  If
 you would like to contribute code, documentation, tests, or bug reports,
-please read the [development section above](https://github.com/PowerShell/GraphicalTools#development)
+please read the [development section above](https://github.com/PowerShell/ConsoleGuiTools#development)
 to learn more.
 
 ## Microsoft.PowerShell.ConsoleGuiTools Architecture
@@ -237,4 +237,4 @@ For more information see the [Code of Conduct FAQ][conduct-FAQ] or contact [open
 [conduct-code]: https://opensource.microsoft.com/codeofconduct/
 [conduct-FAQ]: https://opensource.microsoft.com/codeofconduct/faq/
 [conduct-email]: mailto:opencode@microsoft.com
-[conduct-md]: https://github.com/PowerShell/GraphicalTools/tree/master/CODE_OF_CONDUCT.md
+[conduct-md]: https://github.com/PowerShell/ConsoleGuiTools/tree/master/CODE_OF_CONDUCT.md
