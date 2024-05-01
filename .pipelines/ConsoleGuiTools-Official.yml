@@ -161,4 +161,5 @@ extends:
           inputs:
             command: push
             packagesToPush: $(drop)/Microsoft.PowerShell.ConsoleGuiTools.$(version).nupkg
+            nuGetFeedType: external
             publishFeedCredentials: PowerShellGallery
