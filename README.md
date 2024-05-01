@@ -221,7 +221,7 @@ _Note:_ Previously, this repo included `Microsoft.PowerShell.GraphicalTools` whi
 
 ## Maintainers
 
-- [Andrew Schwartzmeyer](https://andschwa.com) - [@andschwa](https://github.com/andschwa)
+- [Andy Jordan](https://andyleejordan.com) - [@andyleejordan](https://github.com/andyleejordan)
 
 Originally authored by [Tyler Leonhardt](http://twitter.com/tylerleonhardt).
 
