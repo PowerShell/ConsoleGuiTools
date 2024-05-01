@@ -24,8 +24,6 @@ task Build {
     Push-Location src/Microsoft.PowerShell.ConsoleGuiTools
     Invoke-BuildExec { & dotnet publish --configuration $Configuration --output publish }
     $Assets = $(
-        "../../README.md",
-        "../../LICENSE.txt",
         "./publish/Microsoft.PowerShell.ConsoleGuiTools.dll",
         "./publish/Microsoft.PowerShell.ConsoleGuiTools.psd1",
         "./publish/Microsoft.PowerShell.OutGridView.Models.dll",
@@ -35,6 +33,14 @@ task Build {
         Copy-Item -Force -Path $_ -Destination ../../module
     }
     Pop-Location
+
+    $Assets = $(
+        "./README.md",
+        "./LICENSE.txt",
+        "./NOTICE.txt")
+    $Assets | ForEach-Object {
+        Copy-Item -Force -Path $_ -Destination ./module
+    }
 
     New-ExternalHelp -Path docs/Microsoft.PowerShell.ConsoleGuiTools -OutputPath module/en-US -Force
 }
