@@ -63,7 +63,7 @@ extends:
             displayName: Use .NET 6.x SDK
             inputs:
               packageType: sdk
-              version: 6.x
+              useGlobalJson: true
           - task: PowerShell@2
             displayName: Install PSResources
             inputs:
@@ -75,20 +75,29 @@ extends:
             displayName: Sign 1st-party files
             inputs:
               command: sign
-              signing_environment: external_distribution
+              signing_profile: external_distribution
               search_root: $(Build.SourcesDirectory)/module
               files_to_sign: |
-                **/*.psd1;
-                **/Microsoft.PowerShell.*.dll;
+                *.psd1;
+                Microsoft.PowerShell.*.dll;
           - task: onebranch.pipeline.signing@1
             displayName: Sign 3rd-party files
             inputs:
               command: sign
-              signing_environment: 135020002
+              signing_profile: 135020002
               search_root: $(Build.SourcesDirectory)/module
               files_to_sign: |
-                **/NStack.dll;
-                **/Terminal.Gui.dll;
+                NStack.dll;
+                Terminal.Gui.dll;
+          - pwsh: Invoke-Build -Configuration $(BuildConfiguration) Package
+            displayName: Package
+          - task: onebranch.pipeline.signing@1
+            displayName: Sign NuGet package
+            inputs:
+              command: sign
+              signing_profile: external_distribution
+              search_root: $(Build.SourcesDirectory)/out
+              files_to_sign: "*.nupkg"
     - stage: release
       dependsOn: build
       variables:
@@ -104,19 +113,12 @@ extends:
         steps:
         - download: current
           displayName: Download artifacts
-        - task: ArchiveFiles@2
-          displayName: Zip signed artifacts
-          inputs:
-            rootFolderOrFile: $(drop)
-            includeRootFolder: false
-            archiveType: zip
-            archiveFile: out/ConsoleGuiTools.zip
         - task: GitHubRelease@1
           displayName: Create GitHub release
           inputs:
             gitHubConnection: GitHub
             repositoryName: PowerShell/ConsoleGuiTools
-            assets: out/ConsoleGuiTools.zip
+            assets: $(drop)/*.nupkg
             tagSource: userSpecifiedTag
             tag: v$(version)
             isDraft: true
@@ -135,10 +137,10 @@ extends:
             notifyUsers: $(Build.RequestedForEmail)
             instructions: Please validate the release and then publish it!
             timeoutInMinutes: 1440
-        - pwsh: |
-            Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
-            Install-Module -Name Microsoft.PowerShell.PSResourceGet -AllowPrerelease -Scope CurrentUser -Force
-            Import-Module -Name Microsoft.PowerShell.PSResourceGet -MinimumVersion 1.0.0
-            Publish-PSResource -Path $(Pipeline.Workspace)/Publish/Microsoft.PowerShell.ConsoleGuiTools -Repository PSGallery -APIKey $(GalleryToken) -Verbose
+        - task: NuGetCommand@2
           dependsOn: validation
-          displayName: Publishing ConsoleGuiTools to PowerShell Gallery
+          displayName: Publish ConsoleGuiTools to PowerShell Gallery
+          inputs:
+            command: push
+            packagesToPush: $(drop)/*.nupkg
+            publishFeedCredentials: PSGet-PSGalleryPush
