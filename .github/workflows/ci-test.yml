@@ -1,0 +1,51 @@
+name: CI Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  merge_group:
+    types: [ checks_requested ]
+
+jobs:
+  ci:
+    name: dotnet
+    strategy:
+      matrix:
+        os: [ windows-latest, macos-latest, ubuntu-latest ]
+    runs-on: ${{ matrix.os }}
+    env:
+      DOTNET_NOLOGO: true
+      DOTNET_CLI_TELEMETRY_OPTOUT: true
+      DOTNET_GENERATE_ASPNET_CERTIFICATE: false
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dotnet
+        uses: actions/setup-dotnet@v4
+        with:
+          cache: true
+          cache-dependency-path: '**/*.csproj'
+
+      - name: Install PSResources
+        shell: pwsh
+        run: ./tools/installPSResources.ps1
+
+      - name: Build and test
+        shell: pwsh
+        run: Invoke-Build -Configuration Release Build, Package
+
+      - name: Upload module
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ConsoleGuiTools-module-${{ matrix.os }}
+          path: module
+
+      - name: Upload NuGet package
+        uses: actions/upload-artifact@v4
+        with:
+          name: ConsoleGuiTools-nupkg-${{ matrix.os }}
+          path: out/*.nupkg
