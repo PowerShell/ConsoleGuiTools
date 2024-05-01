@@ -89,8 +89,15 @@ extends:
               files_to_sign: |
                 NStack.dll;
                 Terminal.Gui.dll;
+          - task: ArchiveFiles@2
+            displayName: Zip module
+            inputs:
+              rootFolderOrFile: $(Build.SourcesDirectory)/module
+              includeRootFolder: false
+              archiveType: zip
+              archiveFile: out/ConsoleGuiTools-v$(package.version).zip
           - pwsh: Invoke-Build -Configuration $(BuildConfiguration) Package
-            displayName: Package
+            displayName: Package module
           - task: onebranch.pipeline.signing@1
             displayName: Sign NuGet package
             inputs:
@@ -118,7 +125,9 @@ extends:
           inputs:
             gitHubConnection: GitHub
             repositoryName: PowerShell/ConsoleGuiTools
-            assets: $(drop)/Microsoft.PowerShell.ConsoleGuiTools.$(version).nupkg
+            assets: |
+              $(drop)/Microsoft.PowerShell.ConsoleGuiTools.$(version).nupkg
+              $(drop)/ConsoleGuiTools-v$(version).zip
             tagSource: userSpecifiedTag
             tag: v$(version)
             isDraft: true
