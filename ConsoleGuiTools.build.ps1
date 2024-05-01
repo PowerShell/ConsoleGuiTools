@@ -1,111 +1,50 @@
 
 param(
     [ValidateSet("Debug", "Release")]
-    [string]$Configuration = "Debug",
-
-    [string[]]$ModuleName = @("Microsoft.PowerShell.ConsoleGuiTools" )
+    [string]$Configuration = "Debug"
 )
 
-$script:TargetFramework = "net6.0"
-
-$script:ModuleLayouts = @{}
-foreach ($mn in $ModuleName) {
-    $script:ModuleLayouts.$mn = Import-PowerShellDataFile -Path "$PSScriptRoot/src/$mn/ModuleLayout.psd1"
-}
-
 task FindDotNet -Before Clean, Build {
-    Assert (Get-Command dotnet -ErrorAction SilentlyContinue) "dotnet not found, please install it: https://aka.ms/dotnet-cli"
-
-    # Strip out semantic version metadata so it can be cast to `Version`
-    [Version]$existingVersion, $null = (dotnet --version) -split " " -split "-"
-    Assert ($existingVersion -ge [Version]("6.0")) ".NET SDK 6.0 or higher is required, please update it: https://aka.ms/dotnet-cli"
-
-    Write-Host "Using dotnet v$(dotnet --version) at path $((Get-Command dotnet).Source)" -ForegroundColor Green
-}
-
-task Build {
-    Remove-Item $PSScriptRoot/module -Recurse -Force -ErrorAction Ignore
-
-    foreach ($moduleLayout in $script:ModuleLayouts.Values) {
-        foreach ($projName in $moduleLayout.RequiredBuildAssets.Keys) {
-            exec { & dotnet publish -c $Configuration "$PSScriptRoot/src/$projName/$projName.csproj" }
-        }
-
-        foreach ($nativeProj in $moduleLayout.NativeBuildAssets.Keys) {
-            foreach ($targetPlatform in $moduleLayout.NativeBuildAssets[$nativeProj]) {
-                $buildPropertyParams = if ($targetPlatform -eq "win-x64") {
-                    "/property:IsWindows=true"
-                }
-                else {
-                    "/property:IsWindows=false"
-                }
-                exec { & dotnet publish -c $Configuration "$PSScriptRoot/src/$nativeProj/$nativeProj.csproj" -r $targetPlatform $buildPropertyParams }
-            }
-        }
-    }
+    Assert (Get-Command dotnet -ErrorAction SilentlyContinue) "The dotnet CLI was not found, please install it: https://aka.ms/dotnet-cli"
+    $DotnetVersion = dotnet --version
+    Assert ($?) "The required .NET SDK was not found, please install it: https://aka.ms/dotnet-cli"
+    Write-Host "Using dotnet $DotnetVersion at path $((Get-Command dotnet).Source)" -ForegroundColor Green
 }
 
 task Clean {
-    Remove-BuildItem $PSScriptRoot/module
-
-    foreach ($moduleLayout in $script:ModuleLayouts.Values) {
-        foreach ($projName in $moduleLayout.RequiredBuildAssets.Keys) {
-            exec { & dotnet clean -c $Configuration "$PSScriptRoot/src/$projName/$projName.csproj" }
-        }
-
-        foreach ($projName in $moduleLayout.NativeBuildAssets.Keys) {
-            exec { & dotnet clean -c $Configuration "$PSScriptRoot/src/$projName/$projName.csproj" }
-        }
-    }
+    Remove-BuildItem ./module, ./out
+    Push-Location src/Microsoft.PowerShell.ConsoleGuiTools
+    Invoke-BuildExec { & dotnet clean }
+    Pop-Location
 }
 
-task LayoutModule -After Build {
-    foreach ($mn in $ModuleName) {
-        $moduleLayout = $script:ModuleLayouts[$mn]
-        $moduleBinPath = "$PSScriptRoot/module/$mn/"
+task Build {
+    New-Item -ItemType Directory -Force ./module | Out-Null
 
-        # Create the destination dir
-        $null = New-Item -Force $moduleBinPath -Type Directory
-
-        # For each subproject
-        foreach ($projectName in $moduleLayout.RequiredBuildAssets.Keys) {
-            # Get the project build dir path
-            $basePath = [System.IO.Path]::Combine($PSScriptRoot, 'src', $projectName, 'bin', $Configuration, $script:TargetFramework)
-
-            # For each asset in the subproject
-            foreach ($bin in $moduleLayout.RequiredBuildAssets[$projectName]) {
-                # Get the asset path
-                $binPath = Join-Path $basePath $bin
-
-                # Binplace the asset
-                Copy-Item -Force -Verbose $binPath $moduleBinPath
-            }
-        }
-
-        foreach ($projectName in $moduleLayout.NativeBuildAssets.Keys) {
-            foreach ($targetPlatform in $moduleLayout.NativeBuildAssets[$projectName]) {
-                $destDir = Join-Path $moduleBinPath $projectName $targetPlatform
-
-                $null = New-Item -Force $destDir -Type Directory
-
-                # Get the project build dir path
-                $publishPath = [System.IO.Path]::Combine($PSScriptRoot, 'src', $projectName, 'bin', $Configuration, $script:TargetFramework, $targetPlatform, "publish\*" )
-
-                Write-Host $publishPath
-                # Binplace the asset
-                Copy-Item -Recurse -Force  $publishPath $destDir
-            }
-        }
-
-        Copy-Item -Force "$PSScriptRoot/README.md" $moduleBinPath
-        Copy-Item -Force "$PSScriptRoot/LICENSE.txt" $moduleBinPath
+    Push-Location src/Microsoft.PowerShell.ConsoleGuiTools
+    Invoke-BuildExec { & dotnet publish --configuration $Configuration --output publish }
+    $Assets = $(
+        "../../README.md",
+        "../../LICENSE.txt",
+        "./publish/Microsoft.PowerShell.ConsoleGuiTools.dll",
+        "./publish/Microsoft.PowerShell.ConsoleGuiTools.psd1",
+        "./publish/Microsoft.PowerShell.OutGridView.Models.dll",
+        "./publish/Terminal.Gui.dll",
+        "./publish/NStack.dll")
+    $Assets | ForEach-Object {
+        Copy-Item -Force -Path $_ -Destination ../../module
     }
+    Pop-Location
+
+    New-ExternalHelp -Path docs/Microsoft.PowerShell.ConsoleGuiTools -OutputPath module/en-US -Force
 }
 
-task BuildCmdletHelp {
-    foreach ($mn in $ModuleName) {
-        New-ExternalHelp -Path "$PSScriptRoot/docs/$mn" -OutputPath "$PSScriptRoot/module/$mn/en-US" -Force
+task Package {
+    New-Item -ItemType Directory -Force ./out | Out-Null
+    if (-Not (Get-PSResourceRepository -Name ConsoleGuiTools -ErrorAction SilentlyContinue)) {
+        Register-PSResourceRepository -Name ConsoleGuiTools -Uri ./out
     }
+    Publish-PSResource -Path ./module -Repository ConsoleGuiTools -Verbose
 }
 
-task . Clean, Build, BuildCmdletHelp
+task . Clean, Build
