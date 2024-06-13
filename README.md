@@ -1,6 +1,6 @@
 # ConsoleGuiTools - `Out-ConsoleGridView` and `Show-ObjectTree`
 
-This repo contains the `Out-ConsoleGridView` 
+This repo contains the `Out-ConsoleGridView`
 PowerShell Cmdlet providing console-based GUI experiences based on
 [Terminal.Gui (gui.cs)](https://github.com/gui-cs/Terminal.Gui).
 
@@ -94,7 +94,7 @@ Get-Process -ComputerName "Server01" | ocgv -Title "Processes - Server01"
 
 This command displays the processes that are running on the Server01 computer in a grid view window.
 
-The command uses `ocgv`, which is the built-in alias for the **Out-ConsoleGridView** cmdlet, it uses the *Title* parameter to specify the window title.
+The command uses `ocgv`, which is the built-in alias for the **Out-ConsoleGridView** cmdlet, it uses the _Title_ parameter to specify the window title.
 
 ### Example 6: Define a function to kill processes using a graphical chooser
 
@@ -102,9 +102,10 @@ The command uses `ocgv`, which is the built-in alias for the **Out-ConsoleGridVi
 function killp { Get-Process | Out-ConsoleGridView -OutputMode Single -Filter $args[0] | Stop-Process -Id {$_.Id} }
 killp note
 ```
+
 This example shows defining a function named `killp` that shows a grid view of all running processes and allows the user to select one to kill it.
 
-The example uses the `-Filter` paramter to filter for all proceses with a name that includes `note` (thus highlighting `Notepad` if it were running. Selecting an item in the grid view and pressing `ENTER` will kill that process. 
+The example uses the `-Filter` paramter to filter for all proceses with a name that includes `note` (thus highlighting `Notepad` if it were running. Selecting an item in the grid view and pressing `ENTER` will kill that process.
 
 ### Example 7: Pass multiple items through Out-ConsoleGridView
 
@@ -115,8 +116,8 @@ Get-Process | Out-ConsoleGridView -PassThru | Export-Csv -Path .\ProcessLog.csv
 This command lets you select multiple processes from the **Out-ConsoleGridView** window.
 The processes that you select are passed to the **Export-Csv** command and written to the ProcessLog.csv file.
 
-The command uses the *PassThru* parameter of **Out-ConsoleGridView**, which lets you send multiple items down the pipeline.
-The *PassThru* parameter is equivalent to using the Multiple value of the *OutputMode* parameter.
+The command uses the _PassThru_ parameter of **Out-ConsoleGridView**, which lets you send multiple items down the pipeline.
+The _PassThru_ parameter is equivalent to using the Multiple value of the _OutputMode_ parameter.
 
 ### Example 8: Use F7 as "Show Command History"
 
@@ -126,7 +127,7 @@ Press `F7` to see the history for the current PowerShell instance
 
 Press `Shift-F7` to see the history for all PowerShell instances.
 
-Whatever you select within `Out-ConsoleGridView` will be inserted on your command line. 
+Whatever you select within `Out-ConsoleGridView` will be inserted on your command line.
 
 Whatever was typed on the command line prior to hitting `F7` or `Shift-F7` will be used as a filter.
 
@@ -214,27 +215,26 @@ to learn more.
 
 `ConsoleGuiTools` consists of 2 .NET Projects:
 
-- ConsoleGuiTools - Cmdlet implementation for Out-ConsoleGridView
-- OutGridView.Models - Contains data contracts between the GUI & Cmdlet
+* ConsoleGuiTools - Cmdlet implementation for Out-ConsoleGridView
+* OutGridView.Models - Contains data contracts between the GUI & Cmdlet
 
 _Note:_ Previously, this repo included `Microsoft.PowerShell.GraphicalTools` which included the Avalonia-based `Out-GridView` (implemented in `.\Microsoft.PowerShell.GraphicalTools` and `.\OutGridView.Gui`). These components have been deprecated (see note above).
 
 ## Maintainers
 
-- [Andy Jordan](https://andyleejordan.com) - [@andyleejordan](https://github.com/andyleejordan)
+* [Andy Jordan](https://andyleejordan.com) - [@andyleejordan](https://github.com/andyleejordan)
+* [Tig Kindel](https://www.kindel.com) - [@tig](https://github.com/tig)
 
 Originally authored by [Tyler Leonhardt](http://twitter.com/tylerleonhardt).
 
 ## License
 
-This project is [licensed under the MIT License](LICENSE).
+This project is [licensed under the MIT License](LICENSE.txt).
 
-## [Code of Conduct][conduct-md]
+## Code of Conduct
 
-This project has adopted the [Microsoft Open Source Code of Conduct][conduct-code].
-For more information see the [Code of Conduct FAQ][conduct-FAQ] or contact [opencode@microsoft.com][conduct-email] with any additional questions or comments.
+Please see our [Code of Conduct](.github/CODE_OF_CONDUCT.md) before participating in this project.
 
-[conduct-code]: https://opensource.microsoft.com/codeofconduct/
-[conduct-FAQ]: https://opensource.microsoft.com/codeofconduct/faq/
-[conduct-email]: mailto:opencode@microsoft.com
-[conduct-md]: https://github.com/PowerShell/ConsoleGuiTools/tree/master/CODE_OF_CONDUCT.md
+## Security Policy
+
+For any security issues, please see our [Security Policy](.github/SECURITY.md).
