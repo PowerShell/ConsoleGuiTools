@@ -10,6 +10,14 @@
 
 trigger: none
 
+schedules:
+- cron: '50 19 * * 3'
+  displayName: Weekly CodeQL
+  branches:
+    include:
+    - main
+  always: true
+
 parameters:
 - name: debug
   displayName: Enable debug output
@@ -106,6 +114,7 @@ extends:
               files_to_sign: "*.nupkg"
     - stage: release
       dependsOn: build
+      condition: ne(variables['Build.Reason'], 'Schedule')
       variables:
         version: $[ stageDependencies.build.main.outputs['package.version'] ]
         drop: $(Pipeline.Workspace)/drop_build_main
