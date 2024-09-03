@@ -27,7 +27,7 @@ parameters:
 variables:
   system.debug: ${{ parameters.debug }}
   BuildConfiguration: Release
-  WindowsContainerImage: onebranch.azurecr.io/windows/ltsc2019/vse2022:latest
+  WindowsContainerImage: onebranch.azurecr.io/windows/ltsc2022/vse2022:latest
   DOTNET_NOLOGO: true
   DOTNET_GENERATE_ASPNET_CERTIFICATE: false
 
@@ -46,6 +46,11 @@ extends:
       asyncSdl:
         enabled: true
         forStages: [build]
+    featureFlags:
+      EnableCDPxPAT: false
+      WindowsHostVersion:
+        Version: 2022
+        Network: Netlock
     stages:
     - stage: build
       jobs:
@@ -71,11 +76,11 @@ extends:
             inputs:
               packageType: sdk
               useGlobalJson: true
-          - task: PowerShell@2
+          - pwsh: |
+              Register-PSRepository -Name CFS -SourceLocation "https://pkgs.dev.azure.com/powershell/PowerShell/_packaging/powershell/nuget/v2" -InstallationPolicy Trusted
+              Install-Module -Repository CFS -Name Microsoft.PowerShell.PSResourceGet
+              ./tools/installPSResources.ps1 -PSRepository CFS
             displayName: Install PSResources
-            inputs:
-              pwsh: true
-              filePath: tools/installPSResources.ps1
           - pwsh: Invoke-Build -Configuration $(BuildConfiguration)
             displayName: Build
           - task: onebranch.pipeline.signing@1
