@@ -17,8 +17,7 @@ Sends output to an interactive tree in the same console window.
 ## SYNTAX
 
 ```PowerShell
- Show-ObjectTree [-InputObject <psobject>] [-Title <string>] [-OutputMode {None | Single |
-    Multiple}] [-Filter <string>] [-MinUi] [<CommonParameters>]
+ Show-ObjectTree [-InputObject <psobject>] [-Title <string>] [-Filter <string>] [-MinUi] [-UseNetDriver] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
