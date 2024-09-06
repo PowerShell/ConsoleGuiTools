@@ -107,19 +107,7 @@ This example shows defining a function named `killp` that shows a grid view of a
 
 The example uses the `-Filter` paramter to filter for all proceses with a name that includes `note` (thus highlighting `Notepad` if it were running. Selecting an item in the grid view and pressing `ENTER` will kill that process.
 
-### Example 7: Pass multiple items through Out-ConsoleGridView
-
-```PowerShell
-Get-Process | Out-ConsoleGridView -PassThru | Export-Csv -Path .\ProcessLog.csv
-```
-
-This command lets you select multiple processes from the **Out-ConsoleGridView** window.
-The processes that you select are passed to the **Export-Csv** command and written to the ProcessLog.csv file.
-
-The command uses the _PassThru_ parameter of **Out-ConsoleGridView**, which lets you send multiple items down the pipeline.
-The _PassThru_ parameter is equivalent to using the Multiple value of the _OutputMode_ parameter.
-
-### Example 8: Use F7 as "Show Command History"
+### Example 7: Use F7 as "Show Command History"
 
 Add [gui-cs/F7History](https://github.com/gui-cs/F7History) to your Powershell profile.
 
@@ -131,7 +119,7 @@ Whatever you select within `Out-ConsoleGridView` will be inserted on your comman
 
 Whatever was typed on the command line prior to hitting `F7` or `Shift-F7` will be used as a filter.
 
-### Example 9: Output processes to a tree view
+### Example 8: Output processes to a tree view
 
 ```PowerShell
 PS C:\> Get-Process | Show-ObjectTree
