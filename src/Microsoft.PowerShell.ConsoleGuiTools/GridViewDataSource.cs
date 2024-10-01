@@ -14,14 +14,18 @@ using Terminal.Gui;
 
 namespace Microsoft.PowerShell.ConsoleGuiTools
 {
-
-    internal sealed class GridViewDataSource(IEnumerable<GridViewRow> gridViewRowList) : IListDataSource
+    internal sealed class GridViewDataSource : IListDataSource
     {
-        internal List<GridViewRow> GridViewRowList { get; init; } = gridViewRowList.ToList();
+        internal List<GridViewRow> GridViewRowList { get; init; }
 
         public int Count => GridViewRowList.Count;
 
         public int Length { get; }
+
+        public GridViewDataSource(IEnumerable<GridViewRow> gridViewRowList)
+        {
+            this.GridViewRowList = gridViewRowList.ToList();
+        }
 
         public void Render(ListView container, ConsoleDriver driver, bool selected, int item, int col, int line, int width, int start)
         {
