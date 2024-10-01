@@ -4,17 +4,18 @@
 using Newtonsoft.Json;
 using System;
 using System.Text;
-using System.Collections.Generic;
-//TODO: swich to JSON.NET
+//TODO: switch to JSON.NET
 
-namespace OutGridView.Models
+namespace Microsoft.PowerShell.ConsoleGuiTools.Models
 {
+
     public class Serializers
     {
         private readonly static JsonSerializerSettings jsonSerializerSettings = new JsonSerializerSettings()
         {
             TypeNameHandling = TypeNameHandling.All
         };
+
         public static string ObjectToJson<T>(T obj)
         {
             var jsonString = JsonConvert.SerializeObject(obj, jsonSerializerSettings);
@@ -28,7 +29,6 @@ namespace OutGridView.Models
 
             return JsonConvert.DeserializeObject<T>(jsonString, jsonSerializerSettings);
         }
-
 
         private static string FromBase64String(string base64string)
         {
