@@ -11,451 +11,450 @@ using System.Management.Automation;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
-using OutGridView.Models;
+using Microsoft.PowerShell.ConsoleGuiTools.Models;
 
 using Terminal.Gui;
 using Terminal.Gui.Trees;
 
-namespace OutGridView.Cmdlet
+namespace Microsoft.PowerShell.ConsoleGuiTools;
+
+internal sealed class ShowObjectView : Window, ITreeBuilder<object>
 {
-    internal sealed class ShowObjectView : Window, ITreeBuilder<object>
+    private readonly TreeView<object> tree;
+    private readonly RegexTreeViewTextFilter filter;
+    private readonly Label filterErrorLabel;
+
+    public bool SupportsCanExpand => true;
+    private StatusItem selectedStatusBarItem;
+    private StatusBar statusBar;
+
+    public ShowObjectView(List<object> rootObjects, ApplicationData applicationData)
     {
-        private readonly TreeView<object> tree;
-        private readonly RegexTreeViewTextFilter filter;
-        private readonly Label filterErrorLabel;
+        Title = applicationData.Title;
+        Width = Dim.Fill();
+        Height = Dim.Fill(1);
+        Modal = false;
 
-        public bool SupportsCanExpand => true;
-        private StatusItem selectedStatusBarItem;
-        private StatusBar statusBar;
 
-        public ShowObjectView(List<object> rootObjects, ApplicationData applicationData)
+        if (applicationData.MinUI)
         {
-            Title = applicationData.Title;
-            Width = Dim.Fill();
-            Height = Dim.Fill(1);
-            Modal = false;
-
-
-            if (applicationData.MinUI)
-            {
-                Border.BorderStyle = BorderStyle.None;
-                Title = string.Empty;
-                X = -1;
-                Height = Dim.Fill();
-            }
-
-            tree = new TreeView<object>
-            {
-                Y = applicationData.MinUI ? 0 : 2,
-                Width = Dim.Fill(),
-                Height = Dim.Fill(),
-            };
-            tree.TreeBuilder = this;
-            tree.AspectGetter = this.AspectGetter;
-            tree.SelectionChanged += this.SelectionChanged;
-
-            tree.ClearKeybinding(Command.ExpandAll);
-
-            this.filter = new RegexTreeViewTextFilter(this, tree);
-            this.filter.Text = applicationData.Filter ?? string.Empty;
-            tree.Filter = this.filter;
-
-            if (rootObjects.Count > 0)
-            {
-                tree.AddObjects(rootObjects);
-            }
-            else
-            {
-                tree.AddObject("No Objects");
-            }
-            statusBar = new StatusBar();
-
-            string elementDescription = "objects";
-
-            var types = rootObjects.Select(o => o.GetType()).Distinct().ToArray();
-            if (types.Length == 1)
-            {
-                elementDescription = types[0].Name;
-            }
-
-            var lblFilter = new Label()
-            {
-                Text = "Filter:",
-                X = 1,
-            };
-            var tbFilter = new TextField()
-            {
-                X = Pos.Right(lblFilter),
-                Width = Dim.Fill(1),
-                Text = applicationData.Filter ?? string.Empty
-            };
-            tbFilter.CursorPosition = tbFilter.Text.Length;
-
-            tbFilter.TextChanged += (_) =>
-            {
-                filter.Text = tbFilter.Text.ToString();
-            };
-
-
-            filterErrorLabel = new Label(string.Empty)
-            {
-                X = Pos.Right(lblFilter) + 1,
-                Y = Pos.Top(lblFilter) + 1,
-                ColorScheme = Colors.Base,
-                Width = Dim.Fill() - lblFilter.Text.Length
-            };
-
-            if (!applicationData.MinUI)
-            {
-                Add(lblFilter);
-                Add(tbFilter);
-                Add(filterErrorLabel);
-            }
-
-            int pos = 0;
-            statusBar.AddItemAt(pos++, new StatusItem(Key.Esc, "~ESC~ Close", () => Application.RequestStop()));
-
-            var siCount = new StatusItem(Key.Null, $"{rootObjects.Count} {elementDescription}", null);
-            selectedStatusBarItem = new StatusItem(Key.Null, string.Empty, null);
-            statusBar.AddItemAt(pos++, siCount);
-            statusBar.AddItemAt(pos++, selectedStatusBarItem);
-
-            if (applicationData.Debug)
-            {
-                statusBar.AddItemAt(pos++, new StatusItem(Key.Null, $" v{applicationData.ModuleVersion}", null));
-                statusBar.AddItemAt(pos++, new StatusItem(Key.Null,
-                $"{Application.Driver} v{FileVersionInfo.GetVersionInfo(Assembly.GetAssembly(typeof(Application)).Location).ProductVersion}", null));
-            }
-
-            statusBar.Visible = !applicationData.MinUI;
-            Application.Top.Add(statusBar);
-
-            Add(tree);
-        }
-        private void SetRegexError(string error)
-        {
-            if (string.Equals(error, filterErrorLabel.Text.ToString(), StringComparison.Ordinal))
-            {
-                return;
-            }
-            filterErrorLabel.Text = error;
-            filterErrorLabel.ColorScheme = Colors.Error;
-            filterErrorLabel.Redraw(filterErrorLabel.Bounds);
+            Border.BorderStyle = BorderStyle.None;
+            Title = string.Empty;
+            X = -1;
+            Height = Dim.Fill();
         }
 
-        private void SelectionChanged(object sender, SelectionChangedEventArgs<object> e)
+        tree = new TreeView<object>
         {
-            var selectedValue = e.NewValue;
+            Y = applicationData.MinUI ? 0 : 2,
+            Width = Dim.Fill(),
+            Height = Dim.Fill(),
+        };
+        tree.TreeBuilder = this;
+        tree.AspectGetter = this.AspectGetter;
+        tree.SelectionChanged += this.SelectionChanged;
 
-            if (selectedValue is CachedMemberResult cmr)
-            {
-                selectedValue = cmr.Value;
-            }
+        tree.ClearKeybinding(Command.ExpandAll);
 
-            if (selectedValue != null && selectedStatusBarItem != null)
-            {
-                selectedStatusBarItem.Title = selectedValue.GetType().Name;
-            }
-            else
-            {
-                selectedStatusBarItem.Title = string.Empty;
-            }
+        this.filter = new RegexTreeViewTextFilter(this, tree);
+        this.filter.Text = applicationData.Filter ?? string.Empty;
+        tree.Filter = this.filter;
 
-            statusBar.SetNeedsDisplay();
+        if (rootObjects.Count > 0)
+        {
+            tree.AddObjects(rootObjects);
+        }
+        else
+        {
+            tree.AddObject("No Objects");
+        }
+        statusBar = new StatusBar();
+
+        string elementDescription = "objects";
+
+        var types = rootObjects.Select(o => o.GetType()).Distinct().ToArray();
+        if (types.Length == 1)
+        {
+            elementDescription = types[0].Name;
         }
 
-        private string AspectGetter(object toRender)
+        var lblFilter = new Label()
         {
-            if (toRender is Process p)
-            {
-                return p.ProcessName;
-            }
-            if (toRender is null)
-            {
-                return "Null";
-            }
-            if (toRender is FileSystemInfo fsi && !IsRootObject(fsi))
-            {
-                return fsi.Name;
-            }
+            Text = "Filter:",
+            X = 1,
+        };
+        var tbFilter = new TextField()
+        {
+            X = Pos.Right(lblFilter),
+            Width = Dim.Fill(1),
+            Text = applicationData.Filter ?? string.Empty
+        };
+        tbFilter.CursorPosition = tbFilter.Text.Length;
 
-            return toRender.ToString();
+        tbFilter.TextChanged += (_) =>
+        {
+            filter.Text = tbFilter.Text.ToString();
+        };
+
+
+        filterErrorLabel = new Label(string.Empty)
+        {
+            X = Pos.Right(lblFilter) + 1,
+            Y = Pos.Top(lblFilter) + 1,
+            ColorScheme = Colors.Base,
+            Width = Dim.Fill() - lblFilter.Text.Length
+        };
+
+        if (!applicationData.MinUI)
+        {
+            Add(lblFilter);
+            Add(tbFilter);
+            Add(filterErrorLabel);
         }
 
-        private bool IsRootObject(object o)
+        int pos = 0;
+        statusBar.AddItemAt(pos++, new StatusItem(Key.Esc, "~ESC~ Close", () => Application.RequestStop()));
+
+        var siCount = new StatusItem(Key.Null, $"{rootObjects.Count} {elementDescription}", null);
+        selectedStatusBarItem = new StatusItem(Key.Null, string.Empty, null);
+        statusBar.AddItemAt(pos++, siCount);
+        statusBar.AddItemAt(pos++, selectedStatusBarItem);
+
+        if (applicationData.Debug)
         {
-            return tree.Objects.Contains(o);
+            statusBar.AddItemAt(pos++, new StatusItem(Key.Null, $" v{applicationData.ModuleVersion}", null));
+            statusBar.AddItemAt(pos++, new StatusItem(Key.Null,
+            $"{Application.Driver} v{FileVersionInfo.GetVersionInfo(Assembly.GetAssembly(typeof(Application)).Location).ProductVersion}", null));
         }
 
-        public bool CanExpand(object toExpand)
-        {
-            if (toExpand is CachedMemberResult p)
-            {
-                return IsBasicType(p?.Value);
-            }
+        statusBar.Visible = !applicationData.MinUI;
+        Application.Top.Add(statusBar);
 
-            // Any complex object type can be expanded to reveal properties
-            return IsBasicType(toExpand);
+        Add(tree);
+    }
+    private void SetRegexError(string error)
+    {
+        if (string.Equals(error, filterErrorLabel.Text.ToString(), StringComparison.Ordinal))
+        {
+            return;
+        }
+        filterErrorLabel.Text = error;
+        filterErrorLabel.ColorScheme = Colors.Error;
+        filterErrorLabel.Redraw(filterErrorLabel.Bounds);
+    }
+
+    private void SelectionChanged(object sender, SelectionChangedEventArgs<object> e)
+    {
+        var selectedValue = e.NewValue;
+
+        if (selectedValue is CachedMemberResult cmr)
+        {
+            selectedValue = cmr.Value;
         }
 
-        private static bool IsBasicType(object value)
+        if (selectedValue != null && selectedStatusBarItem != null)
         {
-            return value != null && value is not string && !value.GetType().IsValueType;
+            selectedStatusBarItem.Title = selectedValue.GetType().Name;
+        }
+        else
+        {
+            selectedStatusBarItem.Title = string.Empty;
         }
 
-        public IEnumerable<object> GetChildren(object forObject)
+        statusBar.SetNeedsDisplay();
+    }
+
+    private string AspectGetter(object toRender)
+    {
+        if (toRender is Process p)
         {
-            if (forObject == null || !this.CanExpand(forObject))
+            return p.ProcessName;
+        }
+        if (toRender is null)
+        {
+            return "Null";
+        }
+        if (toRender is FileSystemInfo fsi && !IsRootObject(fsi))
+        {
+            return fsi.Name;
+        }
+
+        return toRender.ToString();
+    }
+
+    private bool IsRootObject(object o)
+    {
+        return tree.Objects.Contains(o);
+    }
+
+    public bool CanExpand(object toExpand)
+    {
+        if (toExpand is CachedMemberResult p)
+        {
+            return IsBasicType(p?.Value);
+        }
+
+        // Any complex object type can be expanded to reveal properties
+        return IsBasicType(toExpand);
+    }
+
+    private static bool IsBasicType(object value)
+    {
+        return value != null && value is not string && !value.GetType().IsValueType;
+    }
+
+    public IEnumerable<object> GetChildren(object forObject)
+    {
+        if (forObject == null || !this.CanExpand(forObject))
+        {
+            return Enumerable.Empty<object>();
+        }
+
+        if (forObject is CachedMemberResult p)
+        {
+            if (p.IsCollection)
             {
-                return Enumerable.Empty<object>();
+                return p.Elements;
             }
 
-            if (forObject is CachedMemberResult p)
+            return GetChildren(p.Value);
+        }
+
+        if (forObject is CachedMemberResultElement e)
+        {
+            return GetChildren(e.Value);
+        }
+
+        List<object> children = new List<object>();
+
+        foreach (var member in forObject.GetType().GetMembers(BindingFlags.Instance | BindingFlags.Public).OrderBy(m => m.Name))
+        {
+            if (member is PropertyInfo prop)
             {
-                if (p.IsCollection)
-                {
-                    return p.Elements;
-                }
-
-                return GetChildren(p.Value);
+                children.Add(new CachedMemberResult(forObject, prop));
             }
-
-            if (forObject is CachedMemberResultElement e)
+            if (member is FieldInfo field)
             {
-                return GetChildren(e.Value);
+                children.Add(new CachedMemberResult(forObject, field));
             }
+        }
 
-            List<object> children = new List<object>();
+        try
+        {
+            children.AddRange(GetExtraChildren(forObject));
+        }
+        catch (Exception)
+        {
+            // Extra children unavailable, possibly security or IO exceptions enumerating children etc
+        }
 
-            foreach (var member in forObject.GetType().GetMembers(BindingFlags.Instance | BindingFlags.Public).OrderBy(m => m.Name))
+        return children;
+    }
+
+    private static IEnumerable<object> GetExtraChildren(object forObject)
+    {
+        if (forObject is DirectoryInfo dir)
+        {
+            foreach (var c in dir.EnumerateFileSystemInfos())
             {
-                if (member is PropertyInfo prop)
-                {
-                    children.Add(new CachedMemberResult(forObject, prop));
-                }
-                if (member is FieldInfo field)
-                {
-                    children.Add(new CachedMemberResult(forObject, field));
-                }
+                yield return c;
             }
+        }
+    }
+
+    internal static void Run(List<PSObject> objects, ApplicationData applicationData)
+    {
+        // Note, in Terminal.Gui v2, this property is renamed to Application.UseNetDriver, hence
+        // using that terminology here.
+        Application.UseSystemConsole = applicationData.UseNetDriver;
+        Application.Init();
+        Window window = null;
+
+        try
+        {
+            window = new ShowObjectView(objects.Select(p => p.BaseObject).ToList(), applicationData);
+            Application.Top.Add(window);
+            Application.Run();
+        }
+        finally
+        {
+            Application.Shutdown();
+            window?.Dispose();
+        }
+    }
+
+    sealed class CachedMemberResultElement
+    {
+        public int Index;
+        public object Value;
+
+        private string representation;
+
+        public CachedMemberResultElement(object value, int index)
+        {
+            Index = index;
+            Value = value;
 
             try
             {
-                children.AddRange(GetExtraChildren(forObject));
+                representation = Value?.ToString() ?? "Null";
             }
             catch (Exception)
             {
-                // Extra children unavailable, possibly security or IO exceptions enumerating children etc
-            }
-
-            return children;
-        }
-
-        private static IEnumerable<object> GetExtraChildren(object forObject)
-        {
-            if (forObject is DirectoryInfo dir)
-            {
-                foreach (var c in dir.EnumerateFileSystemInfos())
-                {
-                    yield return c;
-                }
+                Value = representation = "Unavailable";
             }
         }
-
-        internal static void Run(List<PSObject> objects, ApplicationData applicationData)
+        public override string ToString()
         {
-            // Note, in Terminal.Gui v2, this property is renamed to Application.UseNetDriver, hence
-            // using that terminology here.
-            Application.UseSystemConsole = applicationData.UseNetDriver;
-            Application.Init();
-            Window window = null;
+            return $"[{Index}]: {representation}]";
+        }
+    }
+
+    sealed class CachedMemberResult
+    {
+        public MemberInfo Member;
+        public object Value;
+        public object Parent;
+        private string representation;
+        private List<CachedMemberResultElement> valueAsList;
+
+
+        public bool IsCollection => valueAsList != null;
+        public IReadOnlyCollection<CachedMemberResultElement> Elements => valueAsList?.AsReadOnly();
+
+        public CachedMemberResult(object parent, MemberInfo mem)
+        {
+            Parent = parent;
+            Member = mem;
 
             try
             {
-                window = new ShowObjectView(objects.Select(p => p.BaseObject).ToList(), applicationData);
-                Application.Top.Add(window);
-                Application.Run();
-            }
-            finally
-            {
-                Application.Shutdown();
-                window?.Dispose();
-            }
-        }
-
-        sealed class CachedMemberResultElement
-        {
-            public int Index;
-            public object Value;
-
-            private string representation;
-
-            public CachedMemberResultElement(object value, int index)
-            {
-                Index = index;
-                Value = value;
-
-                try
+                if (mem is PropertyInfo p)
                 {
-                    representation = Value?.ToString() ?? "Null";
+                    Value = p.GetValue(parent);
                 }
-                catch (Exception)
+                else if (mem is FieldInfo f)
                 {
-                    Value = representation = "Unavailable";
+                    Value = f.GetValue(parent);
                 }
+                else
+                {
+                    throw new NotSupportedException($"Unknown {nameof(MemberInfo)} Type");
+                }
+
+                representation = ValueToString();
+
             }
-            public override string ToString()
+            catch (Exception)
             {
-                return $"[{Index}]: {representation}]";
+                Value = representation = "Unavailable";
             }
         }
 
-        sealed class CachedMemberResult
+        private string ValueToString()
         {
-            public MemberInfo Member;
-            public object Value;
-            public object Parent;
-            private string representation;
-            private List<CachedMemberResultElement> valueAsList;
-
-
-            public bool IsCollection => valueAsList != null;
-            public IReadOnlyCollection<CachedMemberResultElement> Elements => valueAsList?.AsReadOnly();
-
-            public CachedMemberResult(object parent, MemberInfo mem)
+            if (Value == null)
             {
-                Parent = parent;
-                Member = mem;
-
-                try
+                return "Null";
+            }
+            try
+            {
+                if (IsCollectionOfKnownTypeAndSize(out Type elementType, out int size))
                 {
-                    if (mem is PropertyInfo p)
-                    {
-                        Value = p.GetValue(parent);
-                    }
-                    else if (mem is FieldInfo f)
-                    {
-                        Value = f.GetValue(parent);
-                    }
-                    else
-                    {
-                        throw new NotSupportedException($"Unknown {nameof(MemberInfo)} Type");
-                    }
-
-                    representation = ValueToString();
-
-                }
-                catch (Exception)
-                {
-                    Value = representation = "Unavailable";
+                    return $"{elementType.Name}[{size}]";
                 }
             }
-
-            private string ValueToString()
+            catch (Exception)
             {
-                if (Value == null)
-                {
-                    return "Null";
-                }
-                try
-                {
-                    if (IsCollectionOfKnownTypeAndSize(out Type elementType, out int size))
-                    {
-                        return $"{elementType.Name}[{size}]";
-                    }
-                }
-                catch (Exception)
-                {
-                    return Value?.ToString();
-                }
-
-
                 return Value?.ToString();
             }
 
-            private bool IsCollectionOfKnownTypeAndSize(out Type elementType, out int size)
+
+            return Value?.ToString();
+        }
+
+        private bool IsCollectionOfKnownTypeAndSize(out Type elementType, out int size)
+        {
+            elementType = null;
+            size = 0;
+
+            if (Value == null || Value is string)
             {
-                elementType = null;
-                size = 0;
-
-                if (Value == null || Value is string)
-                {
-
-                    return false;
-                }
-
-                if (Value is IEnumerable ienumerable)
-                {
-                    var list = ienumerable.Cast<object>().ToList();
-
-                    var types = list.Where(v => v != null).Select(v => v.GetType()).Distinct().ToArray();
-
-                    if (types.Length == 1)
-                    {
-                        elementType = types[0];
-                        size = list.Count;
-
-                        valueAsList = list.Select((e, i) => new CachedMemberResultElement(e, i)).ToList();
-                        return true;
-                    }
-                }
 
                 return false;
             }
 
-            public override string ToString()
+            if (Value is IEnumerable ienumerable)
             {
-                return Member.Name + ": " + representation;
+                var list = ienumerable.Cast<object>().ToList();
+
+                var types = list.Where(v => v != null).Select(v => v.GetType()).Distinct().ToArray();
+
+                if (types.Length == 1)
+                {
+                    elementType = types[0];
+                    size = list.Count;
+
+                    valueAsList = list.Select((e, i) => new CachedMemberResultElement(e, i)).ToList();
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public override string ToString()
+        {
+            return Member.Name + ": " + representation;
+        }
+    }
+    private sealed class RegexTreeViewTextFilter : ITreeViewFilter<object>
+    {
+        private readonly ShowObjectView parent;
+        readonly TreeView<object> _forTree;
+
+        public RegexTreeViewTextFilter(ShowObjectView parent, TreeView<object> forTree)
+        {
+            this.parent = parent;
+            _forTree = forTree ?? throw new ArgumentNullException(nameof(forTree));
+        }
+
+        private string text;
+
+        public string Text
+        {
+            get { return text; }
+            set
+            {
+                text = value;
+                RefreshTreeView();
             }
         }
-        private sealed class RegexTreeViewTextFilter : ITreeViewFilter<object>
+
+        private void RefreshTreeView()
         {
-            private readonly ShowObjectView parent;
-            readonly TreeView<object> _forTree;
+            _forTree.InvalidateLineMap();
+            _forTree.SetNeedsDisplay();
+        }
 
-            public RegexTreeViewTextFilter(ShowObjectView parent, TreeView<object> forTree)
+        public bool IsMatch(object model)
+        {
+            if (string.IsNullOrWhiteSpace(Text))
             {
-                this.parent = parent;
-                _forTree = forTree ?? throw new ArgumentNullException(nameof(forTree));
+                return true;
             }
 
-            private string text;
+            parent.SetRegexError(string.Empty);
 
-            public string Text
+            var modelText = _forTree.AspectGetter(model);
+            try
             {
-                get { return text; }
-                set
-                {
-                    text = value;
-                    RefreshTreeView();
-                }
+                return Regex.IsMatch(modelText, text, RegexOptions.IgnoreCase);
             }
-
-            private void RefreshTreeView()
+            catch (RegexParseException e)
             {
-                _forTree.InvalidateLineMap();
-                _forTree.SetNeedsDisplay();
-            }
-
-            public bool IsMatch(object model)
-            {
-                if (string.IsNullOrWhiteSpace(Text))
-                {
-                    return true;
-                }
-
-                parent.SetRegexError(string.Empty);
-
-                var modelText = _forTree.AspectGetter(model);
-                try
-                {
-                    return Regex.IsMatch(modelText, text, RegexOptions.IgnoreCase);
-                }
-                catch (RegexParseException e)
-                {
-                    parent.SetRegexError(e.Message);
-                    return true;
-                }
+                parent.SetRegexError(e.Message);
+                return true;
             }
         }
     }
