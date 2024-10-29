@@ -4,30 +4,33 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+
+using Microsoft.PowerShell.ConsoleGuiTools.Models;
 
 using NStack;
 
 using Terminal.Gui;
 
-namespace OutGridView.Cmdlet
+namespace Microsoft.PowerShell.ConsoleGuiTools
 {
     internal sealed class GridViewDataSource : IListDataSource
     {
-        public List<GridViewRow> GridViewRowList { get; set; }
+        internal List<GridViewRow> GridViewRowList { get; init; }
 
         public int Count => GridViewRowList.Count;
 
-        public GridViewDataSource(List<GridViewRow> itemList)
-        {
-            GridViewRowList = itemList;
-        }
-
         public int Length { get; }
+
+        public GridViewDataSource(IEnumerable<GridViewRow> gridViewRowList)
+        {
+            this.GridViewRowList = gridViewRowList.ToList();
+        }
 
         public void Render(ListView container, ConsoleDriver driver, bool selected, int item, int col, int line, int width, int start)
         {
             container.Move(col, line);
-            RenderUstr(driver, GridViewRowList[item].DisplayString, col, line, width);
+            RenderUstr(driver, GridViewRowList[item].DisplayString, width);
         }
 
         public bool IsMarked(int item) => GridViewRowList[item].IsMarked;
@@ -59,7 +62,7 @@ namespace OutGridView.Cmdlet
         }
 
         // A slightly adapted method from gui.cs: https://github.com/migueldeicaza/gui.cs/blob/fc1faba7452ccbdf49028ac49f0c9f0f42bbae91/Terminal.Gui/Views/ListView.cs#L433-L461
-        private static void RenderUstr(ConsoleDriver driver, ustring ustr, int col, int line, int width)
+        private static void RenderUstr(ConsoleDriver driver, ustring ustr, int width)
         {
             int used = 0;
             int index = 0;

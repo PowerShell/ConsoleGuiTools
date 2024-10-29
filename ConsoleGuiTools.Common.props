@@ -1,6 +1,6 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-        <VersionPrefix>0.7.7</VersionPrefix>
+        <VersionPrefix>0.8.0</VersionPrefix>
         <VersionSuffix></VersionSuffix>
         <Company>Microsoft</Company>
         <Copyright>© Microsoft Corporation.</Copyright>
