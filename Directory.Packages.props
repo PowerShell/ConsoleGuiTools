@@ -1,7 +1,7 @@
 <Project>
   <ItemGroup>
     <PackageVersion Include="Microsoft.PowerShell.SDK" Version="7.4.7" />
-    <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageVersion Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageVersion Include="Nstack.Core" Version="1.1.1" />
     <PackageVersion Include="Terminal.Gui" Version="1.17.1" />
   </ItemGroup>
