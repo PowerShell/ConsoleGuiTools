@@ -165,7 +165,11 @@ internal sealed class OutGridViewDataSource : ITableSource
         if (!row.Values.TryGetValue(columnKey, out var value))
             return string.Empty;
 
-        // Try numeric sort first
+        // DecimalValue already carries a proper numeric SortValue via IComparable
+        if (value is DecimalValue)
+            return value;
+
+        // For StringValue, try numeric parsing as a convenience for untyped data
         if (double.TryParse(value.DisplayValue, out var numericValue))
             return numericValue;
 

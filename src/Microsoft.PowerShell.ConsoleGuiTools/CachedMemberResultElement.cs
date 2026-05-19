@@ -56,7 +56,7 @@ internal sealed class CachedMemberResultElement
     ///     Returns a string representation of this collection element in the format "[index]: value".
     /// </summary>
     /// <returns>A formatted string showing the index and value.</returns>
-    public override string ToString() => $"[{Index}]: {_representation}]";
+    public override string ToString() => $"[{Index}]: {_representation}";
 
     #endregion
 }

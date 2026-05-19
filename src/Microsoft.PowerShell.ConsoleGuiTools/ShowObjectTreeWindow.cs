@@ -166,8 +166,10 @@ internal sealed class ShowObjectTreeWindow : Window, ITreeBuilder<object>
                 var tgVersion = tgFileVersionInfo.FileVersion ?? "no version found";
                 //if (tgFileVersionInfo is { IsPreRelease: true })
                 {
-                    tgVersion = tgFileVersionInfo.ProductVersion?[..tgFileVersionInfo.ProductVersion.IndexOf('+')] ??
-                                tgVersion;
+                    var plusIdx = tgFileVersionInfo.ProductVersion?.IndexOf('+') ?? -1;
+                    tgVersion = plusIdx >= 0
+                        ? tgFileVersionInfo.ProductVersion![..plusIdx]
+                        : tgFileVersionInfo.ProductVersion ?? tgVersion;
                 }
                 shortcuts.Add(new Shortcut(Key.Empty, $"{App?.Driver?.GetName()} v{tgVersion}", null));
             }

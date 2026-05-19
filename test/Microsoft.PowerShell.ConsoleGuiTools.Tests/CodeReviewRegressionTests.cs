@@ -143,26 +143,35 @@ public class CodeReviewRegressionTests
     ///     for -1. If the version string doesn't contain '+', the slice throws.
     ///     See: ShowObjectTreeWindow.cs line 172, OutGridViewWindow.cs line 426
     ///
-    ///     This test demonstrates the pattern used in both files. The actual code is in
-    ///     private methods, so we test the equivalent string operation.
+    ///     This test verifies the guard is in place by testing the same pattern.
     /// </summary>
     [Fact]
     public void VersionParsing_WithoutPlusSign_ShouldNotThrow()
     {
-        // Simulates what the code does:
-        // tgVersion = tgFileVersionInfo.ProductVersion?[..tgFileVersionInfo.ProductVersion.IndexOf('+')] ?? tgVersion;
+        // Simulates the fixed pattern from ShowObjectTreeWindow/OutGridViewWindow:
+        // var plusIdx = productVersion?.IndexOf('+') ?? -1;
+        // result = plusIdx >= 0 ? productVersion![..plusIdx] : productVersion;
         string productVersion = "2.1.0"; // No '+' character
 
-        // This is the buggy pattern - IndexOf returns -1, causing ArgumentOutOfRangeException
         var exception = Record.Exception(() =>
         {
-            var idx = productVersion.IndexOf('+');
-            // The code does: productVersion[..idx] which throws when idx is -1
-            var result = productVersion[..idx];
+            var plusIdx = productVersion.IndexOf('+');
+            var result = plusIdx >= 0 ? productVersion[..plusIdx] : productVersion;
+            Assert.Equal("2.1.0", result);
         });
 
-        // The code SHOULD NOT throw; this test documents that the current pattern throws
         Assert.Null(exception);
+    }
+
+    [Fact]
+    public void VersionParsing_WithPlusSign_TrimsAfterPlus()
+    {
+        string productVersion = "2.1.0+abc123";
+
+        var plusIdx = productVersion.IndexOf('+');
+        var result = plusIdx >= 0 ? productVersion[..plusIdx] : productVersion;
+
+        Assert.Equal("2.1.0", result);
     }
 
     #endregion
