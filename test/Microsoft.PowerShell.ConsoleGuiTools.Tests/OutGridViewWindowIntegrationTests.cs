@@ -65,7 +65,7 @@ public class OutGridViewWindowIntegrationTests
 
         // Build data source from PSObjects in appData
         var typeGetter = new TypeGetter();
-        var psObjects = appData.PSObjects.Cast<PSObject>().ToList();
+        var psObjects = appData.PSObjects?.Cast<PSObject>().ToList() ?? [];
         var columns = typeGetter.GetDataColumnsForObject(psObjects[0]);
         var dataSource = new OutGridViewDataSource(columns);
         for (int i = 0; i < psObjects.Count; i++)

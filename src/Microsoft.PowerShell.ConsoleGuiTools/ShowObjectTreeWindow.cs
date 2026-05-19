@@ -135,7 +135,8 @@ internal sealed class ShowObjectTreeWindow : Window, ITreeBuilder<object>
             {
                 _filterErrorView?.Text = string.Empty;
                 _applicationData.Filter = filterText;
-                _filterField?.TextChanged += (sender, _) => OnFilterTextChanged(sender, ((RegexTreeViewTextFilter)_tree?.Filter));
+                if (_tree?.Filter is RegexTreeViewTextFilter regexFilter)
+                    OnFilterTextChanged(_filterField, regexFilter);
             }
             catch (Exception ex)
             {
@@ -219,7 +220,7 @@ internal sealed class ShowObjectTreeWindow : Window, ITreeBuilder<object>
         _tree?.SetFocus();
     }
 
-    private int GetEpxandedRows()
+    private static int GetExpandedRows()
     {
         int count = 0;
 

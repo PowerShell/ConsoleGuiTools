@@ -261,7 +261,7 @@ public class TypeGetter
                 var accessor = column.PropertyScriptAccessor;
 
 #pragma warning disable CA1310
-                if (accessor.StartsWith("$_.\"") && accessor.EndsWith("\""))
+                if (accessor.StartsWith("$_.\"") && accessor.EndsWith('"'))
 #pragma warning restore CA1310
                 {
                     // Extract property name from "$_."PropertyName"" format
@@ -288,7 +288,7 @@ public class TypeGetter
                     if (result is PSObject psScriptResult) result = psScriptResult.BaseObject;
                 }
             }
-            catch (Exception _)
+            catch (Exception)
             {
                 // If evaluation fails, use null
                 result = null;
