@@ -1,0 +1,40 @@
+{
+    // Single debug profile that prompts for a sample command at launch.
+    // Add new scenarios by appending an option to the "sampleCommand" input below.
+    "version": "0.2.0",
+    "inputs": [
+        {
+            "id": "sampleCommand",
+            "type": "pickString",
+            "description": "Sample command to run after importing the module",
+            "default": "Get-Process | Out-ConsoleGridView -Debug",
+            "options": [
+                "Get-Process | Out-ConsoleGridView -Debug",
+                "Get-Process | Select-Object ProcessName, Id, CPU | Out-ConsoleGridView -Debug -Filter com",
+                "Get-Process | Out-ConsoleGridView -MinUi",
+                "Get-Process | Select-Object ProcessName, Id, Handles, NPM, PM, WS, CPU | Out-ConsoleGridView",
+                "Get-ChildItem | Out-ConsoleGridView -OutputMode Single",
+                "Get-Process | Show-ObjectTree"
+            ]
+        }
+    ],
+    "configurations": [
+        {
+            "name": "ConsoleGuiTools",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-NoLogo",
+                "-NoExit",
+                "-Command",
+                "Import-Module ${workspaceFolder}/module/Microsoft.PowerShell.ConsoleGuiTools.psd1; ${input:sampleCommand}"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "stopAtEntry": false
+        }
+    ]
+}
