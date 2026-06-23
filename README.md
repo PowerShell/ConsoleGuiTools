@@ -3,7 +3,7 @@
 > [!IMPORTANT]
 > The PowerShell team has decided that `Microsoft.PowerShell.ConsoleGuiTools` is **feature complete**, so [v0.7.7](https://github.com/PowerShell/ConsoleGuiTools/releases/tag/v0.7.7) is the last feature release. This repository will be archived in the coming weeks.
 >
-> We are optimistic that our amazing community maintainer and author of Terminal.Gui, [@tig](https://github.com/tig), will release and maintain a fork. If that happens we will happily direct users to it. Thank you for all of your contributions. 🙏
+> Our amazing community maintainer and author of Terminal.Gui, [@tig](https://github.com/tig), is maintaining a community fork at [tui-cs/PSTui](https://github.com/tui-cs/PSTui). Please use it going forward. Thank you for all of your contributions. 🙏
 
 This repo contains the `Out-ConsoleGridView`
 PowerShell Cmdlet providing console-based GUI experiences based on
