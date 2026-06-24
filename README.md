@@ -1,5 +1,10 @@
 # ConsoleGuiTools - `Out-ConsoleGridView` and `Show-ObjectTree`
 
+> [!IMPORTANT]
+> The PowerShell team has decided that `Microsoft.PowerShell.ConsoleGuiTools` is feature complete, so [v0.7.7](https://github.com/PowerShell/ConsoleGuiTools/releases/tag/v0.7.7) is the last feature release.
+>
+> [@tig](https://github.com/tig), the author of Terminal.Gui, is maintaining a community fork at [tui-cs/PSTui](https://github.com/tui-cs/PSTui). Users are encouraged to migrate to it going forward. We thank everyone for their contributions.
+
 This repo contains the `Out-ConsoleGridView`
 PowerShell Cmdlet providing console-based GUI experiences based on
 [Terminal.Gui (gui.cs)](https://github.com/gui-cs/Terminal.Gui).
